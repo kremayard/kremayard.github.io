@@ -64,9 +64,6 @@ class HTTP:
                 Atom (1): Request failed.
         &#34;&#34;&#34;
 
-        if params is None:
-            params = {}
-
         result: tuple = ()
 
         async with aiohttp.ClientSession() as session:
@@ -144,9 +141,6 @@ class HTTP:
                 Atom (1): Request failed.
         &#34;&#34;&#34;
 
-        if params is None:
-            params = {}
-
         result: tuple = ()
 
         async with aiohttp.ClientSession() as session:
@@ -210,9 +204,6 @@ Atom (1): Request failed.</dd>
             Atom (0): Request successfully sent and got 2xx.
             Atom (1): Request failed.
     &#34;&#34;&#34;
-
-    if params is None:
-        params = {}
 
     result: tuple = ()
 

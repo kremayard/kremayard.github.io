@@ -66,6 +66,13 @@ class Client:
             return self.token
 
     def event(self, event_name: str = None):
+        &#34;&#34;&#34;Event decorator for handle gateway events.
+
+        Args:
+            event_name (str, optional): Event name in lowercase. Example MESSAGE_CREATE is message_create for krema. If you don&#39;t add this argument, It will get the name from function name.
+
+        &#34;&#34;&#34;
+
         def decorator(fn):
             def wrapper():
                 self.events.append(
@@ -158,6 +165,13 @@ class Client:
             return self.token
 
     def event(self, event_name: str = None):
+        &#34;&#34;&#34;Event decorator for handle gateway events.
+
+        Args:
+            event_name (str, optional): Event name in lowercase. Example MESSAGE_CREATE is message_create for krema. If you don&#39;t add this argument, It will get the name from function name.
+
+        &#34;&#34;&#34;
+
         def decorator(fn):
             def wrapper():
                 self.events.append(
@@ -224,12 +238,24 @@ def formatted_token(self) -&gt; str:
 <span>def <span class="ident">event</span></span>(<span>self, event_name: str = None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Event decorator for handle gateway events.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>event_name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Event name in lowercase. Example MESSAGE_CREATE is message_create for krema. If you don't add this argument, It will get the name from function name.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def event(self, event_name: str = None):
+    &#34;&#34;&#34;Event decorator for handle gateway events.
+
+    Args:
+        event_name (str, optional): Event name in lowercase. Example MESSAGE_CREATE is message_create for krema. If you don&#39;t add this argument, It will get the name from function name.
+
+    &#34;&#34;&#34;
+
     def decorator(fn):
         def wrapper():
             self.events.append(
