@@ -31,8 +31,6 @@
 Client model for krema.
 &#34;&#34;&#34;
 
-import asyncio
-
 
 class Client:
     &#34;&#34;&#34;Base class for client.
@@ -49,6 +47,9 @@ class Client:
         self.token: str = &#34;&#34;
         self.events: list = []
 
+        self.connection = None
+        self.http = None
+
         pass
 
     @property
@@ -64,6 +65,19 @@ class Client:
         else:
             return self.token
 
+    def event(self, event_name: str = None):
+        def decorator(fn):
+            def wrapper():
+                self.events.append(
+                    (event_name or fn.__name__, fn)
+                )
+
+                return self.events
+
+            return wrapper()
+
+        return decorator
+
     def start(self, token: str, bot: bool = True):
         &#34;&#34;&#34;Start the client.
 
@@ -73,11 +87,15 @@ class Client:
         &#34;&#34;&#34;
 
         from ..gateway import Gateway
+        from ..http import HTTP
 
         self.token = f&#34;Bot {token}&#34; if bot else token
-        connection = Gateway(self)
 
-        asyncio.run(connection.start_connection())</code></pre>
+        self.connection = Gateway(self)
+        self.http = HTTP(self)
+
+        self.connection._event_loop.run_until_complete(
+            self.connection.start_connection())</code></pre>
 </details>
 </section>
 <section>
@@ -121,6 +139,9 @@ class Client:
         self.token: str = &#34;&#34;
         self.events: list = []
 
+        self.connection = None
+        self.http = None
+
         pass
 
     @property
@@ -136,6 +157,19 @@ class Client:
         else:
             return self.token
 
+    def event(self, event_name: str = None):
+        def decorator(fn):
+            def wrapper():
+                self.events.append(
+                    (event_name or fn.__name__, fn)
+                )
+
+                return self.events
+
+            return wrapper()
+
+        return decorator
+
     def start(self, token: str, bot: bool = True):
         &#34;&#34;&#34;Start the client.
 
@@ -145,11 +179,15 @@ class Client:
         &#34;&#34;&#34;
 
         from ..gateway import Gateway
+        from ..http import HTTP
 
         self.token = f&#34;Bot {token}&#34; if bot else token
-        connection = Gateway(self)
 
-        asyncio.run(connection.start_connection())</code></pre>
+        self.connection = Gateway(self)
+        self.http = HTTP(self)
+
+        self.connection._event_loop.run_until_complete(
+            self.connection.start_connection())</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -182,6 +220,29 @@ def formatted_token(self) -&gt; str:
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="krema.models.client.Client.event"><code class="name flex">
+<span>def <span class="ident">event</span></span>(<span>self, event_name: str = None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def event(self, event_name: str = None):
+    def decorator(fn):
+        def wrapper():
+            self.events.append(
+                (event_name or fn.__name__, fn)
+            )
+
+            return self.events
+
+        return wrapper()
+
+    return decorator</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.start"><code class="name flex">
 <span>def <span class="ident">start</span></span>(<span>self, token: str, bot: bool = True)</span>
 </code></dt>
@@ -207,11 +268,15 @@ def formatted_token(self) -&gt; str:
     &#34;&#34;&#34;
 
     from ..gateway import Gateway
+    from ..http import HTTP
 
     self.token = f&#34;Bot {token}&#34; if bot else token
-    connection = Gateway(self)
 
-    asyncio.run(connection.start_connection())</code></pre>
+    self.connection = Gateway(self)
+    self.http = HTTP(self)
+
+    self.connection._event_loop.run_until_complete(
+        self.connection.start_connection())</code></pre>
 </details>
 </dd>
 </dl>
@@ -235,6 +300,7 @@ def formatted_token(self) -&gt; str:
 <li>
 <h4><code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></h4>
 <ul class="">
+<li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>
 <li><code><a title="krema.models.client.Client.start" href="#krema.models.client.Client.start">start</a></code></li>
 </ul>
