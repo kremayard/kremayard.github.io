@@ -120,13 +120,10 @@ class Gateway:
                 print(message, 1)
 
     async def __handle_event(self, event_data, event_type):
-        filters = {
-            &#34;ready&#34;: (event_data, ),
-            &#34;message_create&#34;: (event_data, )
-        }
+        from .models.message import Message
 
-        if event_type in filters.keys():
-            filtered = self.__filter_events(event_type, filters[event_type])
+        if event_type in (&#34;message_create&#34;, ):
+            filtered = self.__filter_events(event_type, (Message(self.client, event_data), ))
         else:
             filtered = self.__filter_events(event_type, (event_data, ))
 
@@ -290,13 +287,10 @@ class Gateway:
                 print(message, 1)
 
     async def __handle_event(self, event_data, event_type):
-        filters = {
-            &#34;ready&#34;: (event_data, ),
-            &#34;message_create&#34;: (event_data, )
-        }
+        from .models.message import Message
 
-        if event_type in filters.keys():
-            filtered = self.__filter_events(event_type, filters[event_type])
+        if event_type in (&#34;message_create&#34;, ):
+            filtered = self.__filter_events(event_type, (Message(self.client, event_data), ))
         else:
             filtered = self.__filter_events(event_type, (event_data, ))
 
