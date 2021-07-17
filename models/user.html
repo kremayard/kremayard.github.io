@@ -114,7 +114,33 @@ class Member:
         self.premium_since: Union[datetime, None] = convert_iso(
             data.get(&#34;premium_since&#34;)) if data.get(&#34;premium_since&#34;) else None
         self.deaf: bool = data.get(&#34;deaf&#34;)
-        self.mute: bool = data.get(&#34;mute&#34;)</code></pre>
+        self.mute: bool = data.get(&#34;mute&#34;)
+
+
+@dataclass
+class ThreadMember:
+    &#34;&#34;&#34;Thread-member class.
+
+    Args:
+        data (dict): Sent packed from websocket.
+
+    Attributes:
+        id (int, None): The ID of the thread.
+        user_id (int, None): The ID of the user.
+        join_timestamp (datetime, None): &#34;The time the current user last joined the thread&#34;.
+        flags (int): &#34;Any user-thread settings, currently only used for notifications&#34;.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: dict) -&gt; None:
+        from ..utils import convert_iso
+
+        self.id: Union[int, None] = int(
+            data.get(&#34;id&#34;)) if data.get(&#34;id&#34;) else None
+        self.user_id: Union[int, None] = int(
+            data.get(&#34;user_id&#34;)) if data.get(&#34;user_id&#34;) else None
+        self.join_timestamp: Union[int, None] = convert_iso(
+            data.get(&#34;join_timestamp&#34;)) if data.get(&#34;join_timestamp&#34;) else None
+        self.flags: int = data.get(&#34;flags&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -202,6 +228,58 @@ class Member:
             data.get(&#34;premium_since&#34;)) if data.get(&#34;premium_since&#34;) else None
         self.deaf: bool = data.get(&#34;deaf&#34;)
         self.mute: bool = data.get(&#34;mute&#34;)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.user.ThreadMember"><code class="flex name class">
+<span>class <span class="ident">ThreadMember</span></span>
+<span>(</span><span>data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Thread-member class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packed from websocket.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>The ID of the thread.</dd>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>The ID of the user.</dd>
+<dt><strong><code>join_timestamp</code></strong> :&ensp;<code>datetime, None</code></dt>
+<dd>"The time the current user last joined the thread".</dd>
+<dt><strong><code>flags</code></strong> :&ensp;<code>int</code></dt>
+<dd>"Any user-thread settings, currently only used for notifications".</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ThreadMember:
+    &#34;&#34;&#34;Thread-member class.
+
+    Args:
+        data (dict): Sent packed from websocket.
+
+    Attributes:
+        id (int, None): The ID of the thread.
+        user_id (int, None): The ID of the user.
+        join_timestamp (datetime, None): &#34;The time the current user last joined the thread&#34;.
+        flags (int): &#34;Any user-thread settings, currently only used for notifications&#34;.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: dict) -&gt; None:
+        from ..utils import convert_iso
+
+        self.id: Union[int, None] = int(
+            data.get(&#34;id&#34;)) if data.get(&#34;id&#34;) else None
+        self.user_id: Union[int, None] = int(
+            data.get(&#34;user_id&#34;)) if data.get(&#34;user_id&#34;) else None
+        self.join_timestamp: Union[int, None] = convert_iso(
+            data.get(&#34;join_timestamp&#34;)) if data.get(&#34;join_timestamp&#34;) else None
+        self.flags: int = data.get(&#34;flags&#34;)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.user.User"><code class="flex name class">
@@ -313,6 +391,9 @@ class User:
 <ul>
 <li>
 <h4><code><a title="krema.models.user.Member" href="#krema.models.user.Member">Member</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.models.user.ThreadMember" href="#krema.models.user.ThreadMember">ThreadMember</a></code></h4>
 </li>
 <li>
 <h4><code><a title="krema.models.user.User" href="#krema.models.user.User">User</a></code></h4>
