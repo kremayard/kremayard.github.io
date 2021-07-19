@@ -35,6 +35,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Union
 
+from ..errors import SendMessageFailed, FetchChannelMessagesFailed, BulkDeleteMessagesFailed, EditChannelFailed
+
 
 @dataclass
 class Channel:
@@ -115,7 +117,97 @@ class Channel:
         self.member: Union[ThreadMember, None] = ThreadMember(
             data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) else None
         self.default_auto_archive_duration: Union[int, None] = data.get(
-            &#34;default_auto_archive_duration&#34;)</code></pre>
+            &#34;default_auto_archive_duration&#34;)
+
+        pass
+
+    async def fetch_messages(self, limit: int = 10):
+        &#34;&#34;&#34;Fetch messages from channel.
+
+        Args:
+            limit (int): Maximum message limit (default is 10).
+
+        Returns:
+            list: List of message object.
+
+        Raises:
+            FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
+
+        if atom == 0:
+            return [Message(self.client, i) for i in result]
+        else:
+            raise FetchChannelMessagesFailed(result)
+
+    async def purge(self, limit: int = 2):
+        &#34;&#34;&#34;Bulk-delete messages from channel.
+
+        Args:
+            limit (int): Maximum message limit (default is 2).
+
+        Returns:
+            list: List of purged? messages.
+
+        Raises:
+            BulkDeleteMessagesFailed: Channel purge is failed.
+        &#34;&#34;&#34;
+
+        messages = await self.fetch_messages(limit)
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, {
+            &#34;messages&#34;: [i.id for i in messages]
+        })
+
+        if atom == 0:
+            return messages
+        else:
+            raise BulkDeleteMessagesFailed(result)
+
+    async def send(self, **kwargs):
+        &#34;&#34;&#34;Send message to the text-channel.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+        Returns:
+            Message: Sent message object.
+
+        Raises:
+            SendMessageFailed: Sending the message is failed.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise SendMessageFailed(result)
+
+    async def edit(self, **kwargs):
+        &#34;&#34;&#34;Edit channel with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
+
+        Returns:
+            Channel: New channel.
+
+        Raises:
+            EditChannelFailed: Editing the channel is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, kwargs)
+
+        if atom == 0:
+            return Channel(self.client, result)
+        else:
+            raise EditChannelFailed(result)</code></pre>
 </details>
 </section>
 <section>
@@ -278,8 +370,289 @@ class Channel:
         self.member: Union[ThreadMember, None] = ThreadMember(
             data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) else None
         self.default_auto_archive_duration: Union[int, None] = data.get(
-            &#34;default_auto_archive_duration&#34;)</code></pre>
+            &#34;default_auto_archive_duration&#34;)
+
+        pass
+
+    async def fetch_messages(self, limit: int = 10):
+        &#34;&#34;&#34;Fetch messages from channel.
+
+        Args:
+            limit (int): Maximum message limit (default is 10).
+
+        Returns:
+            list: List of message object.
+
+        Raises:
+            FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
+
+        if atom == 0:
+            return [Message(self.client, i) for i in result]
+        else:
+            raise FetchChannelMessagesFailed(result)
+
+    async def purge(self, limit: int = 2):
+        &#34;&#34;&#34;Bulk-delete messages from channel.
+
+        Args:
+            limit (int): Maximum message limit (default is 2).
+
+        Returns:
+            list: List of purged? messages.
+
+        Raises:
+            BulkDeleteMessagesFailed: Channel purge is failed.
+        &#34;&#34;&#34;
+
+        messages = await self.fetch_messages(limit)
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, {
+            &#34;messages&#34;: [i.id for i in messages]
+        })
+
+        if atom == 0:
+            return messages
+        else:
+            raise BulkDeleteMessagesFailed(result)
+
+    async def send(self, **kwargs):
+        &#34;&#34;&#34;Send message to the text-channel.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+        Returns:
+            Message: Sent message object.
+
+        Raises:
+            SendMessageFailed: Sending the message is failed.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise SendMessageFailed(result)
+
+    async def edit(self, **kwargs):
+        &#34;&#34;&#34;Edit channel with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
+
+        Returns:
+            Channel: New channel.
+
+        Raises:
+            EditChannelFailed: Editing the channel is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, kwargs)
+
+        if atom == 0:
+            return Channel(self.client, result)
+        else:
+            raise EditChannelFailed(result)</code></pre>
 </details>
+<h3>Methods</h3>
+<dl>
+<dt id="krema.models.guild.Channel.edit"><code class="name flex">
+<span>async def <span class="ident">edit</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit channel with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#modify-channel">https://discord.com/developers/docs/resources/channel#modify-channel</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Channel" href="#krema.models.guild.Channel">Channel</a></code></dt>
+<dd>New channel.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>EditChannelFailed</code></dt>
+<dd>Editing the channel is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit(self, **kwargs):
+    &#34;&#34;&#34;Edit channel with API params.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
+
+    Returns:
+        Channel: New channel.
+
+    Raises:
+        EditChannelFailed: Editing the channel is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, kwargs)
+
+    if atom == 0:
+        return Channel(self.client, result)
+    else:
+        raise EditChannelFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Channel.fetch_messages"><code class="name flex">
+<span>async def <span class="ident">fetch_messages</span></span>(<span>self, limit: int = 10)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch messages from channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Maximum message limit (default is 10).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of message object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchChannelMessagesFailed</code></dt>
+<dd>Fetching the messages from channel is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_messages(self, limit: int = 10):
+    &#34;&#34;&#34;Fetch messages from channel.
+
+    Args:
+        limit (int): Maximum message limit (default is 10).
+
+    Returns:
+        list: List of message object.
+
+    Raises:
+        FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+    &#34;&#34;&#34;
+
+    from .message import Message
+
+    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
+
+    if atom == 0:
+        return [Message(self.client, i) for i in result]
+    else:
+        raise FetchChannelMessagesFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Channel.purge"><code class="name flex">
+<span>async def <span class="ident">purge</span></span>(<span>self, limit: int = 2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Bulk-delete messages from channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Maximum message limit (default is 2).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of purged? messages.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BulkDeleteMessagesFailed</code></dt>
+<dd>Channel purge is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def purge(self, limit: int = 2):
+    &#34;&#34;&#34;Bulk-delete messages from channel.
+
+    Args:
+        limit (int): Maximum message limit (default is 2).
+
+    Returns:
+        list: List of purged? messages.
+
+    Raises:
+        BulkDeleteMessagesFailed: Channel purge is failed.
+    &#34;&#34;&#34;
+
+    messages = await self.fetch_messages(limit)
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, {
+        &#34;messages&#34;: [i.id for i in messages]
+    })
+
+    if atom == 0:
+        return messages
+    else:
+        raise BulkDeleteMessagesFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Channel.send"><code class="name flex">
+<span>async def <span class="ident">send</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Send message to the text-channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params">https://discord.com/developers/docs/resources/channel#create-message-jsonform-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Message</code></dt>
+<dd>Sent message object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>SendMessageFailed</code></dt>
+<dd>Sending the message is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def send(self, **kwargs):
+    &#34;&#34;&#34;Send message to the text-channel.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+    Returns:
+        Message: Sent message object.
+
+    Raises:
+        SendMessageFailed: Sending the message is failed.
+    &#34;&#34;&#34;
+
+    from .message import Message
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
+
+    if atom == 0:
+        return Message(self.client, result)
+    else:
+        raise SendMessageFailed(result)</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -299,6 +672,12 @@ class Channel:
 <ul>
 <li>
 <h4><code><a title="krema.models.guild.Channel" href="#krema.models.guild.Channel">Channel</a></code></h4>
+<ul class="">
+<li><code><a title="krema.models.guild.Channel.edit" href="#krema.models.guild.Channel.edit">edit</a></code></li>
+<li><code><a title="krema.models.guild.Channel.fetch_messages" href="#krema.models.guild.Channel.fetch_messages">fetch_messages</a></code></li>
+<li><code><a title="krema.models.guild.Channel.purge" href="#krema.models.guild.Channel.purge">purge</a></code></li>
+<li><code><a title="krema.models.guild.Channel.send" href="#krema.models.guild.Channel.send">send</a></code></li>
+</ul>
 </li>
 </ul>
 </li>
