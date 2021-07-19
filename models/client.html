@@ -31,6 +31,9 @@
 Client model for krema.
 &#34;&#34;&#34;
 
+from unikorn import kollektor
+from ..errors import *
+
 
 class Client:
     &#34;&#34;&#34;Base class for client.
@@ -47,8 +50,12 @@ class Client:
         self.token: str = &#34;&#34;
         self.events: list = []
 
+        self.messages: kollektor.Kollektor = kollektor.Kollektor()
+
         self.connection = None
         self.http = None
+
+        self.__add_cache_events()
 
         pass
 
@@ -102,7 +109,109 @@ class Client:
         self.http = HTTP(self)
 
         self.connection._event_loop.run_until_complete(
-            self.connection.start_connection())</code></pre>
+            self.connection.start_connection())
+
+    # Handler for Cache Events.
+    def __add_cache_events(self):
+        # Message Add Handler
+        async def _message_create(message_packet):
+            self.messages.append(message_packet)
+
+        # Message Update Handler
+        async def _message_update(message_packet):
+            for index, message in enumerate(self.messages.items):
+                if message.id == message_packet.id:
+                    self.messages.update(index, message_packet)
+                    break
+
+        # Message Delete Handler
+        async def _message_delete(packet):
+            message_id = packet.get(&#34;id&#34;)
+
+            if message_id is None:
+                return
+            else:
+                message_id = int(message_id)
+
+                for message in self.messages.items:
+                    if message.id == message_id:
+                        self.messages.items = tuple(
+                            i for i in self.messages.items if i.id != message.id)
+                        break
+
+        event_list: dict = {
+            &#34;message_create&#34;: _message_create,
+            &#34;message_update&#34;: _message_update,
+            &#34;message_delete&#34;: _message_delete
+        }
+
+        # Load Events
+        self.events.extend(
+            (key, value) for key, value in event_list.items()
+        )
+
+    # Gateway Function
+    # ==================
+
+    async def update_presence(self, packet: dict):
+        &#34;&#34;&#34;Update client-user presence.
+
+        Args:
+            packet (dict): https://discord.com/developers/docs/topics/gateway#update-presence-gateway-presence-update-structure
+        &#34;&#34;&#34;
+
+        await self.connection.websocket.send_json({
+            &#34;op&#34;: 3,
+            &#34;d&#34;: packet
+        })
+
+    # Endpoint Functions
+    # ==================
+
+    async def send_message(self, id: int, **kwargs):
+        &#34;&#34;&#34;Send message to the text-channel.
+
+        Args:
+            id (int): Channel ID.
+            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+        Returns:
+            Message: Sent message object.
+
+        Raises:
+            SendMessageFailed: Sending the message is failed.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        atom, result = await self.http.request(&#34;POST&#34;, f&#34;/channels/{id}/messages&#34;, kwargs)
+
+        if atom == 0:
+            return Message(self, result)
+        else:
+            raise SendMessageFailed(result)
+
+    async def fetch_channel(self, id: int):
+        &#34;&#34;&#34;Fetch a channel by ID.
+
+        Args:
+            id (int): Channel ID.
+
+        Returns:
+            Channel: Found channel.
+
+        Raises:
+            FetchChannelFailed: Fetching the channel is failed.
+        &#34;&#34;&#34;
+
+        from .guild import Channel
+
+        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
+
+        if atom == 0:
+            return Channel(self,  result)
+        else:
+            raise FetchChannelFailed(result)</code></pre>
 </details>
 </section>
 <section>
@@ -146,8 +255,12 @@ class Client:
         self.token: str = &#34;&#34;
         self.events: list = []
 
+        self.messages: kollektor.Kollektor = kollektor.Kollektor()
+
         self.connection = None
         self.http = None
+
+        self.__add_cache_events()
 
         pass
 
@@ -201,7 +314,109 @@ class Client:
         self.http = HTTP(self)
 
         self.connection._event_loop.run_until_complete(
-            self.connection.start_connection())</code></pre>
+            self.connection.start_connection())
+
+    # Handler for Cache Events.
+    def __add_cache_events(self):
+        # Message Add Handler
+        async def _message_create(message_packet):
+            self.messages.append(message_packet)
+
+        # Message Update Handler
+        async def _message_update(message_packet):
+            for index, message in enumerate(self.messages.items):
+                if message.id == message_packet.id:
+                    self.messages.update(index, message_packet)
+                    break
+
+        # Message Delete Handler
+        async def _message_delete(packet):
+            message_id = packet.get(&#34;id&#34;)
+
+            if message_id is None:
+                return
+            else:
+                message_id = int(message_id)
+
+                for message in self.messages.items:
+                    if message.id == message_id:
+                        self.messages.items = tuple(
+                            i for i in self.messages.items if i.id != message.id)
+                        break
+
+        event_list: dict = {
+            &#34;message_create&#34;: _message_create,
+            &#34;message_update&#34;: _message_update,
+            &#34;message_delete&#34;: _message_delete
+        }
+
+        # Load Events
+        self.events.extend(
+            (key, value) for key, value in event_list.items()
+        )
+
+    # Gateway Function
+    # ==================
+
+    async def update_presence(self, packet: dict):
+        &#34;&#34;&#34;Update client-user presence.
+
+        Args:
+            packet (dict): https://discord.com/developers/docs/topics/gateway#update-presence-gateway-presence-update-structure
+        &#34;&#34;&#34;
+
+        await self.connection.websocket.send_json({
+            &#34;op&#34;: 3,
+            &#34;d&#34;: packet
+        })
+
+    # Endpoint Functions
+    # ==================
+
+    async def send_message(self, id: int, **kwargs):
+        &#34;&#34;&#34;Send message to the text-channel.
+
+        Args:
+            id (int): Channel ID.
+            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+        Returns:
+            Message: Sent message object.
+
+        Raises:
+            SendMessageFailed: Sending the message is failed.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        atom, result = await self.http.request(&#34;POST&#34;, f&#34;/channels/{id}/messages&#34;, kwargs)
+
+        if atom == 0:
+            return Message(self, result)
+        else:
+            raise SendMessageFailed(result)
+
+    async def fetch_channel(self, id: int):
+        &#34;&#34;&#34;Fetch a channel by ID.
+
+        Args:
+            id (int): Channel ID.
+
+        Returns:
+            Channel: Found channel.
+
+        Raises:
+            FetchChannelFailed: Fetching the channel is failed.
+        &#34;&#34;&#34;
+
+        from .guild import Channel
+
+        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
+
+        if atom == 0:
+            return Channel(self,  result)
+        else:
+            raise FetchChannelFailed(result)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -269,6 +484,103 @@ def formatted_token(self) -&gt; str:
     return decorator</code></pre>
 </details>
 </dd>
+<dt id="krema.models.client.Client.fetch_channel"><code class="name flex">
+<span>async def <span class="ident">fetch_channel</span></span>(<span>self, id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch a channel by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Channel ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Channel</code></dt>
+<dd>Found channel.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchChannelFailed</code></dt>
+<dd>Fetching the channel is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_channel(self, id: int):
+    &#34;&#34;&#34;Fetch a channel by ID.
+
+    Args:
+        id (int): Channel ID.
+
+    Returns:
+        Channel: Found channel.
+
+    Raises:
+        FetchChannelFailed: Fetching the channel is failed.
+    &#34;&#34;&#34;
+
+    from .guild import Channel
+
+    atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
+
+    if atom == 0:
+        return Channel(self,  result)
+    else:
+        raise FetchChannelFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.send_message"><code class="name flex">
+<span>async def <span class="ident">send_message</span></span>(<span>self, id: int, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Send message to the text-channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Channel ID.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params">https://discord.com/developers/docs/resources/channel#create-message-jsonform-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Message</code></dt>
+<dd>Sent message object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>SendMessageFailed</code></dt>
+<dd>Sending the message is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def send_message(self, id: int, **kwargs):
+    &#34;&#34;&#34;Send message to the text-channel.
+
+    Args:
+        id (int): Channel ID.
+        **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+    Returns:
+        Message: Sent message object.
+
+    Raises:
+        SendMessageFailed: Sending the message is failed.
+    &#34;&#34;&#34;
+
+    from .message import Message
+
+    atom, result = await self.http.request(&#34;POST&#34;, f&#34;/channels/{id}/messages&#34;, kwargs)
+
+    if atom == 0:
+        return Message(self, result)
+    else:
+        raise SendMessageFailed(result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.start"><code class="name flex">
 <span>def <span class="ident">start</span></span>(<span>self, token: str, bot: bool = True)</span>
 </code></dt>
@@ -305,6 +617,33 @@ def formatted_token(self) -&gt; str:
         self.connection.start_connection())</code></pre>
 </details>
 </dd>
+<dt id="krema.models.client.Client.update_presence"><code class="name flex">
+<span>async def <span class="ident">update_presence</span></span>(<span>self, packet: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Update client-user presence.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>packet</code></strong> :&ensp;<code>dict</code></dt>
+<dd><a href="https://discord.com/developers/docs/topics/gateway#update-presence-gateway-presence-update-structure">https://discord.com/developers/docs/topics/gateway#update-presence-gateway-presence-update-structure</a></dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def update_presence(self, packet: dict):
+    &#34;&#34;&#34;Update client-user presence.
+
+    Args:
+        packet (dict): https://discord.com/developers/docs/topics/gateway#update-presence-gateway-presence-update-structure
+    &#34;&#34;&#34;
+
+    await self.connection.websocket.send_json({
+        &#34;op&#34;: 3,
+        &#34;d&#34;: packet
+    })</code></pre>
+</details>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -325,10 +664,13 @@ def formatted_token(self) -&gt; str:
 <ul>
 <li>
 <h4><code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>
+<li><code><a title="krema.models.client.Client.send_message" href="#krema.models.client.Client.send_message">send_message</a></code></li>
 <li><code><a title="krema.models.client.Client.start" href="#krema.models.client.Client.start">start</a></code></li>
+<li><code><a title="krema.models.client.Client.update_presence" href="#krema.models.client.Client.update_presence">update_presence</a></code></li>
 </ul>
 </li>
 </ul>

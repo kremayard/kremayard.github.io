@@ -31,7 +31,8 @@
 Http part of the krema.
 &#34;&#34;&#34;
 
-from typing import Union
+import asyncio
+from typing import Any, Union
 import aiohttp
 
 
@@ -60,7 +61,9 @@ class HTTP:
 
         Returns:
             tuple: A tuple that contains an atom and result.
+                
                 Atom (0): Request successfully sent and got 2xx.
+                
                 Atom (1): Request failed.
         &#34;&#34;&#34;
 
@@ -73,19 +76,28 @@ class HTTP:
                 except aiohttp.client_exceptions.ContentTypeError:
                     body_text = await response.text()
 
-                    if str(response.status).startswith(&#34;2&#34;):
+                    if response.status &gt;= 200 and response.status &lt; 300:
                         result = (0, &#34;&#34;)
                     else:
                         result = (1, body_text)
 
                     return result
 
-                if str(response.status).startswith(&#34;2&#34;):
-                    result = (1, json_data)
-                else:
+                if response.status &gt;= 200 and response.status &lt; 300:
                     result = (0, json_data)
+                    return result
+                else:
+                    retry_after = json_data.get(&#34;retry_after&#34;)
 
-                return result</code></pre>
+                    if retry_after is not None:
+                        return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, params)
+                    else:
+                        result = (1, json_data.get(&#34;message&#34;) or json_data)
+                        return result
+
+    async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, params):
+        await asyncio.sleep(ratelimit + 0.1)
+        return await self.request(method, endpoint, params)</code></pre>
 </details>
 </section>
 <section>
@@ -137,7 +149,9 @@ class HTTP:
 
         Returns:
             tuple: A tuple that contains an atom and result.
+                
                 Atom (0): Request successfully sent and got 2xx.
+                
                 Atom (1): Request failed.
         &#34;&#34;&#34;
 
@@ -150,19 +164,28 @@ class HTTP:
                 except aiohttp.client_exceptions.ContentTypeError:
                     body_text = await response.text()
 
-                    if str(response.status).startswith(&#34;2&#34;):
+                    if response.status &gt;= 200 and response.status &lt; 300:
                         result = (0, &#34;&#34;)
                     else:
                         result = (1, body_text)
 
                     return result
 
-                if str(response.status).startswith(&#34;2&#34;):
-                    result = (1, json_data)
-                else:
+                if response.status &gt;= 200 and response.status &lt; 300:
                     result = (0, json_data)
+                    return result
+                else:
+                    retry_after = json_data.get(&#34;retry_after&#34;)
 
-                return result</code></pre>
+                    if retry_after is not None:
+                        return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, params)
+                    else:
+                        result = (1, json_data.get(&#34;message&#34;) or json_data)
+                        return result
+
+    async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, params):
+        await asyncio.sleep(ratelimit + 0.1)
+        return await self.request(method, endpoint, params)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -183,9 +206,11 @@ class HTTP:
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>tuple</code></dt>
-<dd>A tuple that contains an atom and result.
-Atom (0): Request successfully sent and got 2xx.
-Atom (1): Request failed.</dd>
+<dd>
+<p>A tuple that contains an atom and result.</p>
+<p>Atom (0): Request successfully sent and got 2xx.</p>
+<p>Atom (1): Request failed.</p>
+</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -201,7 +226,9 @@ Atom (1): Request failed.</dd>
 
     Returns:
         tuple: A tuple that contains an atom and result.
+            
             Atom (0): Request successfully sent and got 2xx.
+            
             Atom (1): Request failed.
     &#34;&#34;&#34;
 
@@ -214,19 +241,24 @@ Atom (1): Request failed.</dd>
             except aiohttp.client_exceptions.ContentTypeError:
                 body_text = await response.text()
 
-                if str(response.status).startswith(&#34;2&#34;):
+                if response.status &gt;= 200 and response.status &lt; 300:
                     result = (0, &#34;&#34;)
                 else:
                     result = (1, body_text)
 
                 return result
 
-            if str(response.status).startswith(&#34;2&#34;):
-                result = (1, json_data)
-            else:
+            if response.status &gt;= 200 and response.status &lt; 300:
                 result = (0, json_data)
+                return result
+            else:
+                retry_after = json_data.get(&#34;retry_after&#34;)
 
-            return result</code></pre>
+                if retry_after is not None:
+                    return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, params)
+                else:
+                    result = (1, json_data.get(&#34;message&#34;) or json_data)
+                    return result</code></pre>
 </details>
 </dd>
 </dl>
