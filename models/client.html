@@ -41,14 +41,25 @@ class Client:
     Args:
         intents (int): Intents for your bot. Do not add any intent if you are using for self-bot.
         cache_limit (int): Cache limit for krema. 
+
+    Attributes:
+        token (str): Bot token for http request.
+        events (list): List of events for client.
+        user (User): Client user.
+        messages (kollektor.Kollektor): Message cache.
+        connection (Gateway): Client gateway.
+        connection (HTTP): Client http class.
     &#34;&#34;&#34;
 
     def __init__(self, intents: int = 0, cache_limit: int = 200) -&gt; None:
+        from .user import User
+
         self.intents: int = intents
         self.cache_limit: int = cache_limit
 
         self.token: str = &#34;&#34;
         self.events: list = []
+        self.user: User = None
 
         self.messages: kollektor.Kollektor = kollektor.Kollektor()
 
@@ -56,7 +67,6 @@ class Client:
         self.http = None
 
         self.__add_cache_events()
-
         pass
 
     @property
@@ -92,6 +102,25 @@ class Client:
 
         return decorator
 
+    async def check_token(self):
+        &#34;&#34;&#34;Check token status for client.
+
+        Returns:
+            None: Client token works.
+
+        Raises:
+            InvalidTokenError: Checking the token is failed, probably your token is broken.
+        &#34;&#34;&#34;
+
+        from .user import User
+        atom, result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
+
+        if atom == 1:
+            raise InvalidTokenError(
+                &#34;Token is invalid. Please check your token!&#34;)
+        else:
+            self.user = User(self, result)
+
     def start(self, token: str, bot: bool = True):
         &#34;&#34;&#34;Start the client.
 
@@ -108,6 +137,7 @@ class Client:
         self.connection = Gateway(self)
         self.http = HTTP(self)
 
+        self.connection._event_loop.run_until_complete(self.check_token())
         self.connection._event_loop.run_until_complete(
             self.connection.start_connection())
 
@@ -139,10 +169,22 @@ class Client:
                             i for i in self.messages.items if i.id != message.id)
                         break
 
+        # Message Bulk Delete Handler
+        async def _message_bulk_delete(packet):
+            message_ids = packet.get(&#34;ids&#34;)
+
+            if message_ids is None:
+                return
+            else:
+                message_ids = tuple(int(i) for i in message_ids)
+                self.messages.items = tuple(
+                    i for i in self.messages.items if i.id not in message_ids)
+
         event_list: dict = {
             &#34;message_create&#34;: _message_create,
             &#34;message_update&#34;: _message_update,
-            &#34;message_delete&#34;: _message_delete
+            &#34;message_delete&#34;: _message_delete,
+            &#34;message_delete_bulk&#34;: _message_bulk_delete,
         }
 
         # Load Events
@@ -211,7 +253,55 @@ class Client:
         if atom == 0:
             return Channel(self,  result)
         else:
-            raise FetchChannelFailed(result)</code></pre>
+            raise FetchChannelFailed(result)
+
+    async def fetch_messages(self, id: int, limit: int = 10):
+        &#34;&#34;&#34;Fetch messages from channel.
+
+        Args:
+            id (int): Channel ID.
+            limit (int): Maximum message limit (default is 10).
+
+        Returns:
+            list: List of message object.
+
+        Raises:
+            FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}/messages?limit={limit}&#34;)
+
+        if atom == 0:
+            return [Message(self, i) for i in result]
+        else:
+            raise FetchChannelMessagesFailed(result)
+
+    async def bulk_delete(self, id: int, limit: int = 2):
+        &#34;&#34;&#34;Bulk-delete messages from channel.
+
+        Args:
+            id (int): Channel ID.
+            limit (int): Maximum message limit (default is 2).
+
+        Returns:
+            list: List of purged? messages.
+
+        Raises:
+            BulkDeleteMessagesFailed: Channel purge is failed.
+        &#34;&#34;&#34;
+
+        messages = await self.fetch_messages(id, limit)
+
+        atom, result = await self.http.request(&#34;POST&#34;, f&#34;/channels/{id}/messages/bulk-delete&#34;, {
+            &#34;messages&#34;: [i.id for i in messages]
+        })
+
+        if atom == 0:
+            return messages
+        else:
+            raise BulkDeleteMessagesFailed(result)</code></pre>
 </details>
 </section>
 <section>
@@ -234,7 +324,22 @@ class Client:
 <dt><strong><code>intents</code></strong> :&ensp;<code>int</code></dt>
 <dd>Intents for your bot. Do not add any intent if you are using for self-bot.</dd>
 <dt><strong><code>cache_limit</code></strong> :&ensp;<code>int</code></dt>
-<dd>Cache limit for krema.</dd>
+<dd>Cache limit for krema. </dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>token</code></strong> :&ensp;<code>str</code></dt>
+<dd>Bot token for http request.</dd>
+<dt><strong><code>events</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of events for client.</dd>
+<dt><strong><code>user</code></strong> :&ensp;<code>User</code></dt>
+<dd>Client user.</dd>
+<dt><strong><code>messages</code></strong> :&ensp;<code>kollektor.Kollektor</code></dt>
+<dd>Message cache.</dd>
+<dt><strong><code>connection</code></strong> :&ensp;<code>Gateway</code></dt>
+<dd>Client gateway.</dd>
+<dt><strong><code>connection</code></strong> :&ensp;<code>HTTP</code></dt>
+<dd>Client http class.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -246,14 +351,25 @@ class Client:
     Args:
         intents (int): Intents for your bot. Do not add any intent if you are using for self-bot.
         cache_limit (int): Cache limit for krema. 
+
+    Attributes:
+        token (str): Bot token for http request.
+        events (list): List of events for client.
+        user (User): Client user.
+        messages (kollektor.Kollektor): Message cache.
+        connection (Gateway): Client gateway.
+        connection (HTTP): Client http class.
     &#34;&#34;&#34;
 
     def __init__(self, intents: int = 0, cache_limit: int = 200) -&gt; None:
+        from .user import User
+
         self.intents: int = intents
         self.cache_limit: int = cache_limit
 
         self.token: str = &#34;&#34;
         self.events: list = []
+        self.user: User = None
 
         self.messages: kollektor.Kollektor = kollektor.Kollektor()
 
@@ -261,7 +377,6 @@ class Client:
         self.http = None
 
         self.__add_cache_events()
-
         pass
 
     @property
@@ -297,6 +412,25 @@ class Client:
 
         return decorator
 
+    async def check_token(self):
+        &#34;&#34;&#34;Check token status for client.
+
+        Returns:
+            None: Client token works.
+
+        Raises:
+            InvalidTokenError: Checking the token is failed, probably your token is broken.
+        &#34;&#34;&#34;
+
+        from .user import User
+        atom, result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
+
+        if atom == 1:
+            raise InvalidTokenError(
+                &#34;Token is invalid. Please check your token!&#34;)
+        else:
+            self.user = User(self, result)
+
     def start(self, token: str, bot: bool = True):
         &#34;&#34;&#34;Start the client.
 
@@ -313,6 +447,7 @@ class Client:
         self.connection = Gateway(self)
         self.http = HTTP(self)
 
+        self.connection._event_loop.run_until_complete(self.check_token())
         self.connection._event_loop.run_until_complete(
             self.connection.start_connection())
 
@@ -344,10 +479,22 @@ class Client:
                             i for i in self.messages.items if i.id != message.id)
                         break
 
+        # Message Bulk Delete Handler
+        async def _message_bulk_delete(packet):
+            message_ids = packet.get(&#34;ids&#34;)
+
+            if message_ids is None:
+                return
+            else:
+                message_ids = tuple(int(i) for i in message_ids)
+                self.messages.items = tuple(
+                    i for i in self.messages.items if i.id not in message_ids)
+
         event_list: dict = {
             &#34;message_create&#34;: _message_create,
             &#34;message_update&#34;: _message_update,
-            &#34;message_delete&#34;: _message_delete
+            &#34;message_delete&#34;: _message_delete,
+            &#34;message_delete_bulk&#34;: _message_bulk_delete,
         }
 
         # Load Events
@@ -416,7 +563,55 @@ class Client:
         if atom == 0:
             return Channel(self,  result)
         else:
-            raise FetchChannelFailed(result)</code></pre>
+            raise FetchChannelFailed(result)
+
+    async def fetch_messages(self, id: int, limit: int = 10):
+        &#34;&#34;&#34;Fetch messages from channel.
+
+        Args:
+            id (int): Channel ID.
+            limit (int): Maximum message limit (default is 10).
+
+        Returns:
+            list: List of message object.
+
+        Raises:
+            FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}/messages?limit={limit}&#34;)
+
+        if atom == 0:
+            return [Message(self, i) for i in result]
+        else:
+            raise FetchChannelMessagesFailed(result)
+
+    async def bulk_delete(self, id: int, limit: int = 2):
+        &#34;&#34;&#34;Bulk-delete messages from channel.
+
+        Args:
+            id (int): Channel ID.
+            limit (int): Maximum message limit (default is 2).
+
+        Returns:
+            list: List of purged? messages.
+
+        Raises:
+            BulkDeleteMessagesFailed: Channel purge is failed.
+        &#34;&#34;&#34;
+
+        messages = await self.fetch_messages(id, limit)
+
+        atom, result = await self.http.request(&#34;POST&#34;, f&#34;/channels/{id}/messages/bulk-delete&#34;, {
+            &#34;messages&#34;: [i.id for i in messages]
+        })
+
+        if atom == 0:
+            return messages
+        else:
+            raise BulkDeleteMessagesFailed(result)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -449,6 +644,97 @@ def formatted_token(self) -&gt; str:
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="krema.models.client.Client.bulk_delete"><code class="name flex">
+<span>async def <span class="ident">bulk_delete</span></span>(<span>self, id: int, limit: int = 2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Bulk-delete messages from channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Channel ID.</dd>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Maximum message limit (default is 2).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of purged? messages.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BulkDeleteMessagesFailed</code></dt>
+<dd>Channel purge is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def bulk_delete(self, id: int, limit: int = 2):
+    &#34;&#34;&#34;Bulk-delete messages from channel.
+
+    Args:
+        id (int): Channel ID.
+        limit (int): Maximum message limit (default is 2).
+
+    Returns:
+        list: List of purged? messages.
+
+    Raises:
+        BulkDeleteMessagesFailed: Channel purge is failed.
+    &#34;&#34;&#34;
+
+    messages = await self.fetch_messages(id, limit)
+
+    atom, result = await self.http.request(&#34;POST&#34;, f&#34;/channels/{id}/messages/bulk-delete&#34;, {
+        &#34;messages&#34;: [i.id for i in messages]
+    })
+
+    if atom == 0:
+        return messages
+    else:
+        raise BulkDeleteMessagesFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.check_token"><code class="name flex">
+<span>async def <span class="ident">check_token</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check token status for client.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>Client token works.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>InvalidTokenError</code></dt>
+<dd>Checking the token is failed, probably your token is broken.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def check_token(self):
+    &#34;&#34;&#34;Check token status for client.
+
+    Returns:
+        None: Client token works.
+
+    Raises:
+        InvalidTokenError: Checking the token is failed, probably your token is broken.
+    &#34;&#34;&#34;
+
+    from .user import User
+    atom, result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
+
+    if atom == 1:
+        raise InvalidTokenError(
+            &#34;Token is invalid. Please check your token!&#34;)
+    else:
+        self.user = User(self, result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.event"><code class="name flex">
 <span>def <span class="ident">event</span></span>(<span>self, event_name: str = None)</span>
 </code></dt>
@@ -529,6 +815,56 @@ def formatted_token(self) -&gt; str:
         return Channel(self,  result)
     else:
         raise FetchChannelFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.fetch_messages"><code class="name flex">
+<span>async def <span class="ident">fetch_messages</span></span>(<span>self, id: int, limit: int = 10)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch messages from channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Channel ID.</dd>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Maximum message limit (default is 10).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of message object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchChannelMessagesFailed</code></dt>
+<dd>Fetching the messages from channel is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_messages(self, id: int, limit: int = 10):
+    &#34;&#34;&#34;Fetch messages from channel.
+
+    Args:
+        id (int): Channel ID.
+        limit (int): Maximum message limit (default is 10).
+
+    Returns:
+        list: List of message object.
+
+    Raises:
+        FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+    &#34;&#34;&#34;
+
+    from .message import Message
+
+    atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}/messages?limit={limit}&#34;)
+
+    if atom == 0:
+        return [Message(self, i) for i in result]
+    else:
+        raise FetchChannelMessagesFailed(result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.send_message"><code class="name flex">
@@ -613,6 +949,7 @@ def formatted_token(self) -&gt; str:
     self.connection = Gateway(self)
     self.http = HTTP(self)
 
+    self.connection._event_loop.run_until_complete(self.check_token())
     self.connection._event_loop.run_until_complete(
         self.connection.start_connection())</code></pre>
 </details>
@@ -665,8 +1002,11 @@ def formatted_token(self) -&gt; str:
 <li>
 <h4><code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></h4>
 <ul class="two-column">
+<li><code><a title="krema.models.client.Client.bulk_delete" href="#krema.models.client.Client.bulk_delete">bulk_delete</a></code></li>
+<li><code><a title="krema.models.client.Client.check_token" href="#krema.models.client.Client.check_token">check_token</a></code></li>
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_messages" href="#krema.models.client.Client.fetch_messages">fetch_messages</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>
 <li><code><a title="krema.models.client.Client.send_message" href="#krema.models.client.Client.send_message">send_message</a></code></li>
 <li><code><a title="krema.models.client.Client.start" href="#krema.models.client.Client.start">start</a></code></li>

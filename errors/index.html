@@ -32,7 +32,13 @@ All errors are collected in here.
 &#34;&#34;&#34;
 
 from .message import *
-from .channel import *</code></pre>
+from .channel import *
+
+
+class InvalidTokenError(Exception):
+    &#34;&#34;&#34;Raises when checking the client token failed.&#34;&#34;&#34;
+
+    pass</code></pre>
 </details>
 </section>
 <section>
@@ -53,6 +59,30 @@ from .channel import *</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="krema.errors.InvalidTokenError"><code class="flex name class">
+<span>class <span class="ident">InvalidTokenError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when checking the client token failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class InvalidTokenError(Exception):
+    &#34;&#34;&#34;Raises when checking the client token failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -70,6 +100,13 @@ from .channel import *</code></pre>
 <ul>
 <li><code><a title="krema.errors.channel" href="channel.html">krema.errors.channel</a></code></li>
 <li><code><a title="krema.errors.message" href="message.html">krema.errors.message</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="krema.errors.InvalidTokenError" href="#krema.errors.InvalidTokenError">InvalidTokenError</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

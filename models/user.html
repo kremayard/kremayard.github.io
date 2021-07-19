@@ -68,7 +68,7 @@ class User:
         self.username: str = data.get(&#34;username&#34;)
         self.discriminator: str = data.get(&#34;discriminator&#34;)
         self.avatar: Union[str, None] = data.get(&#34;avatar&#34;)
-        self.bot: bool = data.get(&#34;bot&#34;) or False
+        self.bot: bool = data.get(&#34;bot&#34;, False)
         self.system: Union[bool, None] = data.get(&#34;system&#34;)
         self.mfa_enabled: Union[bool, None] = data.get(&#34;mfa_enabled&#34;)
         self.locale: Union[str, None] = data.get(&#34;locale&#34;)
@@ -362,7 +362,7 @@ class User:
         self.username: str = data.get(&#34;username&#34;)
         self.discriminator: str = data.get(&#34;discriminator&#34;)
         self.avatar: Union[str, None] = data.get(&#34;avatar&#34;)
-        self.bot: bool = data.get(&#34;bot&#34;) or False
+        self.bot: bool = data.get(&#34;bot&#34;, False)
         self.system: Union[bool, None] = data.get(&#34;system&#34;)
         self.mfa_enabled: Union[bool, None] = data.get(&#34;mfa_enabled&#34;)
         self.locale: Union[str, None] = data.get(&#34;locale&#34;)
