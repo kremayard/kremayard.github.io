@@ -42,7 +42,7 @@ class User:
 
     Args:
         client (Client): Krema client.
-        data (dict): Sent packed from websocket.
+        data (dict): Sent packet from websocket.
 
     Attributes:
         client (Client): Krema client.
@@ -85,7 +85,7 @@ class Member:
 
     Args:
         client (Client): Krema client.
-        data (dict): Sent packed from websocket.
+        data (dict): Sent packet from websocket.
 
     Attributes:
         client (Client): Krema client.
@@ -110,9 +110,9 @@ class Member:
         self.pending: Union[bool, None] = data.get(&#34;pending&#34;)
         self.permissions: Union[str, None] = data.get(&#34;permissions&#34;)
         self.joined_at: Union[datetime, None] = convert_iso(
-            data.get(&#34;joined_at&#34;)) if data.get(&#34;joined_at&#34;) else None
+            data.get(&#34;joined_at&#34;)) if data.get(&#34;joined_at&#34;) is not None else None
         self.premium_since: Union[datetime, None] = convert_iso(
-            data.get(&#34;premium_since&#34;)) if data.get(&#34;premium_since&#34;) else None
+            data.get(&#34;premium_since&#34;)) if data.get(&#34;premium_since&#34;) is not None else None
         self.deaf: bool = data.get(&#34;deaf&#34;)
         self.mute: bool = data.get(&#34;mute&#34;)
 
@@ -122,7 +122,7 @@ class ThreadMember:
     &#34;&#34;&#34;Thread-member class.
 
     Args:
-        data (dict): Sent packed from websocket.
+        data (dict): Sent packet from websocket.
 
     Attributes:
         id (int, None): The ID of the thread.
@@ -135,11 +135,11 @@ class ThreadMember:
         from ..utils import convert_iso
 
         self.id: Union[int, None] = int(
-            data.get(&#34;id&#34;)) if data.get(&#34;id&#34;) else None
+            data.get(&#34;id&#34;)) if data.get(&#34;id&#34;) is not None else None
         self.user_id: Union[int, None] = int(
-            data.get(&#34;user_id&#34;)) if data.get(&#34;user_id&#34;) else None
+            data.get(&#34;user_id&#34;)) if data.get(&#34;user_id&#34;) is not None else None
         self.join_timestamp: Union[int, None] = convert_iso(
-            data.get(&#34;join_timestamp&#34;)) if data.get(&#34;join_timestamp&#34;) else None
+            data.get(&#34;join_timestamp&#34;)) if data.get(&#34;join_timestamp&#34;) is not None else None
         self.flags: int = data.get(&#34;flags&#34;)</code></pre>
 </details>
 </section>
@@ -163,7 +163,7 @@ class ThreadMember:
 <dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
 <dd>Krema client.</dd>
 <dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Sent packed from websocket.</dd>
+<dd>Sent packet from websocket.</dd>
 </dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -198,7 +198,7 @@ class Member:
 
     Args:
         client (Client): Krema client.
-        data (dict): Sent packed from websocket.
+        data (dict): Sent packet from websocket.
 
     Attributes:
         client (Client): Krema client.
@@ -223,9 +223,9 @@ class Member:
         self.pending: Union[bool, None] = data.get(&#34;pending&#34;)
         self.permissions: Union[str, None] = data.get(&#34;permissions&#34;)
         self.joined_at: Union[datetime, None] = convert_iso(
-            data.get(&#34;joined_at&#34;)) if data.get(&#34;joined_at&#34;) else None
+            data.get(&#34;joined_at&#34;)) if data.get(&#34;joined_at&#34;) is not None else None
         self.premium_since: Union[datetime, None] = convert_iso(
-            data.get(&#34;premium_since&#34;)) if data.get(&#34;premium_since&#34;) else None
+            data.get(&#34;premium_since&#34;)) if data.get(&#34;premium_since&#34;) is not None else None
         self.deaf: bool = data.get(&#34;deaf&#34;)
         self.mute: bool = data.get(&#34;mute&#34;)</code></pre>
 </details>
@@ -239,7 +239,7 @@ class Member:
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Sent packed from websocket.</dd>
+<dd>Sent packet from websocket.</dd>
 </dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -261,7 +261,7 @@ class ThreadMember:
     &#34;&#34;&#34;Thread-member class.
 
     Args:
-        data (dict): Sent packed from websocket.
+        data (dict): Sent packet from websocket.
 
     Attributes:
         id (int, None): The ID of the thread.
@@ -274,11 +274,11 @@ class ThreadMember:
         from ..utils import convert_iso
 
         self.id: Union[int, None] = int(
-            data.get(&#34;id&#34;)) if data.get(&#34;id&#34;) else None
+            data.get(&#34;id&#34;)) if data.get(&#34;id&#34;) is not None else None
         self.user_id: Union[int, None] = int(
-            data.get(&#34;user_id&#34;)) if data.get(&#34;user_id&#34;) else None
+            data.get(&#34;user_id&#34;)) if data.get(&#34;user_id&#34;) is not None else None
         self.join_timestamp: Union[int, None] = convert_iso(
-            data.get(&#34;join_timestamp&#34;)) if data.get(&#34;join_timestamp&#34;) else None
+            data.get(&#34;join_timestamp&#34;)) if data.get(&#34;join_timestamp&#34;) is not None else None
         self.flags: int = data.get(&#34;flags&#34;)</code></pre>
 </details>
 </dd>
@@ -293,7 +293,7 @@ class ThreadMember:
 <dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
 <dd>Krema client.</dd>
 <dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Sent packed from websocket.</dd>
+<dd>Sent packet from websocket.</dd>
 </dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -336,7 +336,7 @@ class User:
 
     Args:
         client (Client): Krema client.
-        data (dict): Sent packed from websocket.
+        data (dict): Sent packet from websocket.
 
     Attributes:
         client (Client): Krema client.

@@ -47,6 +47,7 @@ class Client:
         events (list): List of events for client.
         user (User): Client user.
         messages (kollektor.Kollektor): Message cache.
+        guilds (kollektor.Kollektor): Guild cache.
         connection (Gateway): Client gateway.
         connection (HTTP): Client http class.
     &#34;&#34;&#34;
@@ -62,6 +63,7 @@ class Client:
         self.user: User = None
 
         self.messages: kollektor.Kollektor = kollektor.Kollektor()
+        self.guilds: kollektor.Kollektor = kollektor.Kollektor()
 
         self.connection = None
         self.http = None
@@ -87,7 +89,6 @@ class Client:
 
         Args:
             event_name (str, optional): Event name in lowercase. Example MESSAGE_CREATE is message_create for krema. If you don&#39;t add this argument, It will get the name from function name.
-
         &#34;&#34;&#34;
 
         def decorator(fn):
@@ -162,12 +163,8 @@ class Client:
                 return
             else:
                 message_id = int(message_id)
-
-                for message in self.messages.items:
-                    if message.id == message_id:
-                        self.messages.items = tuple(
-                            i for i in self.messages.items if i.id != message.id)
-                        break
+                self.messages.items = tuple(
+                    i for i in self.messages.items if i.id != message_id)
 
         # Message Bulk Delete Handler
         async def _message_bulk_delete(packet):
@@ -180,11 +177,36 @@ class Client:
                 self.messages.items = tuple(
                     i for i in self.messages.items if i.id not in message_ids)
 
+        # Guild Create Handler
+        async def _guild_create(guild):
+            self.guilds.append(guild)
+
+        # Guild Update Handler
+        async def _guild_update(guild_packet):
+            for index, guild in enumerate(self.guilds.items):
+                if guild.id == guild_packet.id:
+                    self.guilds.update(index, guild_packet)
+                    break
+
+        # Guild Delete Handler
+        async def _guild_delete(packet):
+            guild_id = packet.get(&#34;id&#34;)
+
+            if guild_id is None:
+                return
+            else:
+                guild_id = int(guild_id)
+                self.guilds.items = tuple(
+                    i for i in self.guilds.items if i.id != guild_id)
+
         event_list: dict = {
             &#34;message_create&#34;: _message_create,
             &#34;message_update&#34;: _message_update,
             &#34;message_delete&#34;: _message_delete,
             &#34;message_delete_bulk&#34;: _message_bulk_delete,
+            &#34;guild_create&#34;: _guild_create,
+            &#34;guild_update&#34;: _guild_update,
+            &#34;guild_delete&#34;: _guild_delete
         }
 
         # Load Events
@@ -265,6 +287,8 @@ class Client:
 <dd>Client user.</dd>
 <dt><strong><code>messages</code></strong> :&ensp;<code>kollektor.Kollektor</code></dt>
 <dd>Message cache.</dd>
+<dt><strong><code>guilds</code></strong> :&ensp;<code>kollektor.Kollektor</code></dt>
+<dd>Guild cache.</dd>
 <dt><strong><code>connection</code></strong> :&ensp;<code>Gateway</code></dt>
 <dd>Client gateway.</dd>
 <dt><strong><code>connection</code></strong> :&ensp;<code>HTTP</code></dt>
@@ -286,6 +310,7 @@ class Client:
         events (list): List of events for client.
         user (User): Client user.
         messages (kollektor.Kollektor): Message cache.
+        guilds (kollektor.Kollektor): Guild cache.
         connection (Gateway): Client gateway.
         connection (HTTP): Client http class.
     &#34;&#34;&#34;
@@ -301,6 +326,7 @@ class Client:
         self.user: User = None
 
         self.messages: kollektor.Kollektor = kollektor.Kollektor()
+        self.guilds: kollektor.Kollektor = kollektor.Kollektor()
 
         self.connection = None
         self.http = None
@@ -326,7 +352,6 @@ class Client:
 
         Args:
             event_name (str, optional): Event name in lowercase. Example MESSAGE_CREATE is message_create for krema. If you don&#39;t add this argument, It will get the name from function name.
-
         &#34;&#34;&#34;
 
         def decorator(fn):
@@ -401,12 +426,8 @@ class Client:
                 return
             else:
                 message_id = int(message_id)
-
-                for message in self.messages.items:
-                    if message.id == message_id:
-                        self.messages.items = tuple(
-                            i for i in self.messages.items if i.id != message.id)
-                        break
+                self.messages.items = tuple(
+                    i for i in self.messages.items if i.id != message_id)
 
         # Message Bulk Delete Handler
         async def _message_bulk_delete(packet):
@@ -419,11 +440,36 @@ class Client:
                 self.messages.items = tuple(
                     i for i in self.messages.items if i.id not in message_ids)
 
+        # Guild Create Handler
+        async def _guild_create(guild):
+            self.guilds.append(guild)
+
+        # Guild Update Handler
+        async def _guild_update(guild_packet):
+            for index, guild in enumerate(self.guilds.items):
+                if guild.id == guild_packet.id:
+                    self.guilds.update(index, guild_packet)
+                    break
+
+        # Guild Delete Handler
+        async def _guild_delete(packet):
+            guild_id = packet.get(&#34;id&#34;)
+
+            if guild_id is None:
+                return
+            else:
+                guild_id = int(guild_id)
+                self.guilds.items = tuple(
+                    i for i in self.guilds.items if i.id != guild_id)
+
         event_list: dict = {
             &#34;message_create&#34;: _message_create,
             &#34;message_update&#34;: _message_update,
             &#34;message_delete&#34;: _message_delete,
             &#34;message_delete_bulk&#34;: _message_bulk_delete,
+            &#34;guild_create&#34;: _guild_create,
+            &#34;guild_update&#34;: _guild_update,
+            &#34;guild_delete&#34;: _guild_delete
         }
 
         # Load Events
@@ -560,7 +606,6 @@ def formatted_token(self) -&gt; str:
 
     Args:
         event_name (str, optional): Event name in lowercase. Example MESSAGE_CREATE is message_create for krema. If you don&#39;t add this argument, It will get the name from function name.
-
     &#34;&#34;&#34;
 
     def decorator(fn):

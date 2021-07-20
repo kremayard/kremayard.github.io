@@ -36,8 +36,11 @@ import aiohttp
 from zlib import decompressobj
 from json import loads
 
+from .models.message import Message
+from .models.guild import Guild
 
 class Gateway:
+
     &#34;&#34;&#34;Base class for gateway.
 
     Args:
@@ -129,11 +132,12 @@ class Gateway:
             # print(message, end=&#34;\n\n&#34;)
 
     async def __handle_event(self, event_data, event_type):
-        from .models.message import Message
-
         if event_type in (&#34;message_create&#34;, &#34;message_update&#34;):
             filtered = self.__filter_events(
                 event_type, (Message(self.client, event_data), ))
+        elif event_type in (&#34;guild_create&#34;, &#34;guild_update&#34;):
+            filtered = self.__filter_events(
+                event_type, (Guild(self.client, event_data), ))
         else:
             filtered = self.__filter_events(event_type, (event_data, ))
 
@@ -218,6 +222,7 @@ class Gateway:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Gateway:
+
     &#34;&#34;&#34;Base class for gateway.
 
     Args:
@@ -309,11 +314,12 @@ class Gateway:
             # print(message, end=&#34;\n\n&#34;)
 
     async def __handle_event(self, event_data, event_type):
-        from .models.message import Message
-
         if event_type in (&#34;message_create&#34;, &#34;message_update&#34;):
             filtered = self.__filter_events(
                 event_type, (Message(self.client, event_data), ))
+        elif event_type in (&#34;guild_create&#34;, &#34;guild_update&#34;):
+            filtered = self.__filter_events(
+                event_type, (Guild(self.client, event_data), ))
         else:
             filtered = self.__filter_events(event_type, (event_data, ))
 

@@ -53,6 +53,12 @@ class BulkDeleteMessagesFailed(Exception):
 class EditChannelFailed(Exception):
     &#34;&#34;&#34;Raises when editing the channel is failed.&#34;&#34;&#34;
 
+    pass
+
+
+class DeleteChannelFailed(Exception):
+    &#34;&#34;&#34;Raises when deleting the channel is failed.&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 </section>
@@ -77,6 +83,27 @@ class EditChannelFailed(Exception):
 </summary>
 <pre><code class="python">class BulkDeleteMessagesFailed(Exception):
     &#34;&#34;&#34;Raises when purge messages from channel is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.channel.DeleteChannelFailed"><code class="flex name class">
+<span>class <span class="ident">DeleteChannelFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when deleting the channel is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeleteChannelFailed(Exception):
+    &#34;&#34;&#34;Raises when deleting the channel is failed.&#34;&#34;&#34;
 
     pass</code></pre>
 </details>
@@ -167,6 +194,9 @@ class EditChannelFailed(Exception):
 <ul>
 <li>
 <h4><code><a title="krema.errors.channel.BulkDeleteMessagesFailed" href="#krema.errors.channel.BulkDeleteMessagesFailed">BulkDeleteMessagesFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.channel.DeleteChannelFailed" href="#krema.errors.channel.DeleteChannelFailed">DeleteChannelFailed</a></code></h4>
 </li>
 <li>
 <h4><code><a title="krema.errors.channel.EditChannelFailed" href="#krema.errors.channel.EditChannelFailed">EditChannelFailed</a></code></h4>

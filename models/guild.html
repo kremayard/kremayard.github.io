@@ -35,7 +35,92 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Union
 
-from ..errors import SendMessageFailed, FetchChannelMessagesFailed, BulkDeleteMessagesFailed, EditChannelFailed
+from ..errors import SendMessageFailed, FetchChannelMessagesFailed, BulkDeleteMessagesFailed, EditChannelFailed, DeleteChannelFailed
+
+
+@dataclass
+class Guild:
+    &#34;&#34;&#34;Guild class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes are same with https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from ..utils import convert_iso
+        from .user import Member
+
+        self.client = client
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.name: str = data.get(&#34;name&#34;)
+        self.icon: Union[str, None] = data.get(&#34;icon&#34;)
+        self.icon_hash: Union[str, None] = data.get(&#34;icon_hash&#34;)
+        self.splash: Union[str, None] = data.get(&#34;splash&#34;)
+        self.discovery_splash: Union[str, None] = data.get(&#34;discovery_splash&#34;)
+        self.owner: Union[bool, None] = data.get(&#34;owner&#34;)
+        self.owner_id: Union[int, None] = int(
+            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) is not None else None
+        self.permissions: Union[str, None] = data.get(&#34;permissions&#34;)
+        self.region: Union[str, None] = data.get(&#34;region&#34;)
+        self.afk_channel_id: Union[int, None] = int(
+            data.get(&#34;afk_channel_id&#34;)) if data.get(&#34;afk_channel_id&#34;) is not None else None
+        self.afk_timeout: int = data.get(&#34;afk_timeout&#34;)
+        self.widget_enabled: Union[bool, None] = data.get(&#34;widget_enabled&#34;)
+        self.widget_channel_id: Union[int, None] = int(
+            data.get(&#34;widget_channel_id&#34;)) if data.get(&#34;widget_channel_id&#34;) is not None else None
+        self.verification_level: int = data.get(&#34;verification_level&#34;)
+        self.default_message_notifications: int = data.get(
+            &#34;default_message_notifications&#34;)
+        self.explicit_content_filter: int = data.get(&#34;explicit_content_filter&#34;)
+        self.roles: list = data.get(&#34;roles&#34;)
+        self.emojis: list = data.get(&#34;emojis&#34;)
+        self.features: list = data.get(&#34;features&#34;)
+        self.mfa_level: int = data.get(&#34;mfa_level&#34;)
+        self.application_id: Union[int, None] = int(
+            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) is not None else None
+        self.system_channel_id: Union[int, None] = int(
+            data.get(&#34;system_channel_id&#34;)) if data.get(&#34;system_channel_id&#34;) is not None else None
+        self.system_channel_flags: Union[int, None] = data.get(
+            &#34;system_channel_flags&#34;)
+        self.rules_channel_id: Union[int, None] = int(
+            data.get(&#34;rules_channel_id&#34;)) if data.get(&#34;rules_channel_id&#34;) is not None else None
+        self.joined_at: Union[datetime, None] = convert_iso(
+            data.get(&#34;joined_at&#34;)) if data.get(&#34;joined_at&#34;) is not None else None
+        self.large: Union[bool, None] = data.get(&#34;large&#34;)
+        self.unavailable: Union[bool, None] = data.get(&#34;unavailable&#34;)
+        self.member_count: Union[int, None] = data.get(&#34;member_count&#34;)
+        self.voice_states: Union[list, None] = data.get(&#34;voice_states&#34;)
+        self.members: Union[list, None] = [Member(self.client, i) for i in data.get(
+            &#34;members&#34;)] if data.get(&#34;members&#34;) is not None else None
+        self.channels: Union[list, None] = [Channel(self.client, i) for i in data.get(
+            &#34;channels&#34;)] if data.get(&#34;channels&#34;) is not None else None
+        self.threads: Union[list, None] = [Channel(self.client, i) for i in data.get(
+            &#34;threads&#34;)] if data.get(&#34;threads&#34;) is not None else None
+        self.presences: Union[list, None] = data.get(&#34;presences&#34;)
+        self.max_presences: Union[int, None] = data.get(&#34;max_presences&#34;)
+        self.max_members: Union[int, None] = data.get(&#34;max_members&#34;)
+        self.vanity_url_code: Union[str, None] = data.get(&#34;vanity_url_code&#34;)
+        self.description: Union[str, None] = data.get(&#34;description&#34;)
+        self.banner: Union[str, None] = data.get(&#34;banner&#34;)
+        self.premium_tier: int = data.get(&#34;premium_tier&#34;)
+        self.premium_subscription_count: Union[int, None] = data.get(
+            &#34;premium_subscription_count&#34;)
+        self.preferred_locale: str = data.get(&#34;preferred_locale&#34;)
+        self.public_updates_channel_id: Union[int, None] = int(data.get(
+            &#34;public_updates_channel_id&#34;)) if data.get(&#34;public_updates_channel_id&#34;) is not None else None
+        self.max_video_channel_users: Union[int, None] = data.get(
+            &#34;max_video_channel_users&#34;)
+        self.approximate_member_count: Union[int, None] = data.get(
+            &#34;approximate_member_count&#34;)
+        self.approximate_presence_count: Union[int, None] = data.get(
+            &#34;approximate_presence_count&#34;)
+        self.welcome_screen: Union[dict, None] = data.get(&#34;welcome_screen&#34;)
+        self.nsfw_level: int = data.get(&#34;nsfw_level&#34;)
+        self.stage_instances: Union[list, None] = data.get(&#34;stage_instances&#34;)
 
 
 @dataclass
@@ -44,7 +129,7 @@ class Channel:
 
     Args:
         client (Client): Krema client.
-        data (dict): Sent packed from websocket.
+        data (dict): Sent packet from websocket.
 
     Attributes:
         client (Client): Krema client.
@@ -84,7 +169,7 @@ class Channel:
         self.id: int = int(data.get(&#34;id&#34;))
         self.type: int = data.get(&#34;type&#34;)
         self.guild_id: Union[int, None] = int(
-            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) else None
+            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
         self.position: Union[int, None] = data.get(&#34;position&#34;)
         self.permission_overwrites: Union[list, None] = data.get(
             &#34;permission_overwrites&#34;)
@@ -92,22 +177,22 @@ class Channel:
         self.topic: Union[str, None] = data.get(&#34;topic&#34;)
         self.nsfw: Union[bool, None] = data.get(&#34;nsfw&#34;)
         self.last_message_id: Union[int, None] = int(
-            data.get(&#34;last_message_id&#34;)) if data.get(&#34;last_message_id&#34;) else None
+            data.get(&#34;last_message_id&#34;)) if data.get(&#34;last_message_id&#34;) is not None else None
         self.bitrate: Union[int, None] = data.get(&#34;bitrate&#34;)
         self.user_limit: Union[int, None] = data.get(&#34;user_limit&#34;)
         self.rate_limit_per_user: Union[int,
                                         None] = data.get(&#34;rate_limit_per_user&#34;)
         self.recipients: Union[list, None] = [User(self.client, i) for i in data.get(
-            &#34;recipients&#34;)] if data.get(&#34;recipients&#34;) else None
+            &#34;recipients&#34;)] if data.get(&#34;recipients&#34;) is not None else None
         self.icon: Union[str, None] = data.get(&#34;icon&#34;)
         self.owner_id: Union[int, None] = int(
-            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) else None
+            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) is not None else None
         self.application_id: Union[int, None] = int(
-            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) else None
+            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) is not None else None
         self.parent_id: Union[int, None] = int(
-            data.get(&#34;parent_id&#34;)) if data.get(&#34;parent_id&#34;) else None
+            data.get(&#34;parent_id&#34;)) if data.get(&#34;parent_id&#34;) is not None else None
         self.last_pin_timestamp: Union[datetime, None] = convert_iso(
-            data.get(&#34;last_pin_timestamp&#34;)) if data.get(&#34;last_pin_timestamp&#34;) else None
+            data.get(&#34;last_pin_timestamp&#34;)) if data.get(&#34;last_pin_timestamp&#34;) is not None else None
         self.rtc_region: Union[str, None] = data.get(&#34;rtc_region&#34;)
         self.video_quality_mode: Union[int,
                                        None] = data.get(&#34;video_quality_mode&#34;)
@@ -115,7 +200,7 @@ class Channel:
         self.member_count: Union[int, None] = data.get(&#34;member_count&#34;)
         self.thread_metadata: Union[dict, None] = data.get(&#34;thread_metadata&#34;)
         self.member: Union[ThreadMember, None] = ThreadMember(
-            data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) else None
+            data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) is not None else None
         self.default_auto_archive_duration: Union[int, None] = data.get(
             &#34;default_auto_archive_duration&#34;)
 
@@ -207,7 +292,24 @@ class Channel:
         if atom == 0:
             return Channel(self.client, result)
         else:
-            raise EditChannelFailed(result)</code></pre>
+            raise EditChannelFailed(result)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete channel.
+
+        Returns:
+            Channel: Deleted channel.
+
+        Raises:
+            DeleteChannelFailed: Editing the channel is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;, {})
+
+        if atom == 0:
+            return Channel(self.client, result)
+        else:
+            raise DeleteChannelFailed(result)</code></pre>
 </details>
 </section>
 <section>
@@ -230,7 +332,7 @@ class Channel:
 <dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
 <dd>Krema client.</dd>
 <dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Sent packed from websocket.</dd>
+<dd>Sent packet from websocket.</dd>
 </dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -297,7 +399,7 @@ class Channel:
 
     Args:
         client (Client): Krema client.
-        data (dict): Sent packed from websocket.
+        data (dict): Sent packet from websocket.
 
     Attributes:
         client (Client): Krema client.
@@ -337,7 +439,7 @@ class Channel:
         self.id: int = int(data.get(&#34;id&#34;))
         self.type: int = data.get(&#34;type&#34;)
         self.guild_id: Union[int, None] = int(
-            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) else None
+            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
         self.position: Union[int, None] = data.get(&#34;position&#34;)
         self.permission_overwrites: Union[list, None] = data.get(
             &#34;permission_overwrites&#34;)
@@ -345,22 +447,22 @@ class Channel:
         self.topic: Union[str, None] = data.get(&#34;topic&#34;)
         self.nsfw: Union[bool, None] = data.get(&#34;nsfw&#34;)
         self.last_message_id: Union[int, None] = int(
-            data.get(&#34;last_message_id&#34;)) if data.get(&#34;last_message_id&#34;) else None
+            data.get(&#34;last_message_id&#34;)) if data.get(&#34;last_message_id&#34;) is not None else None
         self.bitrate: Union[int, None] = data.get(&#34;bitrate&#34;)
         self.user_limit: Union[int, None] = data.get(&#34;user_limit&#34;)
         self.rate_limit_per_user: Union[int,
                                         None] = data.get(&#34;rate_limit_per_user&#34;)
         self.recipients: Union[list, None] = [User(self.client, i) for i in data.get(
-            &#34;recipients&#34;)] if data.get(&#34;recipients&#34;) else None
+            &#34;recipients&#34;)] if data.get(&#34;recipients&#34;) is not None else None
         self.icon: Union[str, None] = data.get(&#34;icon&#34;)
         self.owner_id: Union[int, None] = int(
-            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) else None
+            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) is not None else None
         self.application_id: Union[int, None] = int(
-            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) else None
+            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) is not None else None
         self.parent_id: Union[int, None] = int(
-            data.get(&#34;parent_id&#34;)) if data.get(&#34;parent_id&#34;) else None
+            data.get(&#34;parent_id&#34;)) if data.get(&#34;parent_id&#34;) is not None else None
         self.last_pin_timestamp: Union[datetime, None] = convert_iso(
-            data.get(&#34;last_pin_timestamp&#34;)) if data.get(&#34;last_pin_timestamp&#34;) else None
+            data.get(&#34;last_pin_timestamp&#34;)) if data.get(&#34;last_pin_timestamp&#34;) is not None else None
         self.rtc_region: Union[str, None] = data.get(&#34;rtc_region&#34;)
         self.video_quality_mode: Union[int,
                                        None] = data.get(&#34;video_quality_mode&#34;)
@@ -368,7 +470,7 @@ class Channel:
         self.member_count: Union[int, None] = data.get(&#34;member_count&#34;)
         self.thread_metadata: Union[dict, None] = data.get(&#34;thread_metadata&#34;)
         self.member: Union[ThreadMember, None] = ThreadMember(
-            data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) else None
+            data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) is not None else None
         self.default_auto_archive_duration: Union[int, None] = data.get(
             &#34;default_auto_archive_duration&#34;)
 
@@ -460,10 +562,64 @@ class Channel:
         if atom == 0:
             return Channel(self.client, result)
         else:
-            raise EditChannelFailed(result)</code></pre>
+            raise EditChannelFailed(result)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete channel.
+
+        Returns:
+            Channel: Deleted channel.
+
+        Raises:
+            DeleteChannelFailed: Editing the channel is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;, {})
+
+        if atom == 0:
+            return Channel(self.client, result)
+        else:
+            raise DeleteChannelFailed(result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="krema.models.guild.Channel.delete"><code class="name flex">
+<span>async def <span class="ident">delete</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete channel.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Channel" href="#krema.models.guild.Channel">Channel</a></code></dt>
+<dd>Deleted channel.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>DeleteChannelFailed</code></dt>
+<dd>Editing the channel is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete(self):
+    &#34;&#34;&#34;Delete channel.
+
+    Returns:
+        Channel: Deleted channel.
+
+    Raises:
+        DeleteChannelFailed: Editing the channel is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;, {})
+
+    if atom == 0:
+        return Channel(self.client, result)
+    else:
+        raise DeleteChannelFailed(result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Channel.edit"><code class="name flex">
 <span>async def <span class="ident">edit</span></span>(<span>self, **kwargs)</span>
 </code></dt>
@@ -654,6 +810,109 @@ class Channel:
 </dd>
 </dl>
 </dd>
+<dt id="krema.models.guild.Guild"><code class="flex name class">
+<span>class <span class="ident">Guild</span></span>
+<span>(</span><span>client, data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Guild class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet from websocket.</dd>
+</dl>
+<p>Attributes are same with <a href="https://discord.com/developers/docs/resources/guild#guild-object-guild-structure">https://discord.com/developers/docs/resources/guild#guild-object-guild-structure</a></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Guild:
+    &#34;&#34;&#34;Guild class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes are same with https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from ..utils import convert_iso
+        from .user import Member
+
+        self.client = client
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.name: str = data.get(&#34;name&#34;)
+        self.icon: Union[str, None] = data.get(&#34;icon&#34;)
+        self.icon_hash: Union[str, None] = data.get(&#34;icon_hash&#34;)
+        self.splash: Union[str, None] = data.get(&#34;splash&#34;)
+        self.discovery_splash: Union[str, None] = data.get(&#34;discovery_splash&#34;)
+        self.owner: Union[bool, None] = data.get(&#34;owner&#34;)
+        self.owner_id: Union[int, None] = int(
+            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) is not None else None
+        self.permissions: Union[str, None] = data.get(&#34;permissions&#34;)
+        self.region: Union[str, None] = data.get(&#34;region&#34;)
+        self.afk_channel_id: Union[int, None] = int(
+            data.get(&#34;afk_channel_id&#34;)) if data.get(&#34;afk_channel_id&#34;) is not None else None
+        self.afk_timeout: int = data.get(&#34;afk_timeout&#34;)
+        self.widget_enabled: Union[bool, None] = data.get(&#34;widget_enabled&#34;)
+        self.widget_channel_id: Union[int, None] = int(
+            data.get(&#34;widget_channel_id&#34;)) if data.get(&#34;widget_channel_id&#34;) is not None else None
+        self.verification_level: int = data.get(&#34;verification_level&#34;)
+        self.default_message_notifications: int = data.get(
+            &#34;default_message_notifications&#34;)
+        self.explicit_content_filter: int = data.get(&#34;explicit_content_filter&#34;)
+        self.roles: list = data.get(&#34;roles&#34;)
+        self.emojis: list = data.get(&#34;emojis&#34;)
+        self.features: list = data.get(&#34;features&#34;)
+        self.mfa_level: int = data.get(&#34;mfa_level&#34;)
+        self.application_id: Union[int, None] = int(
+            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) is not None else None
+        self.system_channel_id: Union[int, None] = int(
+            data.get(&#34;system_channel_id&#34;)) if data.get(&#34;system_channel_id&#34;) is not None else None
+        self.system_channel_flags: Union[int, None] = data.get(
+            &#34;system_channel_flags&#34;)
+        self.rules_channel_id: Union[int, None] = int(
+            data.get(&#34;rules_channel_id&#34;)) if data.get(&#34;rules_channel_id&#34;) is not None else None
+        self.joined_at: Union[datetime, None] = convert_iso(
+            data.get(&#34;joined_at&#34;)) if data.get(&#34;joined_at&#34;) is not None else None
+        self.large: Union[bool, None] = data.get(&#34;large&#34;)
+        self.unavailable: Union[bool, None] = data.get(&#34;unavailable&#34;)
+        self.member_count: Union[int, None] = data.get(&#34;member_count&#34;)
+        self.voice_states: Union[list, None] = data.get(&#34;voice_states&#34;)
+        self.members: Union[list, None] = [Member(self.client, i) for i in data.get(
+            &#34;members&#34;)] if data.get(&#34;members&#34;) is not None else None
+        self.channels: Union[list, None] = [Channel(self.client, i) for i in data.get(
+            &#34;channels&#34;)] if data.get(&#34;channels&#34;) is not None else None
+        self.threads: Union[list, None] = [Channel(self.client, i) for i in data.get(
+            &#34;threads&#34;)] if data.get(&#34;threads&#34;) is not None else None
+        self.presences: Union[list, None] = data.get(&#34;presences&#34;)
+        self.max_presences: Union[int, None] = data.get(&#34;max_presences&#34;)
+        self.max_members: Union[int, None] = data.get(&#34;max_members&#34;)
+        self.vanity_url_code: Union[str, None] = data.get(&#34;vanity_url_code&#34;)
+        self.description: Union[str, None] = data.get(&#34;description&#34;)
+        self.banner: Union[str, None] = data.get(&#34;banner&#34;)
+        self.premium_tier: int = data.get(&#34;premium_tier&#34;)
+        self.premium_subscription_count: Union[int, None] = data.get(
+            &#34;premium_subscription_count&#34;)
+        self.preferred_locale: str = data.get(&#34;preferred_locale&#34;)
+        self.public_updates_channel_id: Union[int, None] = int(data.get(
+            &#34;public_updates_channel_id&#34;)) if data.get(&#34;public_updates_channel_id&#34;) is not None else None
+        self.max_video_channel_users: Union[int, None] = data.get(
+            &#34;max_video_channel_users&#34;)
+        self.approximate_member_count: Union[int, None] = data.get(
+            &#34;approximate_member_count&#34;)
+        self.approximate_presence_count: Union[int, None] = data.get(
+            &#34;approximate_presence_count&#34;)
+        self.welcome_screen: Union[dict, None] = data.get(&#34;welcome_screen&#34;)
+        self.nsfw_level: int = data.get(&#34;nsfw_level&#34;)
+        self.stage_instances: Union[list, None] = data.get(&#34;stage_instances&#34;)</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 </article>
@@ -673,11 +932,15 @@ class Channel:
 <li>
 <h4><code><a title="krema.models.guild.Channel" href="#krema.models.guild.Channel">Channel</a></code></h4>
 <ul class="">
+<li><code><a title="krema.models.guild.Channel.delete" href="#krema.models.guild.Channel.delete">delete</a></code></li>
 <li><code><a title="krema.models.guild.Channel.edit" href="#krema.models.guild.Channel.edit">edit</a></code></li>
 <li><code><a title="krema.models.guild.Channel.fetch_messages" href="#krema.models.guild.Channel.fetch_messages">fetch_messages</a></code></li>
 <li><code><a title="krema.models.guild.Channel.purge" href="#krema.models.guild.Channel.purge">purge</a></code></li>
 <li><code><a title="krema.models.guild.Channel.send" href="#krema.models.guild.Channel.send">send</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="krema.models.guild.Guild" href="#krema.models.guild.Guild">Guild</a></code></h4>
 </li>
 </ul>
 </li>
