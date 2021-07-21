@@ -37,7 +37,8 @@ from zlib import decompressobj
 from json import loads
 
 from .models.message import Message
-from .models.guild import Guild
+from .models.guild import Channel, Guild
+
 
 class Gateway:
 
@@ -138,6 +139,9 @@ class Gateway:
         elif event_type in (&#34;guild_create&#34;, &#34;guild_update&#34;):
             filtered = self.__filter_events(
                 event_type, (Guild(self.client, event_data), ))
+        elif event_type in (&#34;channel_create&#34;, &#34;channel_update&#34;, &#34;channel_delete&#34;):
+            filtered = self.__filter_events(
+                event_type, (Channel(self.client, event_data), ))
         else:
             filtered = self.__filter_events(event_type, (event_data, ))
 
@@ -320,6 +324,9 @@ class Gateway:
         elif event_type in (&#34;guild_create&#34;, &#34;guild_update&#34;):
             filtered = self.__filter_events(
                 event_type, (Guild(self.client, event_data), ))
+        elif event_type in (&#34;channel_create&#34;, &#34;channel_update&#34;, &#34;channel_delete&#34;):
+            filtered = self.__filter_events(
+                event_type, (Channel(self.client, event_data), ))
         else:
             filtered = self.__filter_events(event_type, (event_data, ))
 

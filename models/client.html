@@ -48,6 +48,7 @@ class Client:
         user (User): Client user.
         messages (kollektor.Kollektor): Message cache.
         guilds (kollektor.Kollektor): Guild cache.
+        channels (kollektor.Kollektor): Channel cache.
         connection (Gateway): Client gateway.
         connection (HTTP): Client http class.
     &#34;&#34;&#34;
@@ -64,6 +65,7 @@ class Client:
 
         self.messages: kollektor.Kollektor = kollektor.Kollektor()
         self.guilds: kollektor.Kollektor = kollektor.Kollektor()
+        self.channels: kollektor.Kollektor = kollektor.Kollektor()
 
         self.connection = None
         self.http = None
@@ -181,6 +183,10 @@ class Client:
         async def _guild_create(guild):
             self.guilds.append(guild)
 
+            # Add Guild Channels
+            if guild.channels is not None:
+                self.channels.append(*guild.channels)
+
         # Guild Update Handler
         async def _guild_update(guild_packet):
             for index, guild in enumerate(self.guilds.items):
@@ -199,6 +205,27 @@ class Client:
                 self.guilds.items = tuple(
                     i for i in self.guilds.items if i.id != guild_id)
 
+        # Channel Create Handler
+        async def _channel_create(channel):
+            self.channels.append(channel)
+
+        # Channel Update Handler
+        async def _channel_update(channel_packet):
+            for index, channel in enumerate(self.channels.items):
+                if channel.id == channel_packet.id:
+                    self.channels.update(index, channel_packet)
+                    break
+
+        # Channel Delete Handler
+        async def _channel_delete(channel_packet):
+            channel_id = hasattr(channel_packet, &#34;id&#34;)
+
+            if channel_id is None:
+                return
+            else:
+                self.channels.items = tuple(
+                    i for i in self.channels.items if i.id != channel_packet.id)
+
         event_list: dict = {
             &#34;message_create&#34;: _message_create,
             &#34;message_update&#34;: _message_update,
@@ -206,7 +233,10 @@ class Client:
             &#34;message_delete_bulk&#34;: _message_bulk_delete,
             &#34;guild_create&#34;: _guild_create,
             &#34;guild_update&#34;: _guild_update,
-            &#34;guild_delete&#34;: _guild_delete
+            &#34;guild_delete&#34;: _guild_delete,
+            &#34;channel_create&#34;: _channel_create,
+            &#34;channel_update&#34;: _channel_update,
+            &#34;channel_delete&#34;: _channel_delete
         }
 
         # Load Events
@@ -289,6 +319,8 @@ class Client:
 <dd>Message cache.</dd>
 <dt><strong><code>guilds</code></strong> :&ensp;<code>kollektor.Kollektor</code></dt>
 <dd>Guild cache.</dd>
+<dt><strong><code>channels</code></strong> :&ensp;<code>kollektor.Kollektor</code></dt>
+<dd>Channel cache.</dd>
 <dt><strong><code>connection</code></strong> :&ensp;<code>Gateway</code></dt>
 <dd>Client gateway.</dd>
 <dt><strong><code>connection</code></strong> :&ensp;<code>HTTP</code></dt>
@@ -311,6 +343,7 @@ class Client:
         user (User): Client user.
         messages (kollektor.Kollektor): Message cache.
         guilds (kollektor.Kollektor): Guild cache.
+        channels (kollektor.Kollektor): Channel cache.
         connection (Gateway): Client gateway.
         connection (HTTP): Client http class.
     &#34;&#34;&#34;
@@ -327,6 +360,7 @@ class Client:
 
         self.messages: kollektor.Kollektor = kollektor.Kollektor()
         self.guilds: kollektor.Kollektor = kollektor.Kollektor()
+        self.channels: kollektor.Kollektor = kollektor.Kollektor()
 
         self.connection = None
         self.http = None
@@ -444,6 +478,10 @@ class Client:
         async def _guild_create(guild):
             self.guilds.append(guild)
 
+            # Add Guild Channels
+            if guild.channels is not None:
+                self.channels.append(*guild.channels)
+
         # Guild Update Handler
         async def _guild_update(guild_packet):
             for index, guild in enumerate(self.guilds.items):
@@ -462,6 +500,27 @@ class Client:
                 self.guilds.items = tuple(
                     i for i in self.guilds.items if i.id != guild_id)
 
+        # Channel Create Handler
+        async def _channel_create(channel):
+            self.channels.append(channel)
+
+        # Channel Update Handler
+        async def _channel_update(channel_packet):
+            for index, channel in enumerate(self.channels.items):
+                if channel.id == channel_packet.id:
+                    self.channels.update(index, channel_packet)
+                    break
+
+        # Channel Delete Handler
+        async def _channel_delete(channel_packet):
+            channel_id = hasattr(channel_packet, &#34;id&#34;)
+
+            if channel_id is None:
+                return
+            else:
+                self.channels.items = tuple(
+                    i for i in self.channels.items if i.id != channel_packet.id)
+
         event_list: dict = {
             &#34;message_create&#34;: _message_create,
             &#34;message_update&#34;: _message_update,
@@ -469,7 +528,10 @@ class Client:
             &#34;message_delete_bulk&#34;: _message_bulk_delete,
             &#34;guild_create&#34;: _guild_create,
             &#34;guild_update&#34;: _guild_update,
-            &#34;guild_delete&#34;: _guild_delete
+            &#34;guild_delete&#34;: _guild_delete,
+            &#34;channel_create&#34;: _channel_create,
+            &#34;channel_update&#34;: _channel_update,
+            &#34;channel_delete&#34;: _channel_delete
         }
 
         # Load Events
