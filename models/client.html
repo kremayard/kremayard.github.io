@@ -169,7 +169,7 @@ class Client:
                     i for i in self.messages.items if i.id != message_id)
 
         # Message Bulk Delete Handler
-        async def _message_bulk_delete(packet):
+        async def _message_delete_bulk(packet):
             message_ids = packet.get(&#34;ids&#34;)
 
             if message_ids is None:
@@ -226,22 +226,11 @@ class Client:
                 self.channels.items = tuple(
                     i for i in self.channels.items if i.id != channel_packet.id)
 
-        event_list: dict = {
-            &#34;message_create&#34;: _message_create,
-            &#34;message_update&#34;: _message_update,
-            &#34;message_delete&#34;: _message_delete,
-            &#34;message_delete_bulk&#34;: _message_bulk_delete,
-            &#34;guild_create&#34;: _guild_create,
-            &#34;guild_update&#34;: _guild_update,
-            &#34;guild_delete&#34;: _guild_delete,
-            &#34;channel_create&#34;: _channel_create,
-            &#34;channel_update&#34;: _channel_update,
-            &#34;channel_delete&#34;: _channel_delete
-        }
+        local = locals()
 
         # Load Events
         self.events.extend(
-            (key, value) for key, value in event_list.items()
+            (i[1:], local[i]) for i in local if i.startswith(&#34;_&#34;)
         )
 
     # Gateway Function
@@ -464,7 +453,7 @@ class Client:
                     i for i in self.messages.items if i.id != message_id)
 
         # Message Bulk Delete Handler
-        async def _message_bulk_delete(packet):
+        async def _message_delete_bulk(packet):
             message_ids = packet.get(&#34;ids&#34;)
 
             if message_ids is None:
@@ -521,22 +510,11 @@ class Client:
                 self.channels.items = tuple(
                     i for i in self.channels.items if i.id != channel_packet.id)
 
-        event_list: dict = {
-            &#34;message_create&#34;: _message_create,
-            &#34;message_update&#34;: _message_update,
-            &#34;message_delete&#34;: _message_delete,
-            &#34;message_delete_bulk&#34;: _message_bulk_delete,
-            &#34;guild_create&#34;: _guild_create,
-            &#34;guild_update&#34;: _guild_update,
-            &#34;guild_delete&#34;: _guild_delete,
-            &#34;channel_create&#34;: _channel_create,
-            &#34;channel_update&#34;: _channel_update,
-            &#34;channel_delete&#34;: _channel_delete
-        }
+        local = locals()
 
         # Load Events
         self.events.extend(
-            (key, value) for key, value in event_list.items()
+            (i[1:], local[i]) for i in local if i.startswith(&#34;_&#34;)
         )
 
     # Gateway Function

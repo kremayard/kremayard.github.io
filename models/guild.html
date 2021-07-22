@@ -35,7 +35,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Union
 
-from ..errors import SendMessageFailed, FetchChannelMessagesFailed, BulkDeleteMessagesFailed, EditChannelFailed, DeleteChannelFailed
+from ..errors.message import SendMessageFailed
+from ..errors.channel import *
 
 
 @dataclass
@@ -218,7 +219,6 @@ class Channel:
         Raises:
             FetchChannelMessagesFailed: Fetching the messages from channel is failed.
         &#34;&#34;&#34;
-
         from .message import Message
 
         atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
@@ -264,7 +264,6 @@ class Channel:
         Raises:
             SendMessageFailed: Sending the message is failed.
         &#34;&#34;&#34;
-
         from .message import Message
 
         atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
@@ -309,7 +308,28 @@ class Channel:
         if atom == 0:
             return Channel(self.client, result)
         else:
-            raise DeleteChannelFailed(result)</code></pre>
+            raise DeleteChannelFailed(result)
+
+    async def fetch_message(self, message_id: int):
+        &#34;&#34;&#34;Fetch a message from channel by ID.
+
+        Args:
+            message_id: Message ID.
+
+        Returns:
+            Message: Found message.
+
+        Raises:
+            FetchChannelMessageFailed: Fetching the message is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise FetchChannelMessageFailed(result)</code></pre>
 </details>
 </section>
 <section>
@@ -488,7 +508,6 @@ class Channel:
         Raises:
             FetchChannelMessagesFailed: Fetching the messages from channel is failed.
         &#34;&#34;&#34;
-
         from .message import Message
 
         atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
@@ -534,7 +553,6 @@ class Channel:
         Raises:
             SendMessageFailed: Sending the message is failed.
         &#34;&#34;&#34;
-
         from .message import Message
 
         atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
@@ -579,7 +597,28 @@ class Channel:
         if atom == 0:
             return Channel(self.client, result)
         else:
-            raise DeleteChannelFailed(result)</code></pre>
+            raise DeleteChannelFailed(result)
+
+    async def fetch_message(self, message_id: int):
+        &#34;&#34;&#34;Fetch a message from channel by ID.
+
+        Args:
+            message_id: Message ID.
+
+        Returns:
+            Message: Found message.
+
+        Raises:
+            FetchChannelMessageFailed: Fetching the message is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise FetchChannelMessageFailed(result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -665,6 +704,52 @@ class Channel:
         raise EditChannelFailed(result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Channel.fetch_message"><code class="name flex">
+<span>async def <span class="ident">fetch_message</span></span>(<span>self, message_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch a message from channel by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>message_id</code></strong></dt>
+<dd>Message ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Message</code></dt>
+<dd>Found message.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchChannelMessageFailed</code></dt>
+<dd>Fetching the message is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_message(self, message_id: int):
+    &#34;&#34;&#34;Fetch a message from channel by ID.
+
+    Args:
+        message_id: Message ID.
+
+    Returns:
+        Message: Found message.
+
+    Raises:
+        FetchChannelMessageFailed: Fetching the message is failed.
+    &#34;&#34;&#34;
+    from .message import Message
+
+    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
+
+    if atom == 0:
+        return Message(self.client, result)
+    else:
+        raise FetchChannelMessageFailed(result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Channel.fetch_messages"><code class="name flex">
 <span>async def <span class="ident">fetch_messages</span></span>(<span>self, limit: int = 10)</span>
 </code></dt>
@@ -701,7 +786,6 @@ class Channel:
     Raises:
         FetchChannelMessagesFailed: Fetching the messages from channel is failed.
     &#34;&#34;&#34;
-
     from .message import Message
 
     atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
@@ -797,7 +881,6 @@ class Channel:
     Raises:
         SendMessageFailed: Sending the message is failed.
     &#34;&#34;&#34;
-
     from .message import Message
 
     atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
@@ -931,9 +1014,10 @@ class Guild:
 <ul>
 <li>
 <h4><code><a title="krema.models.guild.Channel" href="#krema.models.guild.Channel">Channel</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="krema.models.guild.Channel.delete" href="#krema.models.guild.Channel.delete">delete</a></code></li>
 <li><code><a title="krema.models.guild.Channel.edit" href="#krema.models.guild.Channel.edit">edit</a></code></li>
+<li><code><a title="krema.models.guild.Channel.fetch_message" href="#krema.models.guild.Channel.fetch_message">fetch_message</a></code></li>
 <li><code><a title="krema.models.guild.Channel.fetch_messages" href="#krema.models.guild.Channel.fetch_messages">fetch_messages</a></code></li>
 <li><code><a title="krema.models.guild.Channel.purge" href="#krema.models.guild.Channel.purge">purge</a></code></li>
 <li><code><a title="krema.models.guild.Channel.send" href="#krema.models.guild.Channel.send">send</a></code></li>

@@ -56,19 +56,19 @@ class Kollektor(object):
 
         return len(self.items)
 
-    def find(self, item: Any) -&gt; Union[Any, Nothing]:
+    def find(self, fn: Callable) -&gt; Union[Any, Nothing]:
         &#34;&#34;&#34;Find an object from collection.
 
         Args:
-            item (Any): The item will be found.
+            fn (Callable): The function must return bool.
 
         Returns:
             Any: Found object.
-            kollektor.Nothing`
+            kollektor.Nothing
         &#34;&#34;&#34;
 
         for value in self.items:
-            if value == item (Any):
+            if fn(value):
                 return value
 
         return Nothing
@@ -83,7 +83,7 @@ class Kollektor(object):
             bool: True or False
         &#34;&#34;&#34;
 
-        return self.find(item) is not None
+        return self.find(lambda v: v == item) != Nothing
 
     def append(self, *args: Any) -&gt; tuple:
         &#34;&#34;&#34;Append one or more object to the collection.
@@ -109,11 +109,10 @@ class Kollektor(object):
             Any: New item.
         &#34;&#34;&#34;
 
-        item_list = list(self.items)
-        item_list[index] = new_item
-        self.items = tuple(item_list)
+        self.items = tuple(v if i != index else new_item for i,
+                           v in enumerate(self.items))
 
-        return item_list[index]
+        return new_item
 
     def remove(self, *args: Any) -&gt; tuple:
         &#34;&#34;&#34;Remove one or more object from the collection.
@@ -233,19 +232,19 @@ class Kollektor(object):
 
         return len(self.items)
 
-    def find(self, item: Any) -&gt; Union[Any, Nothing]:
+    def find(self, fn: Callable) -&gt; Union[Any, Nothing]:
         &#34;&#34;&#34;Find an object from collection.
 
         Args:
-            item (Any): The item will be found.
+            fn (Callable): The function must return bool.
 
         Returns:
             Any: Found object.
-            kollektor.Nothing`
+            kollektor.Nothing
         &#34;&#34;&#34;
 
         for value in self.items:
-            if value == item (Any):
+            if fn(value):
                 return value
 
         return Nothing
@@ -260,7 +259,7 @@ class Kollektor(object):
             bool: True or False
         &#34;&#34;&#34;
 
-        return self.find(item) is not None
+        return self.find(lambda v: v == item) != Nothing
 
     def append(self, *args: Any) -&gt; tuple:
         &#34;&#34;&#34;Append one or more object to the collection.
@@ -286,11 +285,10 @@ class Kollektor(object):
             Any: New item.
         &#34;&#34;&#34;
 
-        item_list = list(self.items)
-        item_list[index] = new_item
-        self.items = tuple(item_list)
+        self.items = tuple(v if i != index else new_item for i,
+                           v in enumerate(self.items))
 
-        return item_list[index]
+        return new_item
 
     def remove(self, *args: Any) -&gt; tuple:
         &#34;&#34;&#34;Remove one or more object from the collection.
@@ -468,38 +466,38 @@ def length(self) -&gt; int:
 </details>
 </dd>
 <dt id="kollektor.Kollektor.find"><code class="name flex">
-<span>def <span class="ident">find</span></span>(<span>self, item: Any) ‑> Union[Any, <a title="kollektor.classes.Nothing" href="classes.html#kollektor.classes.Nothing">Nothing</a>]</span>
+<span>def <span class="ident">find</span></span>(<span>self, fn: Callable) ‑> Union[Any, <a title="kollektor.classes.Nothing" href="classes.html#kollektor.classes.Nothing">Nothing</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Find an object from collection.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>item</code></strong> :&ensp;<code>Any</code></dt>
-<dd>The item will be found.</dd>
+<dt><strong><code>fn</code></strong> :&ensp;<code>Callable</code></dt>
+<dd>The function must return bool.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>Any</code></dt>
 <dd>Found object.</dd>
 </dl>
-<p>kollektor.Nothing`</p></div>
+<p>kollektor.Nothing</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find(self, item: Any) -&gt; Union[Any, Nothing]:
+<pre><code class="python">def find(self, fn: Callable) -&gt; Union[Any, Nothing]:
     &#34;&#34;&#34;Find an object from collection.
 
     Args:
-        item (Any): The item will be found.
+        fn (Callable): The function must return bool.
 
     Returns:
         Any: Found object.
-        kollektor.Nothing`
+        kollektor.Nothing
     &#34;&#34;&#34;
 
     for value in self.items:
-        if value == item (Any):
+        if fn(value):
             return value
 
     return Nothing</code></pre>
@@ -560,7 +558,7 @@ def length(self) -&gt; int:
         bool: True or False
     &#34;&#34;&#34;
 
-    return self.find(item) is not None</code></pre>
+    return self.find(lambda v: v == item) != Nothing</code></pre>
 </details>
 </dd>
 <dt id="kollektor.Kollektor.index"><code class="name flex">
@@ -685,11 +683,10 @@ def length(self) -&gt; int:
         Any: New item.
     &#34;&#34;&#34;
 
-    item_list = list(self.items)
-    item_list[index] = new_item
-    self.items = tuple(item_list)
+    self.items = tuple(v if i != index else new_item for i,
+                       v in enumerate(self.items))
 
-    return item_list[index]</code></pre>
+    return new_item</code></pre>
 </details>
 </dd>
 </dl>

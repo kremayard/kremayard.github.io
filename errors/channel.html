@@ -44,6 +44,12 @@ class FetchChannelMessagesFailed(Exception):
     pass
 
 
+class FetchChannelMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when fetching A message from channel is failed.&#34;&#34;&#34;
+
+    pass
+
+
 class BulkDeleteMessagesFailed(Exception):
     &#34;&#34;&#34;Raises when purge messages from channel is failed.&#34;&#34;&#34;
 
@@ -155,6 +161,27 @@ class DeleteChannelFailed(Exception):
 <li>builtins.BaseException</li>
 </ul>
 </dd>
+<dt id="krema.errors.channel.FetchChannelMessageFailed"><code class="flex name class">
+<span>class <span class="ident">FetchChannelMessageFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when fetching A message from channel is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FetchChannelMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when fetching A message from channel is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="krema.errors.channel.FetchChannelMessagesFailed"><code class="flex name class">
 <span>class <span class="ident">FetchChannelMessagesFailed</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -203,6 +230,9 @@ class DeleteChannelFailed(Exception):
 </li>
 <li>
 <h4><code><a title="krema.errors.channel.FetchChannelFailed" href="#krema.errors.channel.FetchChannelFailed">FetchChannelFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.channel.FetchChannelMessageFailed" href="#krema.errors.channel.FetchChannelMessageFailed">FetchChannelMessageFailed</a></code></h4>
 </li>
 <li>
 <h4><code><a title="krema.errors.channel.FetchChannelMessagesFailed" href="#krema.errors.channel.FetchChannelMessagesFailed">FetchChannelMessagesFailed</a></code></h4>
