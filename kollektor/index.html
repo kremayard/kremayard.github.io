@@ -33,18 +33,28 @@ Collection utility for Python.
 
 
 from typing import Any, Callable, Union
-from .classes import Nothing
+from .classes import *
 
 
-class Kollektor(object):
+class Kollektor:
     &#34;&#34;&#34;Base class for kollektor.
 
+    Args:
+        limit (int): Collection limit.
+        items (tuple): Items for collection.
+
     Attributes:
+        limit (int): Collection limit.
         items (tuple): All of the items in the collection.
     &#34;&#34;&#34;
 
-    def __init__(self, *args: Any) -&gt; None:
-        self.items: tuple = args
+    def __init__(self, limit: int = None, items: tuple = ()) -&gt; None:
+        self.limit: int = limit
+        self.items: tuple = items
+
+        if self.limit is not None:
+            if len(self.items) &gt; self.limit:
+                raise LimitExceeded(&#34;Maximum limit exceeded for start items.&#34;)
 
     @property
     def length(self) -&gt; int:
@@ -95,7 +105,15 @@ class Kollektor(object):
             tuple: Added items.
         &#34;&#34;&#34;
 
-        self.items = (*self.items, *args, )
+        if self.limit is not None:
+            if (len(self.items) + len(args)) &gt; self.limit:
+                self.remove_index(*range(len(args)))
+                self.items = (*self.items, *args, )
+            else:
+                self.items = (*self.items, *args, )
+        else:
+            self.items = (*self.items, *args, )
+
         return args
 
     def update(self, index: int, new_item: Any) -&gt; Any:
@@ -114,6 +132,21 @@ class Kollektor(object):
 
         return new_item
 
+    def remove_index(self, *args: int) -&gt; Any:
+        &#34;&#34;&#34;Remove one or more object from collection with index.
+
+        Args:
+            *args (int): List of indexs.
+
+        Returns:
+            tuple: New items.
+        &#34;&#34;&#34;
+
+        self.items = tuple(value for index, value in enumerate(
+            self.items) if index not in args)
+
+        return self.items
+
     def remove(self, *args: Any) -&gt; tuple:
         &#34;&#34;&#34;Remove one or more object from the collection.
 
@@ -124,8 +157,7 @@ class Kollektor(object):
             tuple: New items.
         &#34;&#34;&#34;
 
-        filtered = tuple(value for value in self.items if value not in args)
-        self.items = filtered
+        self.items = tuple(value for value in self.items if value not in args)
 
         return self.items
 
@@ -199,12 +231,21 @@ class Kollektor(object):
 <dl>
 <dt id="kollektor.Kollektor"><code class="flex name class">
 <span>class <span class="ident">Kollektor</span></span>
-<span>(</span><span>*args: Any)</span>
+<span>(</span><span>limit: int = None, items: tuple = ())</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base class for kollektor.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Collection limit.</dd>
+<dt><strong><code>items</code></strong> :&ensp;<code>tuple</code></dt>
+<dd>Items for collection.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Collection limit.</dd>
 <dt><strong><code>items</code></strong> :&ensp;<code>tuple</code></dt>
 <dd>All of the items in the collection.</dd>
 </dl></div>
@@ -212,15 +253,25 @@ class Kollektor(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Kollektor(object):
+<pre><code class="python">class Kollektor:
     &#34;&#34;&#34;Base class for kollektor.
 
+    Args:
+        limit (int): Collection limit.
+        items (tuple): Items for collection.
+
     Attributes:
+        limit (int): Collection limit.
         items (tuple): All of the items in the collection.
     &#34;&#34;&#34;
 
-    def __init__(self, *args: Any) -&gt; None:
-        self.items: tuple = args
+    def __init__(self, limit: int = None, items: tuple = ()) -&gt; None:
+        self.limit: int = limit
+        self.items: tuple = items
+
+        if self.limit is not None:
+            if len(self.items) &gt; self.limit:
+                raise LimitExceeded(&#34;Maximum limit exceeded for start items.&#34;)
 
     @property
     def length(self) -&gt; int:
@@ -271,7 +322,15 @@ class Kollektor(object):
             tuple: Added items.
         &#34;&#34;&#34;
 
-        self.items = (*self.items, *args, )
+        if self.limit is not None:
+            if (len(self.items) + len(args)) &gt; self.limit:
+                self.remove_index(*range(len(args)))
+                self.items = (*self.items, *args, )
+            else:
+                self.items = (*self.items, *args, )
+        else:
+            self.items = (*self.items, *args, )
+
         return args
 
     def update(self, index: int, new_item: Any) -&gt; Any:
@@ -290,6 +349,21 @@ class Kollektor(object):
 
         return new_item
 
+    def remove_index(self, *args: int) -&gt; Any:
+        &#34;&#34;&#34;Remove one or more object from collection with index.
+
+        Args:
+            *args (int): List of indexs.
+
+        Returns:
+            tuple: New items.
+        &#34;&#34;&#34;
+
+        self.items = tuple(value for index, value in enumerate(
+            self.items) if index not in args)
+
+        return self.items
+
     def remove(self, *args: Any) -&gt; tuple:
         &#34;&#34;&#34;Remove one or more object from the collection.
 
@@ -300,8 +374,7 @@ class Kollektor(object):
             tuple: New items.
         &#34;&#34;&#34;
 
-        filtered = tuple(value for value in self.items if value not in args)
-        self.items = filtered
+        self.items = tuple(value for value in self.items if value not in args)
 
         return self.items
 
@@ -413,7 +486,15 @@ def length(self) -&gt; int:
         tuple: Added items.
     &#34;&#34;&#34;
 
-    self.items = (*self.items, *args, )
+    if self.limit is not None:
+        if (len(self.items) + len(args)) &gt; self.limit:
+            self.remove_index(*range(len(args)))
+            self.items = (*self.items, *args, )
+        else:
+            self.items = (*self.items, *args, )
+    else:
+        self.items = (*self.items, *args, )
+
     return args</code></pre>
 </details>
 </dd>
@@ -645,8 +726,42 @@ def length(self) -&gt; int:
         tuple: New items.
     &#34;&#34;&#34;
 
-    filtered = tuple(value for value in self.items if value not in args)
-    self.items = filtered
+    self.items = tuple(value for value in self.items if value not in args)
+
+    return self.items</code></pre>
+</details>
+</dd>
+<dt id="kollektor.Kollektor.remove_index"><code class="name flex">
+<span>def <span class="ident">remove_index</span></span>(<span>self, *args: int) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove one or more object from collection with index.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>*args</code></strong> :&ensp;<code>int</code></dt>
+<dd>List of indexs.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple</code></dt>
+<dd>New items.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_index(self, *args: int) -&gt; Any:
+    &#34;&#34;&#34;Remove one or more object from collection with index.
+
+    Args:
+        *args (int): List of indexs.
+
+    Returns:
+        tuple: New items.
+    &#34;&#34;&#34;
+
+    self.items = tuple(value for index, value in enumerate(
+        self.items) if index not in args)
 
     return self.items</code></pre>
 </details>
@@ -720,6 +835,7 @@ def length(self) -&gt; int:
 <li><code><a title="kollektor.Kollektor.last" href="#kollektor.Kollektor.last">last</a></code></li>
 <li><code><a title="kollektor.Kollektor.length" href="#kollektor.Kollektor.length">length</a></code></li>
 <li><code><a title="kollektor.Kollektor.remove" href="#kollektor.Kollektor.remove">remove</a></code></li>
+<li><code><a title="kollektor.Kollektor.remove_index" href="#kollektor.Kollektor.remove_index">remove_index</a></code></li>
 <li><code><a title="kollektor.Kollektor.update" href="#kollektor.Kollektor.update">update</a></code></li>
 </ul>
 </li>

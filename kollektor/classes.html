@@ -31,8 +31,15 @@
 Other classes about kollektor.
 &#34;&#34;&#34;
 
+
 class Nothing:
     &#34;&#34;&#34;None-Type replacement for Kollektor.&#34;&#34;&#34;
+
+    pass
+
+
+class LimitExceeded(Exception):
+    &#34;&#34;&#34;Raises when limit exceeded for starting items.&#34;&#34;&#34;
 
     pass</code></pre>
 </details>
@@ -46,6 +53,27 @@ class Nothing:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="kollektor.classes.LimitExceeded"><code class="flex name class">
+<span>class <span class="ident">LimitExceeded</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when limit exceeded for starting items.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LimitExceeded(Exception):
+    &#34;&#34;&#34;Raises when limit exceeded for starting items.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="kollektor.classes.Nothing"><code class="flex name class">
 <span>class <span class="ident">Nothing</span></span>
 </code></dt>
@@ -77,6 +105,9 @@ class Nothing:
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="kollektor.classes.LimitExceeded" href="#kollektor.classes.LimitExceeded">LimitExceeded</a></code></h4>
+</li>
 <li>
 <h4><code><a title="kollektor.classes.Nothing" href="#kollektor.classes.Nothing">Nothing</a></code></h4>
 </li>

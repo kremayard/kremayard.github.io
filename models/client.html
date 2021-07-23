@@ -40,7 +40,9 @@ class Client:
 
     Args:
         intents (int): Intents for your bot. Do not add any intent if you are using for self-bot.
-        cache_limit (int): Cache limit for krema. 
+        message_limit (int): Message cache limit for krema (default is 200). 
+        channel_limit (int): Channel cache limit for krema (default is None). 
+        guild_limit (int): Guild cache limit for krema (default is None). 
 
     Attributes:
         token (str): Bot token for http request.
@@ -53,19 +55,21 @@ class Client:
         connection (HTTP): Client http class.
     &#34;&#34;&#34;
 
-    def __init__(self, intents: int = 0, cache_limit: int = 200) -&gt; None:
+    def __init__(self, intents: int = 0, message_limit: int = 200, channel_limit: int = None, guild_limit: int = None) -&gt; None:
         from .user import User
 
         self.intents: int = intents
-        self.cache_limit: int = cache_limit
 
         self.token: str = &#34;&#34;
         self.events: list = []
         self.user: User = None
 
-        self.messages: kollektor.Kollektor = kollektor.Kollektor()
-        self.guilds: kollektor.Kollektor = kollektor.Kollektor()
-        self.channels: kollektor.Kollektor = kollektor.Kollektor()
+        self.messages: kollektor.Kollektor = kollektor.Kollektor(
+            limit=message_limit, items=())
+        self.guilds: kollektor.Kollektor = kollektor.Kollektor(
+            limit=guild_limit, items=())
+        self.channels: kollektor.Kollektor = kollektor.Kollektor(
+            limit=channel_limit, items=())
 
         self.connection = None
         self.http = None
@@ -285,7 +289,7 @@ class Client:
 <dl>
 <dt id="krema.models.client.Client"><code class="flex name class">
 <span>class <span class="ident">Client</span></span>
-<span>(</span><span>intents: int = 0, cache_limit: int = 200)</span>
+<span>(</span><span>intents: int = 0, message_limit: int = 200, channel_limit: int = None, guild_limit: int = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base class for client.</p>
@@ -293,8 +297,12 @@ class Client:
 <dl>
 <dt><strong><code>intents</code></strong> :&ensp;<code>int</code></dt>
 <dd>Intents for your bot. Do not add any intent if you are using for self-bot.</dd>
-<dt><strong><code>cache_limit</code></strong> :&ensp;<code>int</code></dt>
-<dd>Cache limit for krema. </dd>
+<dt><strong><code>message_limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Message cache limit for krema (default is 200). </dd>
+<dt><strong><code>channel_limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Channel cache limit for krema (default is None). </dd>
+<dt><strong><code>guild_limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Guild cache limit for krema (default is None). </dd>
 </dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -324,7 +332,9 @@ class Client:
 
     Args:
         intents (int): Intents for your bot. Do not add any intent if you are using for self-bot.
-        cache_limit (int): Cache limit for krema. 
+        message_limit (int): Message cache limit for krema (default is 200). 
+        channel_limit (int): Channel cache limit for krema (default is None). 
+        guild_limit (int): Guild cache limit for krema (default is None). 
 
     Attributes:
         token (str): Bot token for http request.
@@ -337,19 +347,21 @@ class Client:
         connection (HTTP): Client http class.
     &#34;&#34;&#34;
 
-    def __init__(self, intents: int = 0, cache_limit: int = 200) -&gt; None:
+    def __init__(self, intents: int = 0, message_limit: int = 200, channel_limit: int = None, guild_limit: int = None) -&gt; None:
         from .user import User
 
         self.intents: int = intents
-        self.cache_limit: int = cache_limit
 
         self.token: str = &#34;&#34;
         self.events: list = []
         self.user: User = None
 
-        self.messages: kollektor.Kollektor = kollektor.Kollektor()
-        self.guilds: kollektor.Kollektor = kollektor.Kollektor()
-        self.channels: kollektor.Kollektor = kollektor.Kollektor()
+        self.messages: kollektor.Kollektor = kollektor.Kollektor(
+            limit=message_limit, items=())
+        self.guilds: kollektor.Kollektor = kollektor.Kollektor(
+            limit=guild_limit, items=())
+        self.channels: kollektor.Kollektor = kollektor.Kollektor(
+            limit=channel_limit, items=())
 
         self.connection = None
         self.http = None
