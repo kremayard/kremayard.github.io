@@ -35,6 +35,42 @@ Errors about messages.
 class SendMessageFailed(Exception):
     &#34;&#34;&#34;Raises when sending a message is failed.&#34;&#34;&#34;
 
+    pass
+
+
+class CreateReactionFailed(Exception):
+    &#34;&#34;&#34;Raises when creating the reaction is failed.&#34;&#34;&#34;
+
+    pass
+
+
+class DeleteReactionFailed(Exception):
+    &#34;&#34;&#34;Raises when deleting the reaction is failed.&#34;&#34;&#34;
+
+    pass
+
+
+class FetchReactionsFailed(Exception):
+    &#34;&#34;&#34;Raises when fetching the reactions are failed.&#34;&#34;&#34;
+
+    pass
+
+
+class DeleteReactionsFailed(Exception):
+    &#34;&#34;&#34;Raises when deleting the reactions are failed.&#34;&#34;&#34;
+
+    pass
+
+
+class EditMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when editing the message is failed.&#34;&#34;&#34;
+
+    pass
+
+
+class DeleteMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when deleting the message is failed.&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 </section>
@@ -47,6 +83,132 @@ class SendMessageFailed(Exception):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="krema.errors.message.CreateReactionFailed"><code class="flex name class">
+<span>class <span class="ident">CreateReactionFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when creating the reaction is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CreateReactionFailed(Exception):
+    &#34;&#34;&#34;Raises when creating the reaction is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.message.DeleteMessageFailed"><code class="flex name class">
+<span>class <span class="ident">DeleteMessageFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when deleting the message is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeleteMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when deleting the message is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.message.DeleteReactionFailed"><code class="flex name class">
+<span>class <span class="ident">DeleteReactionFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when deleting the reaction is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeleteReactionFailed(Exception):
+    &#34;&#34;&#34;Raises when deleting the reaction is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.message.DeleteReactionsFailed"><code class="flex name class">
+<span>class <span class="ident">DeleteReactionsFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when deleting the reactions are failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeleteReactionsFailed(Exception):
+    &#34;&#34;&#34;Raises when deleting the reactions are failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.message.EditMessageFailed"><code class="flex name class">
+<span>class <span class="ident">EditMessageFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when editing the message is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EditMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when editing the message is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.message.FetchReactionsFailed"><code class="flex name class">
+<span>class <span class="ident">FetchReactionsFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when fetching the reactions are failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FetchReactionsFailed(Exception):
+    &#34;&#34;&#34;Raises when fetching the reactions are failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="krema.errors.message.SendMessageFailed"><code class="flex name class">
 <span>class <span class="ident">SendMessageFailed</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -84,6 +246,24 @@ class SendMessageFailed(Exception):
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="krema.errors.message.CreateReactionFailed" href="#krema.errors.message.CreateReactionFailed">CreateReactionFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.message.DeleteMessageFailed" href="#krema.errors.message.DeleteMessageFailed">DeleteMessageFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.message.DeleteReactionFailed" href="#krema.errors.message.DeleteReactionFailed">DeleteReactionFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.message.DeleteReactionsFailed" href="#krema.errors.message.DeleteReactionsFailed">DeleteReactionsFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.message.EditMessageFailed" href="#krema.errors.message.EditMessageFailed">EditMessageFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.message.FetchReactionsFailed" href="#krema.errors.message.FetchReactionsFailed">FetchReactionsFailed</a></code></h4>
+</li>
 <li>
 <h4><code><a title="krema.errors.message.SendMessageFailed" href="#krema.errors.message.SendMessageFailed">SendMessageFailed</a></code></h4>
 </li>

@@ -33,7 +33,10 @@ Models for message and other classes about message.
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Union
+from typing import Optional, Union
+from urllib.parse import quote
+from ..utils import convert_iso, dict_to_query
+from ..errors.message import *
 
 
 @dataclass
@@ -90,8 +93,6 @@ class Embed:
     &#34;&#34;&#34;
 
     def __init__(self, data: dict) -&gt; None:
-        from ..utils import convert_iso
-
         self.title: Union[str, None] = data.get(&#34;title&#34;)
         self.type: Union[str, None] = data.get(&#34;type&#34;)
         self.description: Union[str, None] = data.get(&#34;description&#34;)
@@ -151,7 +152,6 @@ class Message:
     &#34;&#34;&#34;
 
     def __init__(self, client, data: dict) -&gt; None:
-        from ..utils import convert_iso
         from .user import User, Member
         from .guild import Channel
 
@@ -199,7 +199,154 @@ class Message:
 
         self.components: Union[list, None] = data.get(&#34;components&#34;)
         self.sticker_items: Union[list, None] = data.get(&#34;sticker_items&#34;)
-        self.stickers: Union[list, None] = data.get(&#34;stickers&#34;)</code></pre>
+        self.stickers: Union[list, None] = data.get(&#34;stickers&#34;)
+
+    async def create_reaction(self, emoji: str):
+        &#34;&#34;&#34;Create / add a reaction to the message.
+
+        Args:
+            emoji (str): The emoji will be added. For custom emojis, use the name:id format.
+
+        Returns:
+            True: Added successfully.
+
+        Raises:
+            CreateReactionFailed: Creating the reaction is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PUT&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/@me&#34;)
+
+        if atom == 0:
+            return True
+        else:
+            raise CreateReactionFailed(result)
+
+    async def delete_reaction(self, emoji: str, user_id: int = None):
+        &#34;&#34;&#34;Delete a user&#39;s reaction from message.
+
+        Args:
+            emoji (str): The emoji will be deleted. For custom emojis, use the name:id format.
+            user_id (int, optional): User id, if not added it will delete client&#39;s reaction.
+
+        Returns:
+            True: Deleted successfully.
+
+        Raises:
+            DeleteReactionFailed: Deleting the reaction is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;, {})
+
+        if atom == 0:
+            return True
+        else:
+            raise DeleteReactionFailed(result)
+
+    async def fetch_reactions(self, emoji: str, **kwargs):
+        &#34;&#34;&#34;Fetch reactions from message.
+
+        Args:
+            emoji (str): The emoji will be deleted. For custom emojis, use the name:id format.
+            **kwargs: https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params
+
+        Returns:
+            list: List of user objects.
+
+        Raises:
+            FetchReactionsFailed: Fetching the reactions are failed.
+        &#34;&#34;&#34;
+
+        from .user import User
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}{dict_to_query(kwargs)}&#34;)
+
+        if atom == 0:
+            return [User(self.client, i) for i in result]
+        else:
+            raise FetchReactionsFailed(result)
+
+    async def delete_reactions(self, emoji: str = None):
+        &#34;&#34;&#34;Delete / delete all reactions from message.
+
+        Args:
+            emoji (str, optional): The emoji will be deleted. For custom emojis, use the name:id format. if not added, it will delete all of the reactions from message.
+
+        Returns:
+            True: succesfully deleted reactions.
+
+        Raises:
+            DeleteReactionsFailed: Deleting the reactions are failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;, {})
+
+        if atom == 0:
+            return True
+        else:
+            raise DeleteReactionsFailed(result)
+
+    async def edit(self, file_name: str = None, **kwargs):
+        &#34;&#34;&#34;Edit the message.
+
+        Args:
+            file_name (str, optional): File name for your file.
+            **kwargs: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
+
+        Returns:
+            Message: New message object.
+
+        Raises:
+            EditMessageFailed: Editing the message is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, kwargs, {&#34;Content-Disposition&#34;: file_name} if file_name is not None else None)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise EditMessageFailed(result)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete the message.
+
+        Returns:
+            True: Deleted successfully
+
+        Raises:
+            DeleteMessageFailed: Deleting the message is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, {})
+
+        if atom == 0:
+            return True
+        else:
+            raise DeleteMessageFailed(result)
+
+    async def reply(self, **kwargs):
+        &#34;&#34;&#34;Reply to the message.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+        Returns:
+            Message: Sent message object.
+
+        Raises:
+            SendMessageFailed: Sending the message is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, {
+            **kwargs,
+            &#34;message_reference&#34;: {
+                &#34;message_id&#34;: self.id
+            }
+        })
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise SendMessageFailed(result)</code></pre>
 </details>
 </section>
 <section>
@@ -343,8 +490,6 @@ class Embed:
     &#34;&#34;&#34;
 
     def __init__(self, data: dict) -&gt; None:
-        from ..utils import convert_iso
-
         self.title: Union[str, None] = data.get(&#34;title&#34;)
         self.type: Union[str, None] = data.get(&#34;type&#34;)
         self.description: Union[str, None] = data.get(&#34;description&#34;)
@@ -486,7 +631,6 @@ class Message:
     &#34;&#34;&#34;
 
     def __init__(self, client, data: dict) -&gt; None:
-        from ..utils import convert_iso
         from .user import User, Member
         from .guild import Channel
 
@@ -534,8 +678,481 @@ class Message:
 
         self.components: Union[list, None] = data.get(&#34;components&#34;)
         self.sticker_items: Union[list, None] = data.get(&#34;sticker_items&#34;)
-        self.stickers: Union[list, None] = data.get(&#34;stickers&#34;)</code></pre>
+        self.stickers: Union[list, None] = data.get(&#34;stickers&#34;)
+
+    async def create_reaction(self, emoji: str):
+        &#34;&#34;&#34;Create / add a reaction to the message.
+
+        Args:
+            emoji (str): The emoji will be added. For custom emojis, use the name:id format.
+
+        Returns:
+            True: Added successfully.
+
+        Raises:
+            CreateReactionFailed: Creating the reaction is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PUT&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/@me&#34;)
+
+        if atom == 0:
+            return True
+        else:
+            raise CreateReactionFailed(result)
+
+    async def delete_reaction(self, emoji: str, user_id: int = None):
+        &#34;&#34;&#34;Delete a user&#39;s reaction from message.
+
+        Args:
+            emoji (str): The emoji will be deleted. For custom emojis, use the name:id format.
+            user_id (int, optional): User id, if not added it will delete client&#39;s reaction.
+
+        Returns:
+            True: Deleted successfully.
+
+        Raises:
+            DeleteReactionFailed: Deleting the reaction is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;, {})
+
+        if atom == 0:
+            return True
+        else:
+            raise DeleteReactionFailed(result)
+
+    async def fetch_reactions(self, emoji: str, **kwargs):
+        &#34;&#34;&#34;Fetch reactions from message.
+
+        Args:
+            emoji (str): The emoji will be deleted. For custom emojis, use the name:id format.
+            **kwargs: https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params
+
+        Returns:
+            list: List of user objects.
+
+        Raises:
+            FetchReactionsFailed: Fetching the reactions are failed.
+        &#34;&#34;&#34;
+
+        from .user import User
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}{dict_to_query(kwargs)}&#34;)
+
+        if atom == 0:
+            return [User(self.client, i) for i in result]
+        else:
+            raise FetchReactionsFailed(result)
+
+    async def delete_reactions(self, emoji: str = None):
+        &#34;&#34;&#34;Delete / delete all reactions from message.
+
+        Args:
+            emoji (str, optional): The emoji will be deleted. For custom emojis, use the name:id format. if not added, it will delete all of the reactions from message.
+
+        Returns:
+            True: succesfully deleted reactions.
+
+        Raises:
+            DeleteReactionsFailed: Deleting the reactions are failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;, {})
+
+        if atom == 0:
+            return True
+        else:
+            raise DeleteReactionsFailed(result)
+
+    async def edit(self, file_name: str = None, **kwargs):
+        &#34;&#34;&#34;Edit the message.
+
+        Args:
+            file_name (str, optional): File name for your file.
+            **kwargs: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
+
+        Returns:
+            Message: New message object.
+
+        Raises:
+            EditMessageFailed: Editing the message is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, kwargs, {&#34;Content-Disposition&#34;: file_name} if file_name is not None else None)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise EditMessageFailed(result)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete the message.
+
+        Returns:
+            True: Deleted successfully
+
+        Raises:
+            DeleteMessageFailed: Deleting the message is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, {})
+
+        if atom == 0:
+            return True
+        else:
+            raise DeleteMessageFailed(result)
+
+    async def reply(self, **kwargs):
+        &#34;&#34;&#34;Reply to the message.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+        Returns:
+            Message: Sent message object.
+
+        Raises:
+            SendMessageFailed: Sending the message is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, {
+            **kwargs,
+            &#34;message_reference&#34;: {
+                &#34;message_id&#34;: self.id
+            }
+        })
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise SendMessageFailed(result)</code></pre>
 </details>
+<h3>Methods</h3>
+<dl>
+<dt id="krema.models.message.Message.create_reaction"><code class="name flex">
+<span>async def <span class="ident">create_reaction</span></span>(<span>self, emoji: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create / add a reaction to the message.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>emoji</code></strong> :&ensp;<code>str</code></dt>
+<dd>The emoji will be added. For custom emojis, use the name:id format.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Added successfully.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>CreateReactionFailed</code></dt>
+<dd>Creating the reaction is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def create_reaction(self, emoji: str):
+    &#34;&#34;&#34;Create / add a reaction to the message.
+
+    Args:
+        emoji (str): The emoji will be added. For custom emojis, use the name:id format.
+
+    Returns:
+        True: Added successfully.
+
+    Raises:
+        CreateReactionFailed: Creating the reaction is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;PUT&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/@me&#34;)
+
+    if atom == 0:
+        return True
+    else:
+        raise CreateReactionFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.message.Message.delete"><code class="name flex">
+<span>async def <span class="ident">delete</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete the message.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Deleted successfully</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>DeleteMessageFailed</code></dt>
+<dd>Deleting the message is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete(self):
+    &#34;&#34;&#34;Delete the message.
+
+    Returns:
+        True: Deleted successfully
+
+    Raises:
+        DeleteMessageFailed: Deleting the message is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, {})
+
+    if atom == 0:
+        return True
+    else:
+        raise DeleteMessageFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.message.Message.delete_reaction"><code class="name flex">
+<span>async def <span class="ident">delete_reaction</span></span>(<span>self, emoji: str, user_id: int = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete a user's reaction from message.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>emoji</code></strong> :&ensp;<code>str</code></dt>
+<dd>The emoji will be deleted. For custom emojis, use the name:id format.</dd>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>User id, if not added it will delete client's reaction.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Deleted successfully.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>DeleteReactionFailed</code></dt>
+<dd>Deleting the reaction is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete_reaction(self, emoji: str, user_id: int = None):
+    &#34;&#34;&#34;Delete a user&#39;s reaction from message.
+
+    Args:
+        emoji (str): The emoji will be deleted. For custom emojis, use the name:id format.
+        user_id (int, optional): User id, if not added it will delete client&#39;s reaction.
+
+    Returns:
+        True: Deleted successfully.
+
+    Raises:
+        DeleteReactionFailed: Deleting the reaction is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;, {})
+
+    if atom == 0:
+        return True
+    else:
+        raise DeleteReactionFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.message.Message.delete_reactions"><code class="name flex">
+<span>async def <span class="ident">delete_reactions</span></span>(<span>self, emoji: str = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete / delete all reactions from message.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>emoji</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The emoji will be deleted. For custom emojis, use the name:id format. if not added, it will delete all of the reactions from message.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>succesfully deleted reactions.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>DeleteReactionsFailed</code></dt>
+<dd>Deleting the reactions are failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete_reactions(self, emoji: str = None):
+    &#34;&#34;&#34;Delete / delete all reactions from message.
+
+    Args:
+        emoji (str, optional): The emoji will be deleted. For custom emojis, use the name:id format. if not added, it will delete all of the reactions from message.
+
+    Returns:
+        True: succesfully deleted reactions.
+
+    Raises:
+        DeleteReactionsFailed: Deleting the reactions are failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;, {})
+
+    if atom == 0:
+        return True
+    else:
+        raise DeleteReactionsFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.message.Message.edit"><code class="name flex">
+<span>async def <span class="ident">edit</span></span>(<span>self, file_name: str = None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit the message.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>file_name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>File name for your file.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params">https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.message.Message" href="#krema.models.message.Message">Message</a></code></dt>
+<dd>New message object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>EditMessageFailed</code></dt>
+<dd>Editing the message is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit(self, file_name: str = None, **kwargs):
+    &#34;&#34;&#34;Edit the message.
+
+    Args:
+        file_name (str, optional): File name for your file.
+        **kwargs: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
+
+    Returns:
+        Message: New message object.
+
+    Raises:
+        EditMessageFailed: Editing the message is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, kwargs, {&#34;Content-Disposition&#34;: file_name} if file_name is not None else None)
+
+    if atom == 0:
+        return Message(self.client, result)
+    else:
+        raise EditMessageFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.message.Message.fetch_reactions"><code class="name flex">
+<span>async def <span class="ident">fetch_reactions</span></span>(<span>self, emoji: str, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch reactions from message.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>emoji</code></strong> :&ensp;<code>str</code></dt>
+<dd>The emoji will be deleted. For custom emojis, use the name:id format.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params">https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of user objects.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchReactionsFailed</code></dt>
+<dd>Fetching the reactions are failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_reactions(self, emoji: str, **kwargs):
+    &#34;&#34;&#34;Fetch reactions from message.
+
+    Args:
+        emoji (str): The emoji will be deleted. For custom emojis, use the name:id format.
+        **kwargs: https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params
+
+    Returns:
+        list: List of user objects.
+
+    Raises:
+        FetchReactionsFailed: Fetching the reactions are failed.
+    &#34;&#34;&#34;
+
+    from .user import User
+
+    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}{dict_to_query(kwargs)}&#34;)
+
+    if atom == 0:
+        return [User(self.client, i) for i in result]
+    else:
+        raise FetchReactionsFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.message.Message.reply"><code class="name flex">
+<span>async def <span class="ident">reply</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reply to the message.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params">https://discord.com/developers/docs/resources/channel#create-message-jsonform-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.message.Message" href="#krema.models.message.Message">Message</a></code></dt>
+<dd>Sent message object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>SendMessageFailed</code></dt>
+<dd>Sending the message is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def reply(self, **kwargs):
+    &#34;&#34;&#34;Reply to the message.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+    Returns:
+        Message: Sent message object.
+
+    Raises:
+        SendMessageFailed: Sending the message is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, {
+        **kwargs,
+        &#34;message_reference&#34;: {
+            &#34;message_id&#34;: self.id
+        }
+    })
+
+    if atom == 0:
+        return Message(self.client, result)
+    else:
+        raise SendMessageFailed(result)</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -561,6 +1178,15 @@ class Message:
 </li>
 <li>
 <h4><code><a title="krema.models.message.Message" href="#krema.models.message.Message">Message</a></code></h4>
+<ul class="two-column">
+<li><code><a title="krema.models.message.Message.create_reaction" href="#krema.models.message.Message.create_reaction">create_reaction</a></code></li>
+<li><code><a title="krema.models.message.Message.delete" href="#krema.models.message.Message.delete">delete</a></code></li>
+<li><code><a title="krema.models.message.Message.delete_reaction" href="#krema.models.message.Message.delete_reaction">delete_reaction</a></code></li>
+<li><code><a title="krema.models.message.Message.delete_reactions" href="#krema.models.message.Message.delete_reactions">delete_reactions</a></code></li>
+<li><code><a title="krema.models.message.Message.edit" href="#krema.models.message.Message.edit">edit</a></code></li>
+<li><code><a title="krema.models.message.Message.fetch_reactions" href="#krema.models.message.Message.fetch_reactions">fetch_reactions</a></code></li>
+<li><code><a title="krema.models.message.Message.reply" href="#krema.models.message.Message.reply">reply</a></code></li>
+</ul>
 </li>
 </ul>
 </li>

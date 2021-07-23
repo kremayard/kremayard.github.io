@@ -44,7 +44,23 @@ def convert_iso(date: str) -&gt; datetime:
         datetime: Converted object.
     &#34;&#34;&#34;
 
-    return datetime.fromisoformat(date)</code></pre>
+    return datetime.fromisoformat(date)
+
+
+def dict_to_query(data: dict) -&gt; str:
+    &#34;&#34;&#34;Convert a dictionary to the query string.
+
+    Args:
+        data (dict): The dictionary object will be converted.
+
+    Returns:
+        str: Converted version.
+    &#34;&#34;&#34;
+
+    if len(data) == 0:
+        return &#34;&#34;
+
+    return f&#34;?{&#39;&amp;&#39;.join(f&#39;{key}={value}&#39; for key, value in data.items())}&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -86,6 +102,41 @@ def convert_iso(date: str) -&gt; datetime:
     return datetime.fromisoformat(date)</code></pre>
 </details>
 </dd>
+<dt id="krema.utils.dict_to_query"><code class="name flex">
+<span>def <span class="ident">dict_to_query</span></span>(<span>data: dict) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert a dictionary to the query string.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>The dictionary object will be converted.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Converted version.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dict_to_query(data: dict) -&gt; str:
+    &#34;&#34;&#34;Convert a dictionary to the query string.
+
+    Args:
+        data (dict): The dictionary object will be converted.
+
+    Returns:
+        str: Converted version.
+    &#34;&#34;&#34;
+
+    if len(data) == 0:
+        return &#34;&#34;
+
+    return f&#34;?{&#39;&amp;&#39;.join(f&#39;{key}={value}&#39; for key, value in data.items())}&#34;</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -105,6 +156,7 @@ def convert_iso(date: str) -&gt; datetime:
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="krema.utils.convert_iso" href="#krema.utils.convert_iso">convert_iso</a></code></li>
+<li><code><a title="krema.utils.dict_to_query" href="#krema.utils.dict_to_query">dict_to_query</a></code></li>
 </ul>
 </li>
 </ul>

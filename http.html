@@ -51,7 +51,7 @@ class HTTP:
 
         pass
 
-    async def request(self, method: str, endpoint: str, params: Union[dict, list] = None) -&gt; tuple:
+    async def request(self, method: str, endpoint: str, params: Union[dict, list] = None, headers: Union[dict] = None) -&gt; tuple:
         &#34;&#34;&#34;Send a async request to the discord API.
 
         Args:
@@ -61,16 +61,19 @@ class HTTP:
 
         Returns:
             tuple: A tuple that contains an atom and result.
-                
+
                 Atom (0): Request successfully sent and got 2xx.
-                
+
                 Atom (1): Request failed.
         &#34;&#34;&#34;
 
         result: tuple = ()
 
+        if headers is None:
+            headers = {}
+
         async with aiohttp.ClientSession() as session:
-            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;}, json=params) as response:
+            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;, **headers}, json=params) as response:
                 try:
                     json_data = await response.json()
                 except aiohttp.client_exceptions.ContentTypeError:
@@ -139,7 +142,7 @@ class HTTP:
 
         pass
 
-    async def request(self, method: str, endpoint: str, params: Union[dict, list] = None) -&gt; tuple:
+    async def request(self, method: str, endpoint: str, params: Union[dict, list] = None, headers: Union[dict] = None) -&gt; tuple:
         &#34;&#34;&#34;Send a async request to the discord API.
 
         Args:
@@ -149,16 +152,19 @@ class HTTP:
 
         Returns:
             tuple: A tuple that contains an atom and result.
-                
+
                 Atom (0): Request successfully sent and got 2xx.
-                
+
                 Atom (1): Request failed.
         &#34;&#34;&#34;
 
         result: tuple = ()
 
+        if headers is None:
+            headers = {}
+
         async with aiohttp.ClientSession() as session:
-            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;}, json=params) as response:
+            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;, **headers}, json=params) as response:
                 try:
                     json_data = await response.json()
                 except aiohttp.client_exceptions.ContentTypeError:
@@ -190,7 +196,7 @@ class HTTP:
 <h3>Methods</h3>
 <dl>
 <dt id="krema.http.HTTP.request"><code class="name flex">
-<span>async def <span class="ident">request</span></span>(<span>self, method: str, endpoint: str, params: Union[dict, list] = None) ‑> tuple</span>
+<span>async def <span class="ident">request</span></span>(<span>self, method: str, endpoint: str, params: Union[dict, list] = None, headers: dict = None) ‑> tuple</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Send a async request to the discord API.</p>
@@ -216,7 +222,7 @@ class HTTP:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def request(self, method: str, endpoint: str, params: Union[dict, list] = None) -&gt; tuple:
+<pre><code class="python">async def request(self, method: str, endpoint: str, params: Union[dict, list] = None, headers: Union[dict] = None) -&gt; tuple:
     &#34;&#34;&#34;Send a async request to the discord API.
 
     Args:
@@ -226,16 +232,19 @@ class HTTP:
 
     Returns:
         tuple: A tuple that contains an atom and result.
-            
+
             Atom (0): Request successfully sent and got 2xx.
-            
+
             Atom (1): Request failed.
     &#34;&#34;&#34;
 
     result: tuple = ()
 
+    if headers is None:
+        headers = {}
+
     async with aiohttp.ClientSession() as session:
-        async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;}, json=params) as response:
+        async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;, **headers}, json=params) as response:
             try:
                 json_data = await response.json()
             except aiohttp.client_exceptions.ContentTypeError:
