@@ -32,6 +32,8 @@ Utils part of the krema.
 &#34;&#34;&#34;
 
 from datetime import datetime
+from base64 import b64encode
+from os.path import basename
 
 
 def convert_iso(date: str) -&gt; datetime:
@@ -55,12 +57,64 @@ def dict_to_query(data: dict) -&gt; str:
 
     Returns:
         str: Converted version.
+
+    Examples:
+        &gt;&gt;&gt; krema.utils.dict_to_query({&#34;hello&#34;: &#34;world&#34;, &#34;int&#34;: 1})
+        &#34;?hello=world&amp;int=1&#34;
     &#34;&#34;&#34;
 
     if len(data) == 0:
         return &#34;&#34;
 
-    return f&#34;?{&#39;&amp;&#39;.join(f&#39;{key}={value}&#39; for key, value in data.items())}&#34;</code></pre>
+    return f&#34;?{&#39;&amp;&#39;.join(f&#39;{key}={value}&#39; for key, value in data.items())}&#34;
+
+
+def file_builder(path: str) -&gt; dict:
+    &#34;&#34;&#34;File builder is a function that helps you while sending files.
+
+    Args:
+        path (str): File path.
+
+    Returns:
+        dict: Converted version for discord API.
+
+    Examples:
+        &gt;&gt;&gt; krema.utils.file_builder(&#34;./path/to/file.txt&#34;)
+        {
+            &#34;name&#34;: &#34;file&#34;,
+            &#34;value&#34;: b&#34;hi&#34;,
+            &#34;filename&#34;: &#34;file.txt&#34;,
+            &#34;content_type&#34;: &#34;application/octet-stream&#34;
+        }
+    &#34;&#34;&#34;
+
+    file = open(path, &#34;rb&#34;)
+    data, name = file.read(), file.name
+
+    file.close()
+
+    return {
+        &#34;name&#34;: &#34;file&#34;,
+        &#34;value&#34;: data,
+        &#34;filename&#34;: basename(name),
+        &#34;content_type&#34;: &#34;application/octet-stream&#34;
+    }
+
+
+def image_to_data_uri(path: str):
+    &#34;&#34;&#34;Convert a image / gif to Data URI format.
+
+    Args:
+        path (str): Path to image / gif.
+
+    Returns:
+        str: Formatted version.
+    &#34;&#34;&#34;
+    with open(path, &#34;rb&#34;) as f:
+        img_bytes = f.read()
+        encrypt = b64encode(img_bytes).decode()
+
+        return f&#34;data:image/{f.name.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)};base64,{encrypt}&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -116,7 +170,11 @@ def dict_to_query(data: dict) -&gt; str:
 <dl>
 <dt><code>str</code></dt>
 <dd>Converted version.</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; krema.utils.dict_to_query({&quot;hello&quot;: &quot;world&quot;, &quot;int&quot;: 1})
+&quot;?hello=world&amp;int=1&quot;
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -129,12 +187,111 @@ def dict_to_query(data: dict) -&gt; str:
 
     Returns:
         str: Converted version.
+
+    Examples:
+        &gt;&gt;&gt; krema.utils.dict_to_query({&#34;hello&#34;: &#34;world&#34;, &#34;int&#34;: 1})
+        &#34;?hello=world&amp;int=1&#34;
     &#34;&#34;&#34;
 
     if len(data) == 0:
         return &#34;&#34;
 
     return f&#34;?{&#39;&amp;&#39;.join(f&#39;{key}={value}&#39; for key, value in data.items())}&#34;</code></pre>
+</details>
+</dd>
+<dt id="krema.utils.file_builder"><code class="name flex">
+<span>def <span class="ident">file_builder</span></span>(<span>path: str) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"><p>File builder is a function that helps you while sending files.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>File path.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Converted version for discord API.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; krema.utils.file_builder(&quot;./path/to/file.txt&quot;)
+{
+    &quot;name&quot;: &quot;file&quot;,
+    &quot;value&quot;: b&quot;hi&quot;,
+    &quot;filename&quot;: &quot;file.txt&quot;,
+    &quot;content_type&quot;: &quot;application/octet-stream&quot;
+}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def file_builder(path: str) -&gt; dict:
+    &#34;&#34;&#34;File builder is a function that helps you while sending files.
+
+    Args:
+        path (str): File path.
+
+    Returns:
+        dict: Converted version for discord API.
+
+    Examples:
+        &gt;&gt;&gt; krema.utils.file_builder(&#34;./path/to/file.txt&#34;)
+        {
+            &#34;name&#34;: &#34;file&#34;,
+            &#34;value&#34;: b&#34;hi&#34;,
+            &#34;filename&#34;: &#34;file.txt&#34;,
+            &#34;content_type&#34;: &#34;application/octet-stream&#34;
+        }
+    &#34;&#34;&#34;
+
+    file = open(path, &#34;rb&#34;)
+    data, name = file.read(), file.name
+
+    file.close()
+
+    return {
+        &#34;name&#34;: &#34;file&#34;,
+        &#34;value&#34;: data,
+        &#34;filename&#34;: basename(name),
+        &#34;content_type&#34;: &#34;application/octet-stream&#34;
+    }</code></pre>
+</details>
+</dd>
+<dt id="krema.utils.image_to_data_uri"><code class="name flex">
+<span>def <span class="ident">image_to_data_uri</span></span>(<span>path: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert a image / gif to Data URI format.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to image / gif.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Formatted version.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def image_to_data_uri(path: str):
+    &#34;&#34;&#34;Convert a image / gif to Data URI format.
+
+    Args:
+        path (str): Path to image / gif.
+
+    Returns:
+        str: Formatted version.
+    &#34;&#34;&#34;
+    with open(path, &#34;rb&#34;) as f:
+        img_bytes = f.read()
+        encrypt = b64encode(img_bytes).decode()
+
+        return f&#34;data:image/{f.name.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)};base64,{encrypt}&#34;</code></pre>
 </details>
 </dd>
 </dl>
@@ -157,6 +314,8 @@ def dict_to_query(data: dict) -&gt; str:
 <ul class="">
 <li><code><a title="krema.utils.convert_iso" href="#krema.utils.convert_iso">convert_iso</a></code></li>
 <li><code><a title="krema.utils.dict_to_query" href="#krema.utils.dict_to_query">dict_to_query</a></code></li>
+<li><code><a title="krema.utils.file_builder" href="#krema.utils.file_builder">file_builder</a></code></li>
+<li><code><a title="krema.utils.image_to_data_uri" href="#krema.utils.image_to_data_uri">image_to_data_uri</a></code></li>
 </ul>
 </li>
 </ul>

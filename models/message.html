@@ -33,10 +33,13 @@ Models for message and other classes about message.
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Union
+from typing import Union
 from urllib.parse import quote
 from ..utils import convert_iso, dict_to_query
 from ..errors.message import *
+
+from json import dumps
+from aiohttp import FormData
 
 
 @dataclass
@@ -235,7 +238,7 @@ class Message:
             DeleteReactionFailed: Deleting the reaction is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;, {})
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;)
 
         if atom == 0:
             return True
@@ -278,18 +281,18 @@ class Message:
             DeleteReactionsFailed: Deleting the reactions are failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;, {})
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;)
 
         if atom == 0:
             return True
         else:
             raise DeleteReactionsFailed(result)
 
-    async def edit(self, file_name: str = None, **kwargs):
+    async def edit(self, file: dict = None, **kwargs):
         &#34;&#34;&#34;Edit the message.
 
         Args:
-            file_name (str, optional): File name for your file.
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
             **kwargs: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
 
         Returns:
@@ -299,7 +302,18 @@ class Message:
             EditMessageFailed: Editing the message is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, kwargs, {&#34;Content-Disposition&#34;: file_name} if file_name is not None else None)
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                kwargs), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = kwargs
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, **params)
 
         if atom == 0:
             return Message(self.client, result)
@@ -316,17 +330,18 @@ class Message:
             DeleteMessageFailed: Deleting the message is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, {})
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;)
 
         if atom == 0:
             return True
         else:
             raise DeleteMessageFailed(result)
 
-    async def reply(self, **kwargs):
+    async def reply(self, file: dict = None, **kwargs):
         &#34;&#34;&#34;Reply to the message.
 
         Args:
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
             **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
 
         Returns:
@@ -336,12 +351,25 @@ class Message:
             SendMessageFailed: Sending the message is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, {
+        reply_data = {
             **kwargs,
             &#34;message_reference&#34;: {
                 &#34;message_id&#34;: self.id
             }
-        })
+        }
+
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                reply_data), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = reply_data
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, **params)
 
         if atom == 0:
             return Message(self.client, result)
@@ -714,7 +742,7 @@ class Message:
             DeleteReactionFailed: Deleting the reaction is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;, {})
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;)
 
         if atom == 0:
             return True
@@ -757,18 +785,18 @@ class Message:
             DeleteReactionsFailed: Deleting the reactions are failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;, {})
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;)
 
         if atom == 0:
             return True
         else:
             raise DeleteReactionsFailed(result)
 
-    async def edit(self, file_name: str = None, **kwargs):
+    async def edit(self, file: dict = None, **kwargs):
         &#34;&#34;&#34;Edit the message.
 
         Args:
-            file_name (str, optional): File name for your file.
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
             **kwargs: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
 
         Returns:
@@ -778,7 +806,18 @@ class Message:
             EditMessageFailed: Editing the message is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, kwargs, {&#34;Content-Disposition&#34;: file_name} if file_name is not None else None)
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                kwargs), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = kwargs
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, **params)
 
         if atom == 0:
             return Message(self.client, result)
@@ -795,17 +834,18 @@ class Message:
             DeleteMessageFailed: Deleting the message is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, {})
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;)
 
         if atom == 0:
             return True
         else:
             raise DeleteMessageFailed(result)
 
-    async def reply(self, **kwargs):
+    async def reply(self, file: dict = None, **kwargs):
         &#34;&#34;&#34;Reply to the message.
 
         Args:
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
             **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
 
         Returns:
@@ -815,12 +855,25 @@ class Message:
             SendMessageFailed: Sending the message is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, {
+        reply_data = {
             **kwargs,
             &#34;message_reference&#34;: {
                 &#34;message_id&#34;: self.id
             }
-        })
+        }
+
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                reply_data), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = reply_data
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, **params)
 
         if atom == 0:
             return Message(self.client, result)
@@ -903,7 +956,7 @@ class Message:
         DeleteMessageFailed: Deleting the message is failed.
     &#34;&#34;&#34;
 
-    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, {})
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;)
 
     if atom == 0:
         return True
@@ -951,7 +1004,7 @@ class Message:
         DeleteReactionFailed: Deleting the reaction is failed.
     &#34;&#34;&#34;
 
-    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;, {})
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions/{quote(emoji)}/{&#39;@me&#39; if user_id is None else user_id}&#34;)
 
     if atom == 0:
         return True
@@ -996,7 +1049,7 @@ class Message:
         DeleteReactionsFailed: Deleting the reactions are failed.
     &#34;&#34;&#34;
 
-    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;, {})
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/reactions{f&#39;/{quote(emoji)}&#39; if emoji is not None else &#39;&#39;}&#34;)
 
     if atom == 0:
         return True
@@ -1005,14 +1058,14 @@ class Message:
 </details>
 </dd>
 <dt id="krema.models.message.Message.edit"><code class="name flex">
-<span>async def <span class="ident">edit</span></span>(<span>self, file_name: str = None, **kwargs)</span>
+<span>async def <span class="ident">edit</span></span>(<span>self, file: dict = None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Edit the message.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>file_name</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>File name for your file.</dd>
+<dt><strong><code>file</code></strong> :&ensp;<code>dict</code></dt>
+<dd>For send a message / embed attachment with file, use <code><a title="krema.utils.file_builder" href="../utils.html#krema.utils.file_builder">file_builder()</a></code> for make it easier.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
 <dd><a href="https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params">https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params</a></dd>
 </dl>
@@ -1030,11 +1083,11 @@ class Message:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def edit(self, file_name: str = None, **kwargs):
+<pre><code class="python">async def edit(self, file: dict = None, **kwargs):
     &#34;&#34;&#34;Edit the message.
 
     Args:
-        file_name (str, optional): File name for your file.
+        file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
         **kwargs: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
 
     Returns:
@@ -1044,7 +1097,18 @@ class Message:
         EditMessageFailed: Editing the message is failed.
     &#34;&#34;&#34;
 
-    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, kwargs, {&#34;Content-Disposition&#34;: file_name} if file_name is not None else None)
+    params, payload = {}, FormData()
+
+    if file is not None:
+        payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+            kwargs), content_type=&#34;application/json&#34;)
+        payload.add_field(**file)
+
+        params[&#34;data&#34;] = payload
+    else:
+        params[&#34;json&#34;] = kwargs
+
+    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}&#34;, **params)
 
     if atom == 0:
         return Message(self.client, result)
@@ -1103,12 +1167,14 @@ class Message:
 </details>
 </dd>
 <dt id="krema.models.message.Message.reply"><code class="name flex">
-<span>async def <span class="ident">reply</span></span>(<span>self, **kwargs)</span>
+<span>async def <span class="ident">reply</span></span>(<span>self, file: dict = None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Reply to the message.</p>
 <h2 id="args">Args</h2>
 <dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>dict</code></dt>
+<dd>For send a message / embed attachment with file, use <code><a title="krema.utils.file_builder" href="../utils.html#krema.utils.file_builder">file_builder()</a></code> for make it easier.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
 <dd><a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params">https://discord.com/developers/docs/resources/channel#create-message-jsonform-params</a></dd>
 </dl>
@@ -1126,10 +1192,11 @@ class Message:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def reply(self, **kwargs):
+<pre><code class="python">async def reply(self, file: dict = None, **kwargs):
     &#34;&#34;&#34;Reply to the message.
 
     Args:
+        file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
         **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
 
     Returns:
@@ -1139,12 +1206,25 @@ class Message:
         SendMessageFailed: Sending the message is failed.
     &#34;&#34;&#34;
 
-    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, {
+    reply_data = {
         **kwargs,
         &#34;message_reference&#34;: {
             &#34;message_id&#34;: self.id
         }
-    })
+    }
+
+    params, payload = {}, FormData()
+
+    if file is not None:
+        payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+            reply_data), content_type=&#34;application/json&#34;)
+        payload.add_field(**file)
+
+        params[&#34;data&#34;] = payload
+    else:
+        params[&#34;json&#34;] = reply_data
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages&#34;, **params)
 
     if atom == 0:
         return Message(self.client, result)

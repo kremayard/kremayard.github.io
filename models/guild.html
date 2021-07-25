@@ -34,6 +34,8 @@ Models for guild, channel and other related stuff.
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Union
+from json import dumps
+from aiohttp import FormData
 
 from ..errors.message import SendMessageFailed
 from ..errors.channel import *
@@ -243,7 +245,7 @@ class Channel:
 
         messages = await self.fetch_messages(limit)
 
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, {
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
             &#34;messages&#34;: [i.id for i in messages]
         })
 
@@ -252,10 +254,11 @@ class Channel:
         else:
             raise BulkDeleteMessagesFailed(result)
 
-    async def send(self, **kwargs):
+    async def send(self, file: dict = None, **kwargs):
         &#34;&#34;&#34;Send message to the text-channel.
 
         Args:
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
             **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
 
         Returns:
@@ -266,7 +269,18 @@ class Channel:
         &#34;&#34;&#34;
         from .message import Message
 
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                kwargs), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = kwargs
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
 
         if atom == 0:
             return Message(self.client, result)
@@ -286,7 +300,7 @@ class Channel:
             EditChannelFailed: Editing the channel is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, kwargs)
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
 
         if atom == 0:
             return Channel(self.client, result)
@@ -303,7 +317,7 @@ class Channel:
             DeleteChannelFailed: Editing the channel is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;, {})
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
 
         if atom == 0:
             return Channel(self.client, result)
@@ -532,7 +546,7 @@ class Channel:
 
         messages = await self.fetch_messages(limit)
 
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, {
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
             &#34;messages&#34;: [i.id for i in messages]
         })
 
@@ -541,10 +555,11 @@ class Channel:
         else:
             raise BulkDeleteMessagesFailed(result)
 
-    async def send(self, **kwargs):
+    async def send(self, file: dict = None, **kwargs):
         &#34;&#34;&#34;Send message to the text-channel.
 
         Args:
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
             **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
 
         Returns:
@@ -555,7 +570,18 @@ class Channel:
         &#34;&#34;&#34;
         from .message import Message
 
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                kwargs), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = kwargs
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
 
         if atom == 0:
             return Message(self.client, result)
@@ -575,7 +601,7 @@ class Channel:
             EditChannelFailed: Editing the channel is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, kwargs)
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
 
         if atom == 0:
             return Channel(self.client, result)
@@ -592,7 +618,7 @@ class Channel:
             DeleteChannelFailed: Editing the channel is failed.
         &#34;&#34;&#34;
 
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;, {})
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
 
         if atom == 0:
             return Channel(self.client, result)
@@ -651,7 +677,7 @@ class Channel:
         DeleteChannelFailed: Editing the channel is failed.
     &#34;&#34;&#34;
 
-    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;, {})
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
 
     if atom == 0:
         return Channel(self.client, result)
@@ -696,7 +722,7 @@ class Channel:
         EditChannelFailed: Editing the channel is failed.
     &#34;&#34;&#34;
 
-    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, kwargs)
+    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
 
     if atom == 0:
         return Channel(self.client, result)
@@ -835,7 +861,7 @@ class Channel:
 
     messages = await self.fetch_messages(limit)
 
-    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, {
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
         &#34;messages&#34;: [i.id for i in messages]
     })
 
@@ -846,12 +872,14 @@ class Channel:
 </details>
 </dd>
 <dt id="krema.models.guild.Channel.send"><code class="name flex">
-<span>async def <span class="ident">send</span></span>(<span>self, **kwargs)</span>
+<span>async def <span class="ident">send</span></span>(<span>self, file: dict = None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Send message to the text-channel.</p>
 <h2 id="args">Args</h2>
 <dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>dict</code></dt>
+<dd>For send a message / embed attachment with file, use <code><a title="krema.utils.file_builder" href="../utils.html#krema.utils.file_builder">file_builder()</a></code> for make it easier.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
 <dd><a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params">https://discord.com/developers/docs/resources/channel#create-message-jsonform-params</a></dd>
 </dl>
@@ -869,10 +897,11 @@ class Channel:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def send(self, **kwargs):
+<pre><code class="python">async def send(self, file: dict = None, **kwargs):
     &#34;&#34;&#34;Send message to the text-channel.
 
     Args:
+        file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
         **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
 
     Returns:
@@ -883,7 +912,18 @@ class Channel:
     &#34;&#34;&#34;
     from .message import Message
 
-    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, kwargs)
+    params, payload = {}, FormData()
+
+    if file is not None:
+        payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+            kwargs), content_type=&#34;application/json&#34;)
+        payload.add_field(**file)
+
+        params[&#34;data&#34;] = payload
+    else:
+        params[&#34;json&#34;] = kwargs
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
 
     if atom == 0:
         return Message(self.client, result)

@@ -32,7 +32,8 @@ Client model for krema.
 &#34;&#34;&#34;
 
 from unikorn import kollektor
-from ..errors import FetchChannelFailed, InvalidTokenError
+from ..errors import FetchChannelFailed, InvalidTokenError, FetchUserFailed, ModifyClientUserFailed
+from ..utils import image_to_data_uri
 
 
 class Client:
@@ -256,7 +257,7 @@ class Client:
     # ==================
 
     async def fetch_channel(self, id: int):
-        &#34;&#34;&#34;Fetch a channel by ID.
+        &#34;&#34;&#34;Fetch a Channel by ID.
 
         Args:
             id (int): Channel ID.
@@ -275,7 +276,55 @@ class Client:
         if atom == 0:
             return Channel(self,  result)
         else:
-            raise FetchChannelFailed(result)</code></pre>
+            raise FetchChannelFailed(result)
+
+    async def fetch_user(self, id: int = None):
+        &#34;&#34;&#34;Fetch an User by ID.
+
+        Args:
+            id (int, optional): User ID, if not added it will fetch client user (@me).
+
+        Returns:
+            User: Found user.
+
+        Raises:
+            FetchUserFailed: Fetching the user is failed.
+        &#34;&#34;&#34;
+
+        from .user import User
+
+        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+
+        if atom == 0:
+            return User(self,  result)
+        else:
+            raise FetchUserFailed(result)
+
+    async def edit(self, username: str, path: str):
+        &#34;&#34;&#34;Edit client user.
+
+        Args:
+            username (str): New username.
+            path (str): Image / Gif path.
+
+        Returns:
+            User: Updated user.
+
+        Raises:
+            ModifyClientUserFailed: Editing the client user is failed.
+        &#34;&#34;&#34;
+
+        from .user import User
+
+        atom, result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+            &#34;username&#34;: username,
+            &#34;avatar&#34;: image_to_data_uri(path)
+        })
+
+        if atom == 0:
+            return User(self,  result)
+        else:
+            raise ModifyClientUserFailed(result)</code></pre>
 </details>
 </section>
 <section>
@@ -548,7 +597,7 @@ class Client:
     # ==================
 
     async def fetch_channel(self, id: int):
-        &#34;&#34;&#34;Fetch a channel by ID.
+        &#34;&#34;&#34;Fetch a Channel by ID.
 
         Args:
             id (int): Channel ID.
@@ -567,7 +616,55 @@ class Client:
         if atom == 0:
             return Channel(self,  result)
         else:
-            raise FetchChannelFailed(result)</code></pre>
+            raise FetchChannelFailed(result)
+
+    async def fetch_user(self, id: int = None):
+        &#34;&#34;&#34;Fetch an User by ID.
+
+        Args:
+            id (int, optional): User ID, if not added it will fetch client user (@me).
+
+        Returns:
+            User: Found user.
+
+        Raises:
+            FetchUserFailed: Fetching the user is failed.
+        &#34;&#34;&#34;
+
+        from .user import User
+
+        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+
+        if atom == 0:
+            return User(self,  result)
+        else:
+            raise FetchUserFailed(result)
+
+    async def edit(self, username: str, path: str):
+        &#34;&#34;&#34;Edit client user.
+
+        Args:
+            username (str): New username.
+            path (str): Image / Gif path.
+
+        Returns:
+            User: Updated user.
+
+        Raises:
+            ModifyClientUserFailed: Editing the client user is failed.
+        &#34;&#34;&#34;
+
+        from .user import User
+
+        atom, result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+            &#34;username&#34;: username,
+            &#34;avatar&#34;: image_to_data_uri(path)
+        })
+
+        if atom == 0:
+            return User(self,  result)
+        else:
+            raise ModifyClientUserFailed(result)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -639,6 +736,59 @@ def formatted_token(self) -&gt; str:
         self.user = User(self, result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.client.Client.edit"><code class="name flex">
+<span>async def <span class="ident">edit</span></span>(<span>self, username: str, path: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit client user.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>username</code></strong> :&ensp;<code>str</code></dt>
+<dd>New username.</dd>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Image / Gif path.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>User</code></dt>
+<dd>Updated user.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ModifyClientUserFailed</code></dt>
+<dd>Editing the client user is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit(self, username: str, path: str):
+    &#34;&#34;&#34;Edit client user.
+
+    Args:
+        username (str): New username.
+        path (str): Image / Gif path.
+
+    Returns:
+        User: Updated user.
+
+    Raises:
+        ModifyClientUserFailed: Editing the client user is failed.
+    &#34;&#34;&#34;
+
+    from .user import User
+
+    atom, result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+        &#34;username&#34;: username,
+        &#34;avatar&#34;: image_to_data_uri(path)
+    })
+
+    if atom == 0:
+        return User(self,  result)
+    else:
+        raise ModifyClientUserFailed(result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.event"><code class="name flex">
 <span>def <span class="ident">event</span></span>(<span>self, event_name: str = None)</span>
 </code></dt>
@@ -677,7 +827,7 @@ def formatted_token(self) -&gt; str:
 <span>async def <span class="ident">fetch_channel</span></span>(<span>self, id: int)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Fetch a channel by ID.</p>
+<div class="desc"><p>Fetch a Channel by ID.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
@@ -698,7 +848,7 @@ def formatted_token(self) -&gt; str:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">async def fetch_channel(self, id: int):
-    &#34;&#34;&#34;Fetch a channel by ID.
+    &#34;&#34;&#34;Fetch a Channel by ID.
 
     Args:
         id (int): Channel ID.
@@ -718,6 +868,53 @@ def formatted_token(self) -&gt; str:
         return Channel(self,  result)
     else:
         raise FetchChannelFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.fetch_user"><code class="name flex">
+<span>async def <span class="ident">fetch_user</span></span>(<span>self, id: int = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch an User by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>User ID, if not added it will fetch client user (@me).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>User</code></dt>
+<dd>Found user.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchUserFailed</code></dt>
+<dd>Fetching the user is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_user(self, id: int = None):
+    &#34;&#34;&#34;Fetch an User by ID.
+
+    Args:
+        id (int, optional): User ID, if not added it will fetch client user (@me).
+
+    Returns:
+        User: Found user.
+
+    Raises:
+        FetchUserFailed: Fetching the user is failed.
+    &#34;&#34;&#34;
+
+    from .user import User
+
+    atom, result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+
+    if atom == 0:
+        return User(self,  result)
+    else:
+        raise FetchUserFailed(result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.start"><code class="name flex">
@@ -806,8 +1003,10 @@ def formatted_token(self) -&gt; str:
 <h4><code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></h4>
 <ul class="two-column">
 <li><code><a title="krema.models.client.Client.check_token" href="#krema.models.client.Client.check_token">check_token</a></code></li>
+<li><code><a title="krema.models.client.Client.edit" href="#krema.models.client.Client.edit">edit</a></code></li>
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_user" href="#krema.models.client.Client.fetch_user">fetch_user</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>
 <li><code><a title="krema.models.client.Client.start" href="#krema.models.client.Client.start">start</a></code></li>
 <li><code><a title="krema.models.client.Client.update_presence" href="#krema.models.client.Client.update_presence">update_presence</a></code></li>

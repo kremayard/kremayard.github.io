@@ -32,7 +32,6 @@ Http part of the krema.
 &#34;&#34;&#34;
 
 import asyncio
-from typing import Any, Union
 import aiohttp
 
 
@@ -51,13 +50,13 @@ class HTTP:
 
         pass
 
-    async def request(self, method: str, endpoint: str, params: Union[dict, list] = None, headers: Union[dict] = None) -&gt; tuple:
+    async def request(self, method: str, endpoint: str, **kwargs) -&gt; tuple:
         &#34;&#34;&#34;Send a async request to the discord API.
 
         Args:
             method (str): REST method. like GET, PATCH etc...
             endpoint (str): Endpoint URL for request.
-            params (dict): JSON Parameters for request.
+            **kwargs Other parameters for request.
 
         Returns:
             tuple: A tuple that contains an atom and result.
@@ -69,11 +68,8 @@ class HTTP:
 
         result: tuple = ()
 
-        if headers is None:
-            headers = {}
-
         async with aiohttp.ClientSession() as session:
-            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;, **headers}, json=params) as response:
+            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
                 try:
                     json_data = await response.json()
                 except aiohttp.client_exceptions.ContentTypeError:
@@ -93,14 +89,14 @@ class HTTP:
                     retry_after = json_data.get(&#34;retry_after&#34;)
 
                     if retry_after is not None:
-                        return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, params)
+                        return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
                     else:
                         result = (1, json_data.get(&#34;message&#34;) or json_data)
                         return result
 
-    async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, params):
+    async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, **kwargs):
         await asyncio.sleep(ratelimit + 0.1)
-        return await self.request(method, endpoint, params)</code></pre>
+        return await self.request(method, endpoint, **kwargs)</code></pre>
 </details>
 </section>
 <section>
@@ -142,13 +138,13 @@ class HTTP:
 
         pass
 
-    async def request(self, method: str, endpoint: str, params: Union[dict, list] = None, headers: Union[dict] = None) -&gt; tuple:
+    async def request(self, method: str, endpoint: str, **kwargs) -&gt; tuple:
         &#34;&#34;&#34;Send a async request to the discord API.
 
         Args:
             method (str): REST method. like GET, PATCH etc...
             endpoint (str): Endpoint URL for request.
-            params (dict): JSON Parameters for request.
+            **kwargs Other parameters for request.
 
         Returns:
             tuple: A tuple that contains an atom and result.
@@ -160,11 +156,8 @@ class HTTP:
 
         result: tuple = ()
 
-        if headers is None:
-            headers = {}
-
         async with aiohttp.ClientSession() as session:
-            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;, **headers}, json=params) as response:
+            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
                 try:
                     json_data = await response.json()
                 except aiohttp.client_exceptions.ContentTypeError:
@@ -184,19 +177,19 @@ class HTTP:
                     retry_after = json_data.get(&#34;retry_after&#34;)
 
                     if retry_after is not None:
-                        return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, params)
+                        return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
                     else:
                         result = (1, json_data.get(&#34;message&#34;) or json_data)
                         return result
 
-    async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, params):
+    async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, **kwargs):
         await asyncio.sleep(ratelimit + 0.1)
-        return await self.request(method, endpoint, params)</code></pre>
+        return await self.request(method, endpoint, **kwargs)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
 <dt id="krema.http.HTTP.request"><code class="name flex">
-<span>async def <span class="ident">request</span></span>(<span>self, method: str, endpoint: str, params: Union[dict, list] = None, headers: dict = None) ‑> tuple</span>
+<span>async def <span class="ident">request</span></span>(<span>self, method: str, endpoint: str, **kwargs) ‑> tuple</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Send a async request to the discord API.</p>
@@ -206,9 +199,8 @@ class HTTP:
 <dd>REST method. like GET, PATCH etc&hellip;</dd>
 <dt><strong><code>endpoint</code></strong> :&ensp;<code>str</code></dt>
 <dd>Endpoint URL for request.</dd>
-<dt><strong><code>params</code></strong> :&ensp;<code>dict</code></dt>
-<dd>JSON Parameters for request.</dd>
 </dl>
+<p>**kwargs Other parameters for request.</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>tuple</code></dt>
@@ -222,13 +214,13 @@ class HTTP:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def request(self, method: str, endpoint: str, params: Union[dict, list] = None, headers: Union[dict] = None) -&gt; tuple:
+<pre><code class="python">async def request(self, method: str, endpoint: str, **kwargs) -&gt; tuple:
     &#34;&#34;&#34;Send a async request to the discord API.
 
     Args:
         method (str): REST method. like GET, PATCH etc...
         endpoint (str): Endpoint URL for request.
-        params (dict): JSON Parameters for request.
+        **kwargs Other parameters for request.
 
     Returns:
         tuple: A tuple that contains an atom and result.
@@ -240,11 +232,8 @@ class HTTP:
 
     result: tuple = ()
 
-    if headers is None:
-        headers = {}
-
     async with aiohttp.ClientSession() as session:
-        async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;Content-Type&#34;: &#34;application/json&#34;, &#34;User-Agent&#34;: &#34;krema&#34;, **headers}, json=params) as response:
+        async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
             try:
                 json_data = await response.json()
             except aiohttp.client_exceptions.ContentTypeError:
@@ -264,7 +253,7 @@ class HTTP:
                 retry_after = json_data.get(&#34;retry_after&#34;)
 
                 if retry_after is not None:
-                    return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, params)
+                    return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
                 else:
                     result = (1, json_data.get(&#34;message&#34;) or json_data)
                     return result</code></pre>
