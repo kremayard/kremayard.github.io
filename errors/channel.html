@@ -65,6 +65,18 @@ class EditChannelFailed(Exception):
 class DeleteChannelFailed(Exception):
     &#34;&#34;&#34;Raises when deleting the channel is failed.&#34;&#34;&#34;
 
+    pass
+
+
+class StartTypingFailed(Exception):
+    &#34;&#34;&#34;Raises when triggering the channel typing is failed.&#34;&#34;&#34;
+
+    pass
+
+
+class FetchPinnedMessagesFailed(Exception):
+    &#34;&#34;&#34;Raises when fetching the pinned messages is failed.&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 </section>
@@ -203,6 +215,48 @@ class DeleteChannelFailed(Exception):
 <li>builtins.BaseException</li>
 </ul>
 </dd>
+<dt id="krema.errors.channel.FetchPinnedMessagesFailed"><code class="flex name class">
+<span>class <span class="ident">FetchPinnedMessagesFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when fetching the pinned messages is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FetchPinnedMessagesFailed(Exception):
+    &#34;&#34;&#34;Raises when fetching the pinned messages is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.channel.StartTypingFailed"><code class="flex name class">
+<span>class <span class="ident">StartTypingFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when triggering the channel typing is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class StartTypingFailed(Exception):
+    &#34;&#34;&#34;Raises when triggering the channel typing is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 </dl>
 </section>
 </article>
@@ -236,6 +290,12 @@ class DeleteChannelFailed(Exception):
 </li>
 <li>
 <h4><code><a title="krema.errors.channel.FetchChannelMessagesFailed" href="#krema.errors.channel.FetchChannelMessagesFailed">FetchChannelMessagesFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.channel.FetchPinnedMessagesFailed" href="#krema.errors.channel.FetchPinnedMessagesFailed">FetchPinnedMessagesFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.channel.StartTypingFailed" href="#krema.errors.channel.StartTypingFailed">StartTypingFailed</a></code></h4>
 </li>
 </ul>
 </li>

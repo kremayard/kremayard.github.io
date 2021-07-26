@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>krema.models.guild API documentation</title>
-<meta name="description" content="Models for guild, channel and other related stuff." />
+<meta name="description" content="Models for guild and other related stuff." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,23 +22,19 @@
 <h1 class="title">Module <code>krema.models.guild</code></h1>
 </header>
 <section id="section-intro">
-<p>Models for guild, channel and other related stuff.</p>
+<p>Models for guild and other related stuff.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-Models for guild, channel and other related stuff.
+Models for guild and other related stuff.
 &#34;&#34;&#34;
 
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Union
-from json import dumps
-from aiohttp import FormData
-
-from ..errors.message import SendMessageFailed
-from ..errors.channel import *
+from ..errors.guild import *
 
 
 @dataclass
@@ -55,6 +51,7 @@ class Guild:
     def __init__(self, client, data: dict) -&gt; None:
         from ..utils import convert_iso
         from .user import Member
+        from .channel import Channel
 
         self.client = client
 
@@ -125,225 +122,135 @@ class Guild:
         self.nsfw_level: int = data.get(&#34;nsfw_level&#34;)
         self.stage_instances: Union[list, None] = data.get(&#34;stage_instances&#34;)
 
+    async def fetch_emojis(self):
+        &#34;&#34;&#34;Fetch all emojis in the Guild.
+
+        Returns:
+            list: List of Emoji objects.
+
+        Raises:
+            FetchEmojisFailed: Fetching the emojis is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/emojis&#34;)
+
+        if atom == 0:
+            return [Emoji(self.client, i) for i in result]
+        else:
+            raise FetchEmojisFailed(result)
+
+    async def fetch_emoji(self, emoji_id: int):
+        &#34;&#34;&#34;Fetch a emoji from Guild.
+
+        Args:
+            emoji_id (int): Emoji ID.
+
+        Returns:
+            Emoji: Found emoji object.
+
+        Raises:
+            FetchEmojiFailed: Fetching the emojis is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
+
+        if atom == 0:
+            return Emoji(self.client, result)
+        else:
+            raise FetchEmojiFailed(result)
+
+    async def create_emoji(self, **kwargs):
+        &#34;&#34;&#34;Create a Guild emoji.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/emoji#create-guild-emoji-json-params (for image, use `krema.utils.image_to_data_uri` function.)
+
+        Returns:
+            Emoji: Created Emoji object.
+
+        Raises:
+            CreateEmojiFailed: Creating the guild emoji is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/emojis&#34;, json=kwargs)
+
+        if atom == 0:
+            return Emoji(self.client, result)
+        else:
+            raise CreateEmojiFailed(result)
+
+    async def update_emoji(self, emoji_id: int, **kwargs):
+        &#34;&#34;&#34;Update a Guild emoji.
+
+        Args:
+            emoji_id (int): Emoji ID.
+            **kwargs: https://discord.com/developers/docs/resources/emoji#modify-guild-emoji-json-params
+
+        Returns:
+            Emoji: Updated Emoji object.
+
+        Raises:
+            UpdateEmojiFailed: Updating the guild emoji is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;, json=kwargs)
+
+        if atom == 0:
+            return Emoji(self.client, result)
+        else:
+            raise UpdateEmojiFailed(result)
+
+    async def delete_emoji(self, emoji_id: int):
+        &#34;&#34;&#34;Delete a Guild emoji.
+
+        Args:
+            emoji_id (int): Emoji ID.
+
+        Returns:
+            True: Emoji deleted successfully.
+
+        Raises:
+            DeleteEmojiFailed: Deleting the guild emoji is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
+
+        if atom == 0:
+            return True
+        else:
+            raise DeleteEmojiFailed(result)
+
 
 @dataclass
-class Channel:
-    &#34;&#34;&#34;Channel class.
-
-    Args:
-        client (Client): Krema client.
-        data (dict): Sent packet from websocket.
+class Emoji:
+    &#34;&#34;&#34;Emoji class.
 
     Attributes:
-        client (Client): Krema client.
-        id (int): Channel ID.
-        type (int): Channel type.
-        guild_id (int, None): Guild ID.
-        position (int, None): Channel position.
-        permission_overwrites (list, None): List of permission_overwrite.
-        name (str, None): Channel name.
-        topic (str, None): Channel topic.
-        nsfw (bool, None): Channel nsfw boolean.
-        last_message_id (int, None): Last message ID in the channel.
-        bitrate (int, None): Channel bitrate (voice).
-        user_limit (int, None): &#34;The user limit of the voice channel&#34; (voice).
-        rate_limit_per_user (int, None): Channel slowmode second.
-        recipients (list, None): List of user object.
-        icon (str, None): Icon hash for DM channel.
-        owner_id (int, None): DM channel owner id.
-        application_id (int, None): &#34;Application id of the group DM creator if it is bot-created&#34;.
-        parent_id (int, None): &#34;for guild channels: id of the parent category for a channel (each parent category can contain up to 50 channels), for threads: id of the text channel this thread was created&#34;.
-        last_pin_timestamp (datetime, None): When the last pinned message was pinned.
-        rtc_region (str, None): Voice region.
-        video_quality_mode (int, None): &#34;the camera video quality mode of the voice channel, 1 when not present&#34;.
-        message_count (int, None): &#34;an approximate count of messages in a thread, stops counting at 50&#34;.
-        member_count (int, None): &#34;an approximate count of users in a thread, stops counting at 50&#34;.
-        thread_metadata (dict, None): &#34;Thread-specific fields not needed by other channels&#34;.
-        member (ThreadMember, None): &#34;Thread member object for the current user, if they have joined the thread, only included on certain API endpoints&#34;.
-        default_auto_archive_duration (int, None): &#34;Default duration for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080&#34;.
+        id (int, None): Emoji ID.
+        name (str, None): Emoji name.
+        roles (list, None): Allowed roles list.
+        user (User, None): Owner of the emoji.
+        require_colons (bool, None): whether this emoji must be wrapped in colons.
+        managed (bool, None): whether this emoji is managed.
+        animated (bool, None): whether this emoji is animated.
+        available (bool, None): &#34;whether this emoji can be used, may be false due to loss of Server Boosts&#34;.
     &#34;&#34;&#34;
 
     def __init__(self, client, data: dict) -&gt; None:
-        from .user import User, ThreadMember
-        from ..utils import convert_iso
+        from .user import User
 
         self.client = client
 
-        self.id: int = int(data.get(&#34;id&#34;))
-        self.type: int = data.get(&#34;type&#34;)
-        self.guild_id: Union[int, None] = int(
-            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
-        self.position: Union[int, None] = data.get(&#34;position&#34;)
-        self.permission_overwrites: Union[list, None] = data.get(
-            &#34;permission_overwrites&#34;)
+        self.id: Union[int, None] = int(
+            data.get(&#34;id&#34;)) if data.get(&#34;id&#34;) is not None else None
         self.name: Union[str, None] = data.get(&#34;name&#34;)
-        self.topic: Union[str, None] = data.get(&#34;topic&#34;)
-        self.nsfw: Union[bool, None] = data.get(&#34;nsfw&#34;)
-        self.last_message_id: Union[int, None] = int(
-            data.get(&#34;last_message_id&#34;)) if data.get(&#34;last_message_id&#34;) is not None else None
-        self.bitrate: Union[int, None] = data.get(&#34;bitrate&#34;)
-        self.user_limit: Union[int, None] = data.get(&#34;user_limit&#34;)
-        self.rate_limit_per_user: Union[int,
-                                        None] = data.get(&#34;rate_limit_per_user&#34;)
-        self.recipients: Union[list, None] = [User(self.client, i) for i in data.get(
-            &#34;recipients&#34;)] if data.get(&#34;recipients&#34;) is not None else None
-        self.icon: Union[str, None] = data.get(&#34;icon&#34;)
-        self.owner_id: Union[int, None] = int(
-            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) is not None else None
-        self.application_id: Union[int, None] = int(
-            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) is not None else None
-        self.parent_id: Union[int, None] = int(
-            data.get(&#34;parent_id&#34;)) if data.get(&#34;parent_id&#34;) is not None else None
-        self.last_pin_timestamp: Union[datetime, None] = convert_iso(
-            data.get(&#34;last_pin_timestamp&#34;)) if data.get(&#34;last_pin_timestamp&#34;) is not None else None
-        self.rtc_region: Union[str, None] = data.get(&#34;rtc_region&#34;)
-        self.video_quality_mode: Union[int,
-                                       None] = data.get(&#34;video_quality_mode&#34;)
-        self.message_count: Union[int, None] = data.get(&#34;message_count&#34;)
-        self.member_count: Union[int, None] = data.get(&#34;member_count&#34;)
-        self.thread_metadata: Union[dict, None] = data.get(&#34;thread_metadata&#34;)
-        self.member: Union[ThreadMember, None] = ThreadMember(
-            data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) is not None else None
-        self.default_auto_archive_duration: Union[int, None] = data.get(
-            &#34;default_auto_archive_duration&#34;)
-
-        pass
-
-    async def fetch_messages(self, limit: int = 10):
-        &#34;&#34;&#34;Fetch messages from channel.
-
-        Args:
-            limit (int): Maximum message limit (default is 10).
-
-        Returns:
-            list: List of message object.
-
-        Raises:
-            FetchChannelMessagesFailed: Fetching the messages from channel is failed.
-        &#34;&#34;&#34;
-        from .message import Message
-
-        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
-
-        if atom == 0:
-            return [Message(self.client, i) for i in result]
-        else:
-            raise FetchChannelMessagesFailed(result)
-
-    async def purge(self, limit: int = 2):
-        &#34;&#34;&#34;Bulk-delete messages from channel.
-
-        Args:
-            limit (int): Maximum message limit (default is 2).
-
-        Returns:
-            list: List of purged? messages.
-
-        Raises:
-            BulkDeleteMessagesFailed: Channel purge is failed.
-        &#34;&#34;&#34;
-
-        messages = await self.fetch_messages(limit)
-
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
-            &#34;messages&#34;: [i.id for i in messages]
-        })
-
-        if atom == 0:
-            return messages
-        else:
-            raise BulkDeleteMessagesFailed(result)
-
-    async def send(self, file: dict = None, **kwargs):
-        &#34;&#34;&#34;Send message to the text-channel.
-
-        Args:
-            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
-            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
-
-        Returns:
-            Message: Sent message object.
-
-        Raises:
-            SendMessageFailed: Sending the message is failed.
-        &#34;&#34;&#34;
-        from .message import Message
-
-        params, payload = {}, FormData()
-
-        if file is not None:
-            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
-                kwargs), content_type=&#34;application/json&#34;)
-            payload.add_field(**file)
-
-            params[&#34;data&#34;] = payload
-        else:
-            params[&#34;json&#34;] = kwargs
-
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
-
-        if atom == 0:
-            return Message(self.client, result)
-        else:
-            raise SendMessageFailed(result)
-
-    async def edit(self, **kwargs):
-        &#34;&#34;&#34;Edit channel with API params.
-
-        Args:
-            **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
-
-        Returns:
-            Channel: New channel.
-
-        Raises:
-            EditChannelFailed: Editing the channel is failed.
-        &#34;&#34;&#34;
-
-        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
-
-        if atom == 0:
-            return Channel(self.client, result)
-        else:
-            raise EditChannelFailed(result)
-
-    async def delete(self):
-        &#34;&#34;&#34;Delete channel.
-
-        Returns:
-            Channel: Deleted channel.
-
-        Raises:
-            DeleteChannelFailed: Editing the channel is failed.
-        &#34;&#34;&#34;
-
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
-
-        if atom == 0:
-            return Channel(self.client, result)
-        else:
-            raise DeleteChannelFailed(result)
-
-    async def fetch_message(self, message_id: int):
-        &#34;&#34;&#34;Fetch a message from channel by ID.
-
-        Args:
-            message_id: Message ID.
-
-        Returns:
-            Message: Found message.
-
-        Raises:
-            FetchChannelMessageFailed: Fetching the message is failed.
-        &#34;&#34;&#34;
-        from .message import Message
-
-        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
-
-        if atom == 0:
-            return Message(self.client, result)
-        else:
-            raise FetchChannelMessageFailed(result)</code></pre>
+        self.roles: Union[list, None] = data.get(&#34;roles&#34;)
+        self.user: Union[User, None] = User(self.client, data.get(
+            &#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
+        self.require_colons: Union[bool, None] = data.get(&#34;require_colons&#34;)
+        self.managed: Union[bool, None] = data.get(&#34;managed&#34;)
+        self.animated: Union[bool, None] = data.get(&#34;animated&#34;)
+        self.available: Union[bool, None] = data.get(&#34;available&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -355,583 +262,66 @@ class Channel:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="krema.models.guild.Channel"><code class="flex name class">
-<span>class <span class="ident">Channel</span></span>
+<dt id="krema.models.guild.Emoji"><code class="flex name class">
+<span>class <span class="ident">Emoji</span></span>
 <span>(</span><span>client, data: dict)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Channel class.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
-<dd>Krema client.</dd>
-<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Sent packet from websocket.</dd>
-</dl>
+<div class="desc"><p>Emoji class.</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
-<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
-<dd>Krema client.</dd>
-<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
-<dd>Channel ID.</dd>
-<dt><strong><code>type</code></strong> :&ensp;<code>int</code></dt>
-<dd>Channel type.</dd>
-<dt><strong><code>guild_id</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>Guild ID.</dd>
-<dt><strong><code>position</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>Channel position.</dd>
-<dt><strong><code>permission_overwrites</code></strong> :&ensp;<code>list, None</code></dt>
-<dd>List of permission_overwrite.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>Emoji ID.</dd>
 <dt><strong><code>name</code></strong> :&ensp;<code>str, None</code></dt>
-<dd>Channel name.</dd>
-<dt><strong><code>topic</code></strong> :&ensp;<code>str, None</code></dt>
-<dd>Channel topic.</dd>
-<dt><strong><code>nsfw</code></strong> :&ensp;<code>bool, None</code></dt>
-<dd>Channel nsfw boolean.</dd>
-<dt><strong><code>last_message_id</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>Last message ID in the channel.</dd>
-<dt><strong><code>bitrate</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>Channel bitrate (voice).</dd>
-<dt><strong><code>user_limit</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>"The user limit of the voice channel" (voice).</dd>
-<dt><strong><code>rate_limit_per_user</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>Channel slowmode second.</dd>
-<dt><strong><code>recipients</code></strong> :&ensp;<code>list, None</code></dt>
-<dd>List of user object.</dd>
-<dt><strong><code>icon</code></strong> :&ensp;<code>str, None</code></dt>
-<dd>Icon hash for DM channel.</dd>
-<dt><strong><code>owner_id</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>DM channel owner id.</dd>
-<dt><strong><code>application_id</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>"Application id of the group DM creator if it is bot-created".</dd>
-<dt><strong><code>parent_id</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>"for guild channels: id of the parent category for a channel (each parent category can contain up to 50 channels), for threads: id of the text channel this thread was created".</dd>
-<dt><strong><code>last_pin_timestamp</code></strong> :&ensp;<code>datetime, None</code></dt>
-<dd>When the last pinned message was pinned.</dd>
-<dt><strong><code>rtc_region</code></strong> :&ensp;<code>str, None</code></dt>
-<dd>Voice region.</dd>
-<dt><strong><code>video_quality_mode</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>"the camera video quality mode of the voice channel, 1 when not present".</dd>
-<dt><strong><code>message_count</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>"an approximate count of messages in a thread, stops counting at 50".</dd>
-<dt><strong><code>member_count</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>"an approximate count of users in a thread, stops counting at 50".</dd>
-<dt><strong><code>thread_metadata</code></strong> :&ensp;<code>dict, None</code></dt>
-<dd>"Thread-specific fields not needed by other channels".</dd>
-<dt><strong><code>member</code></strong> :&ensp;<code>ThreadMember, None</code></dt>
-<dd>"Thread member object for the current user, if they have joined the thread, only included on certain API endpoints".</dd>
-<dt><strong><code>default_auto_archive_duration</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>"Default duration for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080".</dd>
+<dd>Emoji name.</dd>
+<dt><strong><code>roles</code></strong> :&ensp;<code>list, None</code></dt>
+<dd>Allowed roles list.</dd>
+<dt><strong><code>user</code></strong> :&ensp;<code>User, None</code></dt>
+<dd>Owner of the emoji.</dd>
+<dt><strong><code>require_colons</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>whether this emoji must be wrapped in colons.</dd>
+<dt><strong><code>managed</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>whether this emoji is managed.</dd>
+<dt><strong><code>animated</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>whether this emoji is animated.</dd>
+<dt><strong><code>available</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>"whether this emoji can be used, may be false due to loss of Server Boosts".</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@dataclass
-class Channel:
-    &#34;&#34;&#34;Channel class.
-
-    Args:
-        client (Client): Krema client.
-        data (dict): Sent packet from websocket.
+class Emoji:
+    &#34;&#34;&#34;Emoji class.
 
     Attributes:
-        client (Client): Krema client.
-        id (int): Channel ID.
-        type (int): Channel type.
-        guild_id (int, None): Guild ID.
-        position (int, None): Channel position.
-        permission_overwrites (list, None): List of permission_overwrite.
-        name (str, None): Channel name.
-        topic (str, None): Channel topic.
-        nsfw (bool, None): Channel nsfw boolean.
-        last_message_id (int, None): Last message ID in the channel.
-        bitrate (int, None): Channel bitrate (voice).
-        user_limit (int, None): &#34;The user limit of the voice channel&#34; (voice).
-        rate_limit_per_user (int, None): Channel slowmode second.
-        recipients (list, None): List of user object.
-        icon (str, None): Icon hash for DM channel.
-        owner_id (int, None): DM channel owner id.
-        application_id (int, None): &#34;Application id of the group DM creator if it is bot-created&#34;.
-        parent_id (int, None): &#34;for guild channels: id of the parent category for a channel (each parent category can contain up to 50 channels), for threads: id of the text channel this thread was created&#34;.
-        last_pin_timestamp (datetime, None): When the last pinned message was pinned.
-        rtc_region (str, None): Voice region.
-        video_quality_mode (int, None): &#34;the camera video quality mode of the voice channel, 1 when not present&#34;.
-        message_count (int, None): &#34;an approximate count of messages in a thread, stops counting at 50&#34;.
-        member_count (int, None): &#34;an approximate count of users in a thread, stops counting at 50&#34;.
-        thread_metadata (dict, None): &#34;Thread-specific fields not needed by other channels&#34;.
-        member (ThreadMember, None): &#34;Thread member object for the current user, if they have joined the thread, only included on certain API endpoints&#34;.
-        default_auto_archive_duration (int, None): &#34;Default duration for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080&#34;.
+        id (int, None): Emoji ID.
+        name (str, None): Emoji name.
+        roles (list, None): Allowed roles list.
+        user (User, None): Owner of the emoji.
+        require_colons (bool, None): whether this emoji must be wrapped in colons.
+        managed (bool, None): whether this emoji is managed.
+        animated (bool, None): whether this emoji is animated.
+        available (bool, None): &#34;whether this emoji can be used, may be false due to loss of Server Boosts&#34;.
     &#34;&#34;&#34;
 
     def __init__(self, client, data: dict) -&gt; None:
-        from .user import User, ThreadMember
-        from ..utils import convert_iso
+        from .user import User
 
         self.client = client
 
-        self.id: int = int(data.get(&#34;id&#34;))
-        self.type: int = data.get(&#34;type&#34;)
-        self.guild_id: Union[int, None] = int(
-            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
-        self.position: Union[int, None] = data.get(&#34;position&#34;)
-        self.permission_overwrites: Union[list, None] = data.get(
-            &#34;permission_overwrites&#34;)
+        self.id: Union[int, None] = int(
+            data.get(&#34;id&#34;)) if data.get(&#34;id&#34;) is not None else None
         self.name: Union[str, None] = data.get(&#34;name&#34;)
-        self.topic: Union[str, None] = data.get(&#34;topic&#34;)
-        self.nsfw: Union[bool, None] = data.get(&#34;nsfw&#34;)
-        self.last_message_id: Union[int, None] = int(
-            data.get(&#34;last_message_id&#34;)) if data.get(&#34;last_message_id&#34;) is not None else None
-        self.bitrate: Union[int, None] = data.get(&#34;bitrate&#34;)
-        self.user_limit: Union[int, None] = data.get(&#34;user_limit&#34;)
-        self.rate_limit_per_user: Union[int,
-                                        None] = data.get(&#34;rate_limit_per_user&#34;)
-        self.recipients: Union[list, None] = [User(self.client, i) for i in data.get(
-            &#34;recipients&#34;)] if data.get(&#34;recipients&#34;) is not None else None
-        self.icon: Union[str, None] = data.get(&#34;icon&#34;)
-        self.owner_id: Union[int, None] = int(
-            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) is not None else None
-        self.application_id: Union[int, None] = int(
-            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) is not None else None
-        self.parent_id: Union[int, None] = int(
-            data.get(&#34;parent_id&#34;)) if data.get(&#34;parent_id&#34;) is not None else None
-        self.last_pin_timestamp: Union[datetime, None] = convert_iso(
-            data.get(&#34;last_pin_timestamp&#34;)) if data.get(&#34;last_pin_timestamp&#34;) is not None else None
-        self.rtc_region: Union[str, None] = data.get(&#34;rtc_region&#34;)
-        self.video_quality_mode: Union[int,
-                                       None] = data.get(&#34;video_quality_mode&#34;)
-        self.message_count: Union[int, None] = data.get(&#34;message_count&#34;)
-        self.member_count: Union[int, None] = data.get(&#34;member_count&#34;)
-        self.thread_metadata: Union[dict, None] = data.get(&#34;thread_metadata&#34;)
-        self.member: Union[ThreadMember, None] = ThreadMember(
-            data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) is not None else None
-        self.default_auto_archive_duration: Union[int, None] = data.get(
-            &#34;default_auto_archive_duration&#34;)
-
-        pass
-
-    async def fetch_messages(self, limit: int = 10):
-        &#34;&#34;&#34;Fetch messages from channel.
-
-        Args:
-            limit (int): Maximum message limit (default is 10).
-
-        Returns:
-            list: List of message object.
-
-        Raises:
-            FetchChannelMessagesFailed: Fetching the messages from channel is failed.
-        &#34;&#34;&#34;
-        from .message import Message
-
-        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
-
-        if atom == 0:
-            return [Message(self.client, i) for i in result]
-        else:
-            raise FetchChannelMessagesFailed(result)
-
-    async def purge(self, limit: int = 2):
-        &#34;&#34;&#34;Bulk-delete messages from channel.
-
-        Args:
-            limit (int): Maximum message limit (default is 2).
-
-        Returns:
-            list: List of purged? messages.
-
-        Raises:
-            BulkDeleteMessagesFailed: Channel purge is failed.
-        &#34;&#34;&#34;
-
-        messages = await self.fetch_messages(limit)
-
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
-            &#34;messages&#34;: [i.id for i in messages]
-        })
-
-        if atom == 0:
-            return messages
-        else:
-            raise BulkDeleteMessagesFailed(result)
-
-    async def send(self, file: dict = None, **kwargs):
-        &#34;&#34;&#34;Send message to the text-channel.
-
-        Args:
-            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
-            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
-
-        Returns:
-            Message: Sent message object.
-
-        Raises:
-            SendMessageFailed: Sending the message is failed.
-        &#34;&#34;&#34;
-        from .message import Message
-
-        params, payload = {}, FormData()
-
-        if file is not None:
-            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
-                kwargs), content_type=&#34;application/json&#34;)
-            payload.add_field(**file)
-
-            params[&#34;data&#34;] = payload
-        else:
-            params[&#34;json&#34;] = kwargs
-
-        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
-
-        if atom == 0:
-            return Message(self.client, result)
-        else:
-            raise SendMessageFailed(result)
-
-    async def edit(self, **kwargs):
-        &#34;&#34;&#34;Edit channel with API params.
-
-        Args:
-            **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
-
-        Returns:
-            Channel: New channel.
-
-        Raises:
-            EditChannelFailed: Editing the channel is failed.
-        &#34;&#34;&#34;
-
-        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
-
-        if atom == 0:
-            return Channel(self.client, result)
-        else:
-            raise EditChannelFailed(result)
-
-    async def delete(self):
-        &#34;&#34;&#34;Delete channel.
-
-        Returns:
-            Channel: Deleted channel.
-
-        Raises:
-            DeleteChannelFailed: Editing the channel is failed.
-        &#34;&#34;&#34;
-
-        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
-
-        if atom == 0:
-            return Channel(self.client, result)
-        else:
-            raise DeleteChannelFailed(result)
-
-    async def fetch_message(self, message_id: int):
-        &#34;&#34;&#34;Fetch a message from channel by ID.
-
-        Args:
-            message_id: Message ID.
-
-        Returns:
-            Message: Found message.
-
-        Raises:
-            FetchChannelMessageFailed: Fetching the message is failed.
-        &#34;&#34;&#34;
-        from .message import Message
-
-        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
-
-        if atom == 0:
-            return Message(self.client, result)
-        else:
-            raise FetchChannelMessageFailed(result)</code></pre>
+        self.roles: Union[list, None] = data.get(&#34;roles&#34;)
+        self.user: Union[User, None] = User(self.client, data.get(
+            &#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
+        self.require_colons: Union[bool, None] = data.get(&#34;require_colons&#34;)
+        self.managed: Union[bool, None] = data.get(&#34;managed&#34;)
+        self.animated: Union[bool, None] = data.get(&#34;animated&#34;)
+        self.available: Union[bool, None] = data.get(&#34;available&#34;)</code></pre>
 </details>
-<h3>Methods</h3>
-<dl>
-<dt id="krema.models.guild.Channel.delete"><code class="name flex">
-<span>async def <span class="ident">delete</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Delete channel.</p>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code><a title="krema.models.guild.Channel" href="#krema.models.guild.Channel">Channel</a></code></dt>
-<dd>Deleted channel.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>DeleteChannelFailed</code></dt>
-<dd>Editing the channel is failed.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">async def delete(self):
-    &#34;&#34;&#34;Delete channel.
-
-    Returns:
-        Channel: Deleted channel.
-
-    Raises:
-        DeleteChannelFailed: Editing the channel is failed.
-    &#34;&#34;&#34;
-
-    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
-
-    if atom == 0:
-        return Channel(self.client, result)
-    else:
-        raise DeleteChannelFailed(result)</code></pre>
-</details>
-</dd>
-<dt id="krema.models.guild.Channel.edit"><code class="name flex">
-<span>async def <span class="ident">edit</span></span>(<span>self, **kwargs)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Edit channel with API params.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>**kwargs</code></strong></dt>
-<dd><a href="https://discord.com/developers/docs/resources/channel#modify-channel">https://discord.com/developers/docs/resources/channel#modify-channel</a></dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code><a title="krema.models.guild.Channel" href="#krema.models.guild.Channel">Channel</a></code></dt>
-<dd>New channel.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>EditChannelFailed</code></dt>
-<dd>Editing the channel is failed.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">async def edit(self, **kwargs):
-    &#34;&#34;&#34;Edit channel with API params.
-
-    Args:
-        **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
-
-    Returns:
-        Channel: New channel.
-
-    Raises:
-        EditChannelFailed: Editing the channel is failed.
-    &#34;&#34;&#34;
-
-    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
-
-    if atom == 0:
-        return Channel(self.client, result)
-    else:
-        raise EditChannelFailed(result)</code></pre>
-</details>
-</dd>
-<dt id="krema.models.guild.Channel.fetch_message"><code class="name flex">
-<span>async def <span class="ident">fetch_message</span></span>(<span>self, message_id: int)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Fetch a message from channel by ID.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>message_id</code></strong></dt>
-<dd>Message ID.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>Message</code></dt>
-<dd>Found message.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>FetchChannelMessageFailed</code></dt>
-<dd>Fetching the message is failed.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">async def fetch_message(self, message_id: int):
-    &#34;&#34;&#34;Fetch a message from channel by ID.
-
-    Args:
-        message_id: Message ID.
-
-    Returns:
-        Message: Found message.
-
-    Raises:
-        FetchChannelMessageFailed: Fetching the message is failed.
-    &#34;&#34;&#34;
-    from .message import Message
-
-    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
-
-    if atom == 0:
-        return Message(self.client, result)
-    else:
-        raise FetchChannelMessageFailed(result)</code></pre>
-</details>
-</dd>
-<dt id="krema.models.guild.Channel.fetch_messages"><code class="name flex">
-<span>async def <span class="ident">fetch_messages</span></span>(<span>self, limit: int = 10)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Fetch messages from channel.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
-<dd>Maximum message limit (default is 10).</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>list</code></dt>
-<dd>List of message object.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>FetchChannelMessagesFailed</code></dt>
-<dd>Fetching the messages from channel is failed.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">async def fetch_messages(self, limit: int = 10):
-    &#34;&#34;&#34;Fetch messages from channel.
-
-    Args:
-        limit (int): Maximum message limit (default is 10).
-
-    Returns:
-        list: List of message object.
-
-    Raises:
-        FetchChannelMessagesFailed: Fetching the messages from channel is failed.
-    &#34;&#34;&#34;
-    from .message import Message
-
-    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
-
-    if atom == 0:
-        return [Message(self.client, i) for i in result]
-    else:
-        raise FetchChannelMessagesFailed(result)</code></pre>
-</details>
-</dd>
-<dt id="krema.models.guild.Channel.purge"><code class="name flex">
-<span>async def <span class="ident">purge</span></span>(<span>self, limit: int = 2)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Bulk-delete messages from channel.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
-<dd>Maximum message limit (default is 2).</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>list</code></dt>
-<dd>List of purged? messages.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>BulkDeleteMessagesFailed</code></dt>
-<dd>Channel purge is failed.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">async def purge(self, limit: int = 2):
-    &#34;&#34;&#34;Bulk-delete messages from channel.
-
-    Args:
-        limit (int): Maximum message limit (default is 2).
-
-    Returns:
-        list: List of purged? messages.
-
-    Raises:
-        BulkDeleteMessagesFailed: Channel purge is failed.
-    &#34;&#34;&#34;
-
-    messages = await self.fetch_messages(limit)
-
-    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
-        &#34;messages&#34;: [i.id for i in messages]
-    })
-
-    if atom == 0:
-        return messages
-    else:
-        raise BulkDeleteMessagesFailed(result)</code></pre>
-</details>
-</dd>
-<dt id="krema.models.guild.Channel.send"><code class="name flex">
-<span>async def <span class="ident">send</span></span>(<span>self, file: dict = None, **kwargs)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Send message to the text-channel.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>file</code></strong> :&ensp;<code>dict</code></dt>
-<dd>For send a message / embed attachment with file, use <code><a title="krema.utils.file_builder" href="../utils.html#krema.utils.file_builder">file_builder()</a></code> for make it easier.</dd>
-<dt><strong><code>**kwargs</code></strong></dt>
-<dd><a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params">https://discord.com/developers/docs/resources/channel#create-message-jsonform-params</a></dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>Message</code></dt>
-<dd>Sent message object.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>SendMessageFailed</code></dt>
-<dd>Sending the message is failed.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">async def send(self, file: dict = None, **kwargs):
-    &#34;&#34;&#34;Send message to the text-channel.
-
-    Args:
-        file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
-        **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
-
-    Returns:
-        Message: Sent message object.
-
-    Raises:
-        SendMessageFailed: Sending the message is failed.
-    &#34;&#34;&#34;
-    from .message import Message
-
-    params, payload = {}, FormData()
-
-    if file is not None:
-        payload.add_field(name=&#39;payload_json&#39;, value=dumps(
-            kwargs), content_type=&#34;application/json&#34;)
-        payload.add_field(**file)
-
-        params[&#34;data&#34;] = payload
-    else:
-        params[&#34;json&#34;] = kwargs
-
-    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
-
-    if atom == 0:
-        return Message(self.client, result)
-    else:
-        raise SendMessageFailed(result)</code></pre>
-</details>
-</dd>
-</dl>
 </dd>
 <dt id="krema.models.guild.Guild"><code class="flex name class">
 <span>class <span class="ident">Guild</span></span>
@@ -965,6 +355,7 @@ class Guild:
     def __init__(self, client, data: dict) -&gt; None:
         from ..utils import convert_iso
         from .user import Member
+        from .channel import Channel
 
         self.client = client
 
@@ -1033,8 +424,329 @@ class Guild:
             &#34;approximate_presence_count&#34;)
         self.welcome_screen: Union[dict, None] = data.get(&#34;welcome_screen&#34;)
         self.nsfw_level: int = data.get(&#34;nsfw_level&#34;)
-        self.stage_instances: Union[list, None] = data.get(&#34;stage_instances&#34;)</code></pre>
+        self.stage_instances: Union[list, None] = data.get(&#34;stage_instances&#34;)
+
+    async def fetch_emojis(self):
+        &#34;&#34;&#34;Fetch all emojis in the Guild.
+
+        Returns:
+            list: List of Emoji objects.
+
+        Raises:
+            FetchEmojisFailed: Fetching the emojis is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/emojis&#34;)
+
+        if atom == 0:
+            return [Emoji(self.client, i) for i in result]
+        else:
+            raise FetchEmojisFailed(result)
+
+    async def fetch_emoji(self, emoji_id: int):
+        &#34;&#34;&#34;Fetch a emoji from Guild.
+
+        Args:
+            emoji_id (int): Emoji ID.
+
+        Returns:
+            Emoji: Found emoji object.
+
+        Raises:
+            FetchEmojiFailed: Fetching the emojis is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
+
+        if atom == 0:
+            return Emoji(self.client, result)
+        else:
+            raise FetchEmojiFailed(result)
+
+    async def create_emoji(self, **kwargs):
+        &#34;&#34;&#34;Create a Guild emoji.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/emoji#create-guild-emoji-json-params (for image, use `krema.utils.image_to_data_uri` function.)
+
+        Returns:
+            Emoji: Created Emoji object.
+
+        Raises:
+            CreateEmojiFailed: Creating the guild emoji is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/emojis&#34;, json=kwargs)
+
+        if atom == 0:
+            return Emoji(self.client, result)
+        else:
+            raise CreateEmojiFailed(result)
+
+    async def update_emoji(self, emoji_id: int, **kwargs):
+        &#34;&#34;&#34;Update a Guild emoji.
+
+        Args:
+            emoji_id (int): Emoji ID.
+            **kwargs: https://discord.com/developers/docs/resources/emoji#modify-guild-emoji-json-params
+
+        Returns:
+            Emoji: Updated Emoji object.
+
+        Raises:
+            UpdateEmojiFailed: Updating the guild emoji is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;, json=kwargs)
+
+        if atom == 0:
+            return Emoji(self.client, result)
+        else:
+            raise UpdateEmojiFailed(result)
+
+    async def delete_emoji(self, emoji_id: int):
+        &#34;&#34;&#34;Delete a Guild emoji.
+
+        Args:
+            emoji_id (int): Emoji ID.
+
+        Returns:
+            True: Emoji deleted successfully.
+
+        Raises:
+            DeleteEmojiFailed: Deleting the guild emoji is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
+
+        if atom == 0:
+            return True
+        else:
+            raise DeleteEmojiFailed(result)</code></pre>
 </details>
+<h3>Methods</h3>
+<dl>
+<dt id="krema.models.guild.Guild.create_emoji"><code class="name flex">
+<span>async def <span class="ident">create_emoji</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a Guild emoji.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/emoji#create-guild-emoji-json-params">https://discord.com/developers/docs/resources/emoji#create-guild-emoji-json-params</a> (for image, use <code><a title="krema.utils.image_to_data_uri" href="../utils.html#krema.utils.image_to_data_uri">image_to_data_uri()</a></code> function.)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Emoji" href="#krema.models.guild.Emoji">Emoji</a></code></dt>
+<dd>Created Emoji object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>CreateEmojiFailed</code></dt>
+<dd>Creating the guild emoji is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def create_emoji(self, **kwargs):
+    &#34;&#34;&#34;Create a Guild emoji.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/emoji#create-guild-emoji-json-params (for image, use `krema.utils.image_to_data_uri` function.)
+
+    Returns:
+        Emoji: Created Emoji object.
+
+    Raises:
+        CreateEmojiFailed: Creating the guild emoji is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/emojis&#34;, json=kwargs)
+
+    if atom == 0:
+        return Emoji(self.client, result)
+    else:
+        raise CreateEmojiFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.delete_emoji"><code class="name flex">
+<span>async def <span class="ident">delete_emoji</span></span>(<span>self, emoji_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete a Guild emoji.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>emoji_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Emoji ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Emoji deleted successfully.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>DeleteEmojiFailed</code></dt>
+<dd>Deleting the guild emoji is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete_emoji(self, emoji_id: int):
+    &#34;&#34;&#34;Delete a Guild emoji.
+
+    Args:
+        emoji_id (int): Emoji ID.
+
+    Returns:
+        True: Emoji deleted successfully.
+
+    Raises:
+        DeleteEmojiFailed: Deleting the guild emoji is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
+
+    if atom == 0:
+        return True
+    else:
+        raise DeleteEmojiFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_emoji"><code class="name flex">
+<span>async def <span class="ident">fetch_emoji</span></span>(<span>self, emoji_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch a emoji from Guild.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>emoji_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Emoji ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Emoji" href="#krema.models.guild.Emoji">Emoji</a></code></dt>
+<dd>Found emoji object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchEmojiFailed</code></dt>
+<dd>Fetching the emojis is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_emoji(self, emoji_id: int):
+    &#34;&#34;&#34;Fetch a emoji from Guild.
+
+    Args:
+        emoji_id (int): Emoji ID.
+
+    Returns:
+        Emoji: Found emoji object.
+
+    Raises:
+        FetchEmojiFailed: Fetching the emojis is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
+
+    if atom == 0:
+        return Emoji(self.client, result)
+    else:
+        raise FetchEmojiFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_emojis"><code class="name flex">
+<span>async def <span class="ident">fetch_emojis</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch all emojis in the Guild.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Emoji objects.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchEmojisFailed</code></dt>
+<dd>Fetching the emojis is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_emojis(self):
+    &#34;&#34;&#34;Fetch all emojis in the Guild.
+
+    Returns:
+        list: List of Emoji objects.
+
+    Raises:
+        FetchEmojisFailed: Fetching the emojis is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/emojis&#34;)
+
+    if atom == 0:
+        return [Emoji(self.client, i) for i in result]
+    else:
+        raise FetchEmojisFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.update_emoji"><code class="name flex">
+<span>async def <span class="ident">update_emoji</span></span>(<span>self, emoji_id: int, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Update a Guild emoji.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>emoji_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Emoji ID.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/emoji#modify-guild-emoji-json-params">https://discord.com/developers/docs/resources/emoji#modify-guild-emoji-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Emoji" href="#krema.models.guild.Emoji">Emoji</a></code></dt>
+<dd>Updated Emoji object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>UpdateEmojiFailed</code></dt>
+<dd>Updating the guild emoji is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def update_emoji(self, emoji_id: int, **kwargs):
+    &#34;&#34;&#34;Update a Guild emoji.
+
+    Args:
+        emoji_id (int): Emoji ID.
+        **kwargs: https://discord.com/developers/docs/resources/emoji#modify-guild-emoji-json-params
+
+    Returns:
+        Emoji: Updated Emoji object.
+
+    Raises:
+        UpdateEmojiFailed: Updating the guild emoji is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;, json=kwargs)
+
+    if atom == 0:
+        return Emoji(self.client, result)
+    else:
+        raise UpdateEmojiFailed(result)</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -1053,18 +765,17 @@ class Guild:
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="krema.models.guild.Channel" href="#krema.models.guild.Channel">Channel</a></code></h4>
-<ul class="two-column">
-<li><code><a title="krema.models.guild.Channel.delete" href="#krema.models.guild.Channel.delete">delete</a></code></li>
-<li><code><a title="krema.models.guild.Channel.edit" href="#krema.models.guild.Channel.edit">edit</a></code></li>
-<li><code><a title="krema.models.guild.Channel.fetch_message" href="#krema.models.guild.Channel.fetch_message">fetch_message</a></code></li>
-<li><code><a title="krema.models.guild.Channel.fetch_messages" href="#krema.models.guild.Channel.fetch_messages">fetch_messages</a></code></li>
-<li><code><a title="krema.models.guild.Channel.purge" href="#krema.models.guild.Channel.purge">purge</a></code></li>
-<li><code><a title="krema.models.guild.Channel.send" href="#krema.models.guild.Channel.send">send</a></code></li>
-</ul>
+<h4><code><a title="krema.models.guild.Emoji" href="#krema.models.guild.Emoji">Emoji</a></code></h4>
 </li>
 <li>
 <h4><code><a title="krema.models.guild.Guild" href="#krema.models.guild.Guild">Guild</a></code></h4>
+<ul class="">
+<li><code><a title="krema.models.guild.Guild.create_emoji" href="#krema.models.guild.Guild.create_emoji">create_emoji</a></code></li>
+<li><code><a title="krema.models.guild.Guild.delete_emoji" href="#krema.models.guild.Guild.delete_emoji">delete_emoji</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_emoji" href="#krema.models.guild.Guild.fetch_emoji">fetch_emoji</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_emojis" href="#krema.models.guild.Guild.fetch_emojis">fetch_emojis</a></code></li>
+<li><code><a title="krema.models.guild.Guild.update_emoji" href="#krema.models.guild.Guild.update_emoji">update_emoji</a></code></li>
+</ul>
 </li>
 </ul>
 </li>

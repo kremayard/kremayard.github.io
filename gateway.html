@@ -36,8 +36,7 @@ import aiohttp
 from zlib import decompressobj
 from json import loads
 
-from .models.message import Message
-from .models.guild import Channel, Guild
+from .models import Message, Channel, Guild
 
 
 class Gateway:

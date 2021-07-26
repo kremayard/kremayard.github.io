@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>krema.models.channel API documentation</title>
+<meta name="description" content="Models for channel and other related stuff." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>krema.models.channel</code></h1>
+</header>
+<section id="section-intro">
+<p>Models for channel and other related stuff.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Models for channel and other related stuff.
+&#34;&#34;&#34;
+
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Union
+
+from json import dumps
+from aiohttp import FormData
+
+from ..errors.message import SendMessageFailed
+from ..errors.channel import *
+
+
+@dataclass
+class Channel:
+    &#34;&#34;&#34;Channel class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        client (Client): Krema client.
+        id (int): Channel ID.
+        type (int): Channel type.
+        guild_id (int, None): Guild ID.
+        position (int, None): Channel position.
+        permission_overwrites (list, None): List of permission_overwrite.
+        name (str, None): Channel name.
+        topic (str, None): Channel topic.
+        nsfw (bool, None): Channel nsfw boolean.
+        last_message_id (int, None): Last message ID in the channel.
+        bitrate (int, None): Channel bitrate (voice).
+        user_limit (int, None): &#34;The user limit of the voice channel&#34; (voice).
+        rate_limit_per_user (int, None): Channel slowmode second.
+        recipients (list, None): List of user object.
+        icon (str, None): Icon hash for DM channel.
+        owner_id (int, None): DM channel owner id.
+        application_id (int, None): &#34;Application id of the group DM creator if it is bot-created&#34;.
+        parent_id (int, None): &#34;for guild channels: id of the parent category for a channel (each parent category can contain up to 50 channels), for threads: id of the text channel this thread was created&#34;.
+        last_pin_timestamp (datetime, None): When the last pinned message was pinned.
+        rtc_region (str, None): Voice region.
+        video_quality_mode (int, None): &#34;the camera video quality mode of the voice channel, 1 when not present&#34;.
+        message_count (int, None): &#34;an approximate count of messages in a thread, stops counting at 50&#34;.
+        member_count (int, None): &#34;an approximate count of users in a thread, stops counting at 50&#34;.
+        thread_metadata (dict, None): &#34;Thread-specific fields not needed by other channels&#34;.
+        member (ThreadMember, None): &#34;Thread member object for the current user, if they have joined the thread, only included on certain API endpoints&#34;.
+        default_auto_archive_duration (int, None): &#34;Default duration for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080&#34;.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import User, ThreadMember
+        from ..utils import convert_iso
+
+        self.client = client
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.type: int = data.get(&#34;type&#34;)
+        self.guild_id: Union[int, None] = int(
+            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
+        self.position: Union[int, None] = data.get(&#34;position&#34;)
+        self.permission_overwrites: Union[list, None] = data.get(
+            &#34;permission_overwrites&#34;)
+        self.name: Union[str, None] = data.get(&#34;name&#34;)
+        self.topic: Union[str, None] = data.get(&#34;topic&#34;)
+        self.nsfw: Union[bool, None] = data.get(&#34;nsfw&#34;)
+        self.last_message_id: Union[int, None] = int(
+            data.get(&#34;last_message_id&#34;)) if data.get(&#34;last_message_id&#34;) is not None else None
+        self.bitrate: Union[int, None] = data.get(&#34;bitrate&#34;)
+        self.user_limit: Union[int, None] = data.get(&#34;user_limit&#34;)
+        self.rate_limit_per_user: Union[int,
+                                        None] = data.get(&#34;rate_limit_per_user&#34;)
+        self.recipients: Union[list, None] = [User(self.client, i) for i in data.get(
+            &#34;recipients&#34;)] if data.get(&#34;recipients&#34;) is not None else None
+        self.icon: Union[str, None] = data.get(&#34;icon&#34;)
+        self.owner_id: Union[int, None] = int(
+            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) is not None else None
+        self.application_id: Union[int, None] = int(
+            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) is not None else None
+        self.parent_id: Union[int, None] = int(
+            data.get(&#34;parent_id&#34;)) if data.get(&#34;parent_id&#34;) is not None else None
+        self.last_pin_timestamp: Union[datetime, None] = convert_iso(
+            data.get(&#34;last_pin_timestamp&#34;)) if data.get(&#34;last_pin_timestamp&#34;) is not None else None
+        self.rtc_region: Union[str, None] = data.get(&#34;rtc_region&#34;)
+        self.video_quality_mode: Union[int,
+                                       None] = data.get(&#34;video_quality_mode&#34;)
+        self.message_count: Union[int, None] = data.get(&#34;message_count&#34;)
+        self.member_count: Union[int, None] = data.get(&#34;member_count&#34;)
+        self.thread_metadata: Union[dict, None] = data.get(&#34;thread_metadata&#34;)
+        self.member: Union[ThreadMember, None] = ThreadMember(
+            data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) is not None else None
+        self.default_auto_archive_duration: Union[int, None] = data.get(
+            &#34;default_auto_archive_duration&#34;)
+
+        pass
+
+    async def fetch_messages(self, limit: int = 10):
+        &#34;&#34;&#34;Fetch messages from channel.
+
+        Args:
+            limit (int): Maximum message limit (default is 10).
+
+        Returns:
+            list: List of message object.
+
+        Raises:
+            FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
+
+        if atom == 0:
+            return [Message(self.client, i) for i in result]
+        else:
+            raise FetchChannelMessagesFailed(result)
+
+    async def purge(self, limit: int = 2):
+        &#34;&#34;&#34;Bulk-delete messages from channel.
+
+        Args:
+            limit (int): Maximum message limit (default is 2).
+
+        Returns:
+            list: List of purged? messages.
+
+        Raises:
+            BulkDeleteMessagesFailed: Channel purge is failed.
+        &#34;&#34;&#34;
+
+        messages = await self.fetch_messages(limit)
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
+            &#34;messages&#34;: [i.id for i in messages]
+        })
+
+        if atom == 0:
+            return messages
+        else:
+            raise BulkDeleteMessagesFailed(result)
+
+    async def send(self, file: dict = None, **kwargs):
+        &#34;&#34;&#34;Send message to the text-channel.
+
+        Args:
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
+            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+        Returns:
+            Message: Sent message object.
+
+        Raises:
+            SendMessageFailed: Sending the message is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                kwargs), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = kwargs
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise SendMessageFailed(result)
+
+    async def edit(self, **kwargs):
+        &#34;&#34;&#34;Edit channel with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
+
+        Returns:
+            Channel: New channel.
+
+        Raises:
+            EditChannelFailed: Editing the channel is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
+
+        if atom == 0:
+            return Channel(self.client, result)
+        else:
+            raise EditChannelFailed(result)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete channel.
+
+        Returns:
+            Channel: Deleted channel.
+
+        Raises:
+            DeleteChannelFailed: Editing the channel is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
+
+        if atom == 0:
+            return Channel(self.client, result)
+        else:
+            raise DeleteChannelFailed(result)
+
+    async def fetch_message(self, message_id: int):
+        &#34;&#34;&#34;Fetch a message from channel by ID.
+
+        Args:
+            message_id: Message ID.
+
+        Returns:
+            Message: Found message.
+
+        Raises:
+            FetchChannelMessageFailed: Fetching the message is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise FetchChannelMessageFailed(result)
+
+    async def trigger_typing(self):
+        &#34;&#34;&#34;Trigger the Channel typing.
+
+        Returns:
+            True: Typing triggered successfully.
+
+        Raises:
+            StartTypingFailed: Triggering is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/typing&#34;)
+
+        if atom == 0:
+            return True
+        else:
+            raise StartTypingFailed(result)
+
+    async def fetch_pinned_messages(self):
+        &#34;&#34;&#34;Fetch pinned messages from Channel.
+
+        Returns:
+            list: List of message objects.
+
+        Raises:
+            FetchPinnedMessagesFailed: Fetching the pinned messages is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/pins&#34;)
+
+        if atom == 0:
+            return [Message(self.client, i) for i in result]
+        else:
+            raise FetchPinnedMessagesFailed(result)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="krema.models.channel.Channel"><code class="flex name class">
+<span>class <span class="ident">Channel</span></span>
+<span>(</span><span>client, data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Channel class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet from websocket.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Channel ID.</dd>
+<dt><strong><code>type</code></strong> :&ensp;<code>int</code></dt>
+<dd>Channel type.</dd>
+<dt><strong><code>guild_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>Guild ID.</dd>
+<dt><strong><code>position</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>Channel position.</dd>
+<dt><strong><code>permission_overwrites</code></strong> :&ensp;<code>list, None</code></dt>
+<dd>List of permission_overwrite.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str, None</code></dt>
+<dd>Channel name.</dd>
+<dt><strong><code>topic</code></strong> :&ensp;<code>str, None</code></dt>
+<dd>Channel topic.</dd>
+<dt><strong><code>nsfw</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>Channel nsfw boolean.</dd>
+<dt><strong><code>last_message_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>Last message ID in the channel.</dd>
+<dt><strong><code>bitrate</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>Channel bitrate (voice).</dd>
+<dt><strong><code>user_limit</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>"The user limit of the voice channel" (voice).</dd>
+<dt><strong><code>rate_limit_per_user</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>Channel slowmode second.</dd>
+<dt><strong><code>recipients</code></strong> :&ensp;<code>list, None</code></dt>
+<dd>List of user object.</dd>
+<dt><strong><code>icon</code></strong> :&ensp;<code>str, None</code></dt>
+<dd>Icon hash for DM channel.</dd>
+<dt><strong><code>owner_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>DM channel owner id.</dd>
+<dt><strong><code>application_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>"Application id of the group DM creator if it is bot-created".</dd>
+<dt><strong><code>parent_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>"for guild channels: id of the parent category for a channel (each parent category can contain up to 50 channels), for threads: id of the text channel this thread was created".</dd>
+<dt><strong><code>last_pin_timestamp</code></strong> :&ensp;<code>datetime, None</code></dt>
+<dd>When the last pinned message was pinned.</dd>
+<dt><strong><code>rtc_region</code></strong> :&ensp;<code>str, None</code></dt>
+<dd>Voice region.</dd>
+<dt><strong><code>video_quality_mode</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>"the camera video quality mode of the voice channel, 1 when not present".</dd>
+<dt><strong><code>message_count</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>"an approximate count of messages in a thread, stops counting at 50".</dd>
+<dt><strong><code>member_count</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>"an approximate count of users in a thread, stops counting at 50".</dd>
+<dt><strong><code>thread_metadata</code></strong> :&ensp;<code>dict, None</code></dt>
+<dd>"Thread-specific fields not needed by other channels".</dd>
+<dt><strong><code>member</code></strong> :&ensp;<code>ThreadMember, None</code></dt>
+<dd>"Thread member object for the current user, if they have joined the thread, only included on certain API endpoints".</dd>
+<dt><strong><code>default_auto_archive_duration</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>"Default duration for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080".</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Channel:
+    &#34;&#34;&#34;Channel class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        client (Client): Krema client.
+        id (int): Channel ID.
+        type (int): Channel type.
+        guild_id (int, None): Guild ID.
+        position (int, None): Channel position.
+        permission_overwrites (list, None): List of permission_overwrite.
+        name (str, None): Channel name.
+        topic (str, None): Channel topic.
+        nsfw (bool, None): Channel nsfw boolean.
+        last_message_id (int, None): Last message ID in the channel.
+        bitrate (int, None): Channel bitrate (voice).
+        user_limit (int, None): &#34;The user limit of the voice channel&#34; (voice).
+        rate_limit_per_user (int, None): Channel slowmode second.
+        recipients (list, None): List of user object.
+        icon (str, None): Icon hash for DM channel.
+        owner_id (int, None): DM channel owner id.
+        application_id (int, None): &#34;Application id of the group DM creator if it is bot-created&#34;.
+        parent_id (int, None): &#34;for guild channels: id of the parent category for a channel (each parent category can contain up to 50 channels), for threads: id of the text channel this thread was created&#34;.
+        last_pin_timestamp (datetime, None): When the last pinned message was pinned.
+        rtc_region (str, None): Voice region.
+        video_quality_mode (int, None): &#34;the camera video quality mode of the voice channel, 1 when not present&#34;.
+        message_count (int, None): &#34;an approximate count of messages in a thread, stops counting at 50&#34;.
+        member_count (int, None): &#34;an approximate count of users in a thread, stops counting at 50&#34;.
+        thread_metadata (dict, None): &#34;Thread-specific fields not needed by other channels&#34;.
+        member (ThreadMember, None): &#34;Thread member object for the current user, if they have joined the thread, only included on certain API endpoints&#34;.
+        default_auto_archive_duration (int, None): &#34;Default duration for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080&#34;.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import User, ThreadMember
+        from ..utils import convert_iso
+
+        self.client = client
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.type: int = data.get(&#34;type&#34;)
+        self.guild_id: Union[int, None] = int(
+            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
+        self.position: Union[int, None] = data.get(&#34;position&#34;)
+        self.permission_overwrites: Union[list, None] = data.get(
+            &#34;permission_overwrites&#34;)
+        self.name: Union[str, None] = data.get(&#34;name&#34;)
+        self.topic: Union[str, None] = data.get(&#34;topic&#34;)
+        self.nsfw: Union[bool, None] = data.get(&#34;nsfw&#34;)
+        self.last_message_id: Union[int, None] = int(
+            data.get(&#34;last_message_id&#34;)) if data.get(&#34;last_message_id&#34;) is not None else None
+        self.bitrate: Union[int, None] = data.get(&#34;bitrate&#34;)
+        self.user_limit: Union[int, None] = data.get(&#34;user_limit&#34;)
+        self.rate_limit_per_user: Union[int,
+                                        None] = data.get(&#34;rate_limit_per_user&#34;)
+        self.recipients: Union[list, None] = [User(self.client, i) for i in data.get(
+            &#34;recipients&#34;)] if data.get(&#34;recipients&#34;) is not None else None
+        self.icon: Union[str, None] = data.get(&#34;icon&#34;)
+        self.owner_id: Union[int, None] = int(
+            data.get(&#34;owner_id&#34;)) if data.get(&#34;owner_id&#34;) is not None else None
+        self.application_id: Union[int, None] = int(
+            data.get(&#34;application_id&#34;)) if data.get(&#34;application_id&#34;) is not None else None
+        self.parent_id: Union[int, None] = int(
+            data.get(&#34;parent_id&#34;)) if data.get(&#34;parent_id&#34;) is not None else None
+        self.last_pin_timestamp: Union[datetime, None] = convert_iso(
+            data.get(&#34;last_pin_timestamp&#34;)) if data.get(&#34;last_pin_timestamp&#34;) is not None else None
+        self.rtc_region: Union[str, None] = data.get(&#34;rtc_region&#34;)
+        self.video_quality_mode: Union[int,
+                                       None] = data.get(&#34;video_quality_mode&#34;)
+        self.message_count: Union[int, None] = data.get(&#34;message_count&#34;)
+        self.member_count: Union[int, None] = data.get(&#34;member_count&#34;)
+        self.thread_metadata: Union[dict, None] = data.get(&#34;thread_metadata&#34;)
+        self.member: Union[ThreadMember, None] = ThreadMember(
+            data.get(&#34;member&#34;)) if data.get(&#34;member&#34;) is not None else None
+        self.default_auto_archive_duration: Union[int, None] = data.get(
+            &#34;default_auto_archive_duration&#34;)
+
+        pass
+
+    async def fetch_messages(self, limit: int = 10):
+        &#34;&#34;&#34;Fetch messages from channel.
+
+        Args:
+            limit (int): Maximum message limit (default is 10).
+
+        Returns:
+            list: List of message object.
+
+        Raises:
+            FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
+
+        if atom == 0:
+            return [Message(self.client, i) for i in result]
+        else:
+            raise FetchChannelMessagesFailed(result)
+
+    async def purge(self, limit: int = 2):
+        &#34;&#34;&#34;Bulk-delete messages from channel.
+
+        Args:
+            limit (int): Maximum message limit (default is 2).
+
+        Returns:
+            list: List of purged? messages.
+
+        Raises:
+            BulkDeleteMessagesFailed: Channel purge is failed.
+        &#34;&#34;&#34;
+
+        messages = await self.fetch_messages(limit)
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
+            &#34;messages&#34;: [i.id for i in messages]
+        })
+
+        if atom == 0:
+            return messages
+        else:
+            raise BulkDeleteMessagesFailed(result)
+
+    async def send(self, file: dict = None, **kwargs):
+        &#34;&#34;&#34;Send message to the text-channel.
+
+        Args:
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
+            **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+        Returns:
+            Message: Sent message object.
+
+        Raises:
+            SendMessageFailed: Sending the message is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                kwargs), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = kwargs
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise SendMessageFailed(result)
+
+    async def edit(self, **kwargs):
+        &#34;&#34;&#34;Edit channel with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
+
+        Returns:
+            Channel: New channel.
+
+        Raises:
+            EditChannelFailed: Editing the channel is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
+
+        if atom == 0:
+            return Channel(self.client, result)
+        else:
+            raise EditChannelFailed(result)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete channel.
+
+        Returns:
+            Channel: Deleted channel.
+
+        Raises:
+            DeleteChannelFailed: Editing the channel is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
+
+        if atom == 0:
+            return Channel(self.client, result)
+        else:
+            raise DeleteChannelFailed(result)
+
+    async def fetch_message(self, message_id: int):
+        &#34;&#34;&#34;Fetch a message from channel by ID.
+
+        Args:
+            message_id: Message ID.
+
+        Returns:
+            Message: Found message.
+
+        Raises:
+            FetchChannelMessageFailed: Fetching the message is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
+
+        if atom == 0:
+            return Message(self.client, result)
+        else:
+            raise FetchChannelMessageFailed(result)
+
+    async def trigger_typing(self):
+        &#34;&#34;&#34;Trigger the Channel typing.
+
+        Returns:
+            True: Typing triggered successfully.
+
+        Raises:
+            StartTypingFailed: Triggering is failed.
+        &#34;&#34;&#34;
+
+        atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/typing&#34;)
+
+        if atom == 0:
+            return True
+        else:
+            raise StartTypingFailed(result)
+
+    async def fetch_pinned_messages(self):
+        &#34;&#34;&#34;Fetch pinned messages from Channel.
+
+        Returns:
+            list: List of message objects.
+
+        Raises:
+            FetchPinnedMessagesFailed: Fetching the pinned messages is failed.
+        &#34;&#34;&#34;
+        from .message import Message
+
+        atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/pins&#34;)
+
+        if atom == 0:
+            return [Message(self.client, i) for i in result]
+        else:
+            raise FetchPinnedMessagesFailed(result)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="krema.models.channel.Channel.delete"><code class="name flex">
+<span>async def <span class="ident">delete</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete channel.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.channel.Channel" href="#krema.models.channel.Channel">Channel</a></code></dt>
+<dd>Deleted channel.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>DeleteChannelFailed</code></dt>
+<dd>Editing the channel is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete(self):
+    &#34;&#34;&#34;Delete channel.
+
+    Returns:
+        Channel: Deleted channel.
+
+    Raises:
+        DeleteChannelFailed: Editing the channel is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.id}&#34;)
+
+    if atom == 0:
+        return Channel(self.client, result)
+    else:
+        raise DeleteChannelFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.edit"><code class="name flex">
+<span>async def <span class="ident">edit</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit channel with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#modify-channel">https://discord.com/developers/docs/resources/channel#modify-channel</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.channel.Channel" href="#krema.models.channel.Channel">Channel</a></code></dt>
+<dd>New channel.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>EditChannelFailed</code></dt>
+<dd>Editing the channel is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit(self, **kwargs):
+    &#34;&#34;&#34;Edit channel with API params.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#modify-channel
+
+    Returns:
+        Channel: New channel.
+
+    Raises:
+        EditChannelFailed: Editing the channel is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/channels/{self.id}&#34;, json=kwargs)
+
+    if atom == 0:
+        return Channel(self.client, result)
+    else:
+        raise EditChannelFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.fetch_message"><code class="name flex">
+<span>async def <span class="ident">fetch_message</span></span>(<span>self, message_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch a message from channel by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>message_id</code></strong></dt>
+<dd>Message ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Message</code></dt>
+<dd>Found message.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchChannelMessageFailed</code></dt>
+<dd>Fetching the message is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_message(self, message_id: int):
+    &#34;&#34;&#34;Fetch a message from channel by ID.
+
+    Args:
+        message_id: Message ID.
+
+    Returns:
+        Message: Found message.
+
+    Raises:
+        FetchChannelMessageFailed: Fetching the message is failed.
+    &#34;&#34;&#34;
+    from .message import Message
+
+    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages/{message_id}&#34;)
+
+    if atom == 0:
+        return Message(self.client, result)
+    else:
+        raise FetchChannelMessageFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.fetch_messages"><code class="name flex">
+<span>async def <span class="ident">fetch_messages</span></span>(<span>self, limit: int = 10)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch messages from channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Maximum message limit (default is 10).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of message object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchChannelMessagesFailed</code></dt>
+<dd>Fetching the messages from channel is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_messages(self, limit: int = 10):
+    &#34;&#34;&#34;Fetch messages from channel.
+
+    Args:
+        limit (int): Maximum message limit (default is 10).
+
+    Returns:
+        list: List of message object.
+
+    Raises:
+        FetchChannelMessagesFailed: Fetching the messages from channel is failed.
+    &#34;&#34;&#34;
+    from .message import Message
+
+    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/messages?limit={limit}&#34;)
+
+    if atom == 0:
+        return [Message(self.client, i) for i in result]
+    else:
+        raise FetchChannelMessagesFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.fetch_pinned_messages"><code class="name flex">
+<span>async def <span class="ident">fetch_pinned_messages</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch pinned messages from Channel.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of message objects.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FetchPinnedMessagesFailed</code></dt>
+<dd>Fetching the pinned messages is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_pinned_messages(self):
+    &#34;&#34;&#34;Fetch pinned messages from Channel.
+
+    Returns:
+        list: List of message objects.
+
+    Raises:
+        FetchPinnedMessagesFailed: Fetching the pinned messages is failed.
+    &#34;&#34;&#34;
+    from .message import Message
+
+    atom, result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/pins&#34;)
+
+    if atom == 0:
+        return [Message(self.client, i) for i in result]
+    else:
+        raise FetchPinnedMessagesFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.purge"><code class="name flex">
+<span>async def <span class="ident">purge</span></span>(<span>self, limit: int = 2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Bulk-delete messages from channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code></dt>
+<dd>Maximum message limit (default is 2).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of purged? messages.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BulkDeleteMessagesFailed</code></dt>
+<dd>Channel purge is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def purge(self, limit: int = 2):
+    &#34;&#34;&#34;Bulk-delete messages from channel.
+
+    Args:
+        limit (int): Maximum message limit (default is 2).
+
+    Returns:
+        list: List of purged? messages.
+
+    Raises:
+        BulkDeleteMessagesFailed: Channel purge is failed.
+    &#34;&#34;&#34;
+
+    messages = await self.fetch_messages(limit)
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages/bulk-delete&#34;, json={
+        &#34;messages&#34;: [i.id for i in messages]
+    })
+
+    if atom == 0:
+        return messages
+    else:
+        raise BulkDeleteMessagesFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.send"><code class="name flex">
+<span>async def <span class="ident">send</span></span>(<span>self, file: dict = None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Send message to the text-channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>dict</code></dt>
+<dd>For send a message / embed attachment with file, use <code><a title="krema.utils.file_builder" href="../utils.html#krema.utils.file_builder">file_builder()</a></code> for make it easier.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params">https://discord.com/developers/docs/resources/channel#create-message-jsonform-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Message</code></dt>
+<dd>Sent message object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>SendMessageFailed</code></dt>
+<dd>Sending the message is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def send(self, file: dict = None, **kwargs):
+    &#34;&#34;&#34;Send message to the text-channel.
+
+    Args:
+        file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
+        **kwargs: https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+
+    Returns:
+        Message: Sent message object.
+
+    Raises:
+        SendMessageFailed: Sending the message is failed.
+    &#34;&#34;&#34;
+    from .message import Message
+
+    params, payload = {}, FormData()
+
+    if file is not None:
+        payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+            kwargs), content_type=&#34;application/json&#34;)
+        payload.add_field(**file)
+
+        params[&#34;data&#34;] = payload
+    else:
+        params[&#34;json&#34;] = kwargs
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
+
+    if atom == 0:
+        return Message(self.client, result)
+    else:
+        raise SendMessageFailed(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.trigger_typing"><code class="name flex">
+<span>async def <span class="ident">trigger_typing</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Trigger the Channel typing.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Typing triggered successfully.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>StartTypingFailed</code></dt>
+<dd>Triggering is failed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def trigger_typing(self):
+    &#34;&#34;&#34;Trigger the Channel typing.
+
+    Returns:
+        True: Typing triggered successfully.
+
+    Raises:
+        StartTypingFailed: Triggering is failed.
+    &#34;&#34;&#34;
+
+    atom, result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/typing&#34;)
+
+    if atom == 0:
+        return True
+    else:
+        raise StartTypingFailed(result)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="krema.models" href="index.html">krema.models</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="krema.models.channel.Channel" href="#krema.models.channel.Channel">Channel</a></code></h4>
+<ul class="">
+<li><code><a title="krema.models.channel.Channel.delete" href="#krema.models.channel.Channel.delete">delete</a></code></li>
+<li><code><a title="krema.models.channel.Channel.edit" href="#krema.models.channel.Channel.edit">edit</a></code></li>
+<li><code><a title="krema.models.channel.Channel.fetch_message" href="#krema.models.channel.Channel.fetch_message">fetch_message</a></code></li>
+<li><code><a title="krema.models.channel.Channel.fetch_messages" href="#krema.models.channel.Channel.fetch_messages">fetch_messages</a></code></li>
+<li><code><a title="krema.models.channel.Channel.fetch_pinned_messages" href="#krema.models.channel.Channel.fetch_pinned_messages">fetch_pinned_messages</a></code></li>
+<li><code><a title="krema.models.channel.Channel.purge" href="#krema.models.channel.Channel.purge">purge</a></code></li>
+<li><code><a title="krema.models.channel.Channel.send" href="#krema.models.channel.Channel.send">send</a></code></li>
+<li><code><a title="krema.models.channel.Channel.trigger_typing" href="#krema.models.channel.Channel.trigger_typing">trigger_typing</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

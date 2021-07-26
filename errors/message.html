@@ -51,13 +51,13 @@ class DeleteReactionFailed(Exception):
 
 
 class FetchReactionsFailed(Exception):
-    &#34;&#34;&#34;Raises when fetching the reactions are failed.&#34;&#34;&#34;
+    &#34;&#34;&#34;Raises when fetching the reactions is failed.&#34;&#34;&#34;
 
     pass
 
 
 class DeleteReactionsFailed(Exception):
-    &#34;&#34;&#34;Raises when deleting the reactions are failed.&#34;&#34;&#34;
+    &#34;&#34;&#34;Raises when deleting the reactions is failed.&#34;&#34;&#34;
 
     pass
 
@@ -70,6 +70,18 @@ class EditMessageFailed(Exception):
 
 class DeleteMessageFailed(Exception):
     &#34;&#34;&#34;Raises when deleting the message is failed.&#34;&#34;&#34;
+
+    pass
+
+
+class PinMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when pinning the message is failed.&#34;&#34;&#34;
+
+    pass
+
+
+class UnpinMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when unpinning the message is failed.&#34;&#34;&#34;
 
     pass</code></pre>
 </details>
@@ -151,13 +163,13 @@ class DeleteMessageFailed(Exception):
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Raises when deleting the reactions are failed.</p></div>
+<div class="desc"><p>Raises when deleting the reactions is failed.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class DeleteReactionsFailed(Exception):
-    &#34;&#34;&#34;Raises when deleting the reactions are failed.&#34;&#34;&#34;
+    &#34;&#34;&#34;Raises when deleting the reactions is failed.&#34;&#34;&#34;
 
     pass</code></pre>
 </details>
@@ -193,13 +205,34 @@ class DeleteMessageFailed(Exception):
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Raises when fetching the reactions are failed.</p></div>
+<div class="desc"><p>Raises when fetching the reactions is failed.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FetchReactionsFailed(Exception):
-    &#34;&#34;&#34;Raises when fetching the reactions are failed.&#34;&#34;&#34;
+    &#34;&#34;&#34;Raises when fetching the reactions is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.message.PinMessageFailed"><code class="flex name class">
+<span>class <span class="ident">PinMessageFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when pinning the message is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PinMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when pinning the message is failed.&#34;&#34;&#34;
 
     pass</code></pre>
 </details>
@@ -221,6 +254,27 @@ class DeleteMessageFailed(Exception):
 </summary>
 <pre><code class="python">class SendMessageFailed(Exception):
     &#34;&#34;&#34;Raises when sending a message is failed.&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="krema.errors.message.UnpinMessageFailed"><code class="flex name class">
+<span>class <span class="ident">UnpinMessageFailed</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raises when unpinning the message is failed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UnpinMessageFailed(Exception):
+    &#34;&#34;&#34;Raises when unpinning the message is failed.&#34;&#34;&#34;
 
     pass</code></pre>
 </details>
@@ -265,7 +319,13 @@ class DeleteMessageFailed(Exception):
 <h4><code><a title="krema.errors.message.FetchReactionsFailed" href="#krema.errors.message.FetchReactionsFailed">FetchReactionsFailed</a></code></h4>
 </li>
 <li>
+<h4><code><a title="krema.errors.message.PinMessageFailed" href="#krema.errors.message.PinMessageFailed">PinMessageFailed</a></code></h4>
+</li>
+<li>
 <h4><code><a title="krema.errors.message.SendMessageFailed" href="#krema.errors.message.SendMessageFailed">SendMessageFailed</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.errors.message.UnpinMessageFailed" href="#krema.errors.message.UnpinMessageFailed">UnpinMessageFailed</a></code></h4>
 </li>
 </ul>
 </li>

@@ -269,7 +269,7 @@ class Client:
             FetchChannelFailed: Fetching the channel is failed.
         &#34;&#34;&#34;
 
-        from .guild import Channel
+        from .channel import Channel
 
         atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
 
@@ -609,7 +609,7 @@ class Client:
             FetchChannelFailed: Fetching the channel is failed.
         &#34;&#34;&#34;
 
-        from .guild import Channel
+        from .channel import Channel
 
         atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
 
@@ -860,7 +860,7 @@ def formatted_token(self) -&gt; str:
         FetchChannelFailed: Fetching the channel is failed.
     &#34;&#34;&#34;
 
-    from .guild import Channel
+    from .channel import Channel
 
     atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
 
