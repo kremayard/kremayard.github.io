@@ -32,8 +32,9 @@ Http part of the krema.
 &#34;&#34;&#34;
 
 import asyncio
+from typing import Union
 import aiohttp
-
+from .errors import *
 
 class HTTP:
     &#34;&#34;&#34;Base class for HTTP.
@@ -50,7 +51,7 @@ class HTTP:
 
         pass
 
-    async def request(self, method: str, endpoint: str, **kwargs) -&gt; tuple:
+    async def request(self, method: str, endpoint: str, **kwargs) -&gt; Union[str, list, dict]:
         &#34;&#34;&#34;Send a async request to the discord API.
 
         Args:
@@ -59,14 +60,11 @@ class HTTP:
             **kwargs Other parameters for request.
 
         Returns:
-            tuple: A tuple that contains an atom and result.
+            result (dict, list, str): Result from Discord API
 
-                Atom (0): Request successfully sent and got 2xx.
-
-                Atom (1): Request failed.
+        Raises:
+            All of the Exceptions from `krema.errors` may raise.
         &#34;&#34;&#34;
-
-        result: tuple = ()
 
         async with aiohttp.ClientSession() as session:
             async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
@@ -75,28 +73,36 @@ class HTTP:
                 except aiohttp.client_exceptions.ContentTypeError:
                     body_text = await response.text()
 
-                    if response.status &gt;= 200 and response.status &lt; 300:
-                        result = (0, &#34;&#34;)
+                    if 300 &gt; response.status &gt;= 200:
+                        return &#34;&#34;
                     else:
-                        result = (1, body_text)
+                        self.__raise_for_status(response.status, body_text)
 
-                    return result
-
-                if response.status &gt;= 200 and response.status &lt; 300:
-                    result = (0, json_data)
-                    return result
+                if 300 &gt; response.status &gt;= 200:
+                    return json_data
                 else:
                     retry_after = json_data.get(&#34;retry_after&#34;)
 
                     if retry_after is not None:
                         return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
                     else:
-                        result = (1, json_data.get(&#34;message&#34;) or json_data)
-                        return result
+                        self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)
 
     async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, **kwargs):
         await asyncio.sleep(ratelimit + 0.1)
-        return await self.request(method, endpoint, **kwargs)</code></pre>
+        return await self.request(method, endpoint, **kwargs)
+
+    def __raise_for_status(self, status: int, result: str):
+        if status == 404:
+            raise NotFound(result)
+        elif status == 403:
+            raise Forbidden(result)
+        elif status == 429:
+            raise RateLimited(result)
+        elif 600 &gt; status &gt;= 500:
+            raise ServerError(result)
+        else:
+            raise UnexceptedStatus(result)</code></pre>
 </details>
 </section>
 <section>
@@ -138,7 +144,7 @@ class HTTP:
 
         pass
 
-    async def request(self, method: str, endpoint: str, **kwargs) -&gt; tuple:
+    async def request(self, method: str, endpoint: str, **kwargs) -&gt; Union[str, list, dict]:
         &#34;&#34;&#34;Send a async request to the discord API.
 
         Args:
@@ -147,14 +153,11 @@ class HTTP:
             **kwargs Other parameters for request.
 
         Returns:
-            tuple: A tuple that contains an atom and result.
+            result (dict, list, str): Result from Discord API
 
-                Atom (0): Request successfully sent and got 2xx.
-
-                Atom (1): Request failed.
+        Raises:
+            All of the Exceptions from `krema.errors` may raise.
         &#34;&#34;&#34;
-
-        result: tuple = ()
 
         async with aiohttp.ClientSession() as session:
             async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
@@ -163,33 +166,41 @@ class HTTP:
                 except aiohttp.client_exceptions.ContentTypeError:
                     body_text = await response.text()
 
-                    if response.status &gt;= 200 and response.status &lt; 300:
-                        result = (0, &#34;&#34;)
+                    if 300 &gt; response.status &gt;= 200:
+                        return &#34;&#34;
                     else:
-                        result = (1, body_text)
+                        self.__raise_for_status(response.status, body_text)
 
-                    return result
-
-                if response.status &gt;= 200 and response.status &lt; 300:
-                    result = (0, json_data)
-                    return result
+                if 300 &gt; response.status &gt;= 200:
+                    return json_data
                 else:
                     retry_after = json_data.get(&#34;retry_after&#34;)
 
                     if retry_after is not None:
                         return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
                     else:
-                        result = (1, json_data.get(&#34;message&#34;) or json_data)
-                        return result
+                        self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)
 
     async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, **kwargs):
         await asyncio.sleep(ratelimit + 0.1)
-        return await self.request(method, endpoint, **kwargs)</code></pre>
+        return await self.request(method, endpoint, **kwargs)
+
+    def __raise_for_status(self, status: int, result: str):
+        if status == 404:
+            raise NotFound(result)
+        elif status == 403:
+            raise Forbidden(result)
+        elif status == 429:
+            raise RateLimited(result)
+        elif 600 &gt; status &gt;= 500:
+            raise ServerError(result)
+        else:
+            raise UnexceptedStatus(result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
 <dt id="krema.http.HTTP.request"><code class="name flex">
-<span>async def <span class="ident">request</span></span>(<span>self, method: str, endpoint: str, **kwargs) ‑> tuple</span>
+<span>async def <span class="ident">request</span></span>(<span>self, method: str, endpoint: str, **kwargs) ‑> Union[str, list, dict]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Send a async request to the discord API.</p>
@@ -202,19 +213,14 @@ class HTTP:
 </dl>
 <p>**kwargs Other parameters for request.</p>
 <h2 id="returns">Returns</h2>
-<dl>
-<dt><code>tuple</code></dt>
-<dd>
-<p>A tuple that contains an atom and result.</p>
-<p>Atom (0): Request successfully sent and got 2xx.</p>
-<p>Atom (1): Request failed.</p>
-</dd>
-</dl></div>
+<p>result (dict, list, str): Result from Discord API</p>
+<h2 id="raises">Raises</h2>
+<p>All of the Exceptions from <code><a title="krema.errors" href="errors.html">krema.errors</a></code> may raise.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def request(self, method: str, endpoint: str, **kwargs) -&gt; tuple:
+<pre><code class="python">async def request(self, method: str, endpoint: str, **kwargs) -&gt; Union[str, list, dict]:
     &#34;&#34;&#34;Send a async request to the discord API.
 
     Args:
@@ -223,14 +229,11 @@ class HTTP:
         **kwargs Other parameters for request.
 
     Returns:
-        tuple: A tuple that contains an atom and result.
+        result (dict, list, str): Result from Discord API
 
-            Atom (0): Request successfully sent and got 2xx.
-
-            Atom (1): Request failed.
+    Raises:
+        All of the Exceptions from `krema.errors` may raise.
     &#34;&#34;&#34;
-
-    result: tuple = ()
 
     async with aiohttp.ClientSession() as session:
         async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
@@ -239,24 +242,20 @@ class HTTP:
             except aiohttp.client_exceptions.ContentTypeError:
                 body_text = await response.text()
 
-                if response.status &gt;= 200 and response.status &lt; 300:
-                    result = (0, &#34;&#34;)
+                if 300 &gt; response.status &gt;= 200:
+                    return &#34;&#34;
                 else:
-                    result = (1, body_text)
+                    self.__raise_for_status(response.status, body_text)
 
-                return result
-
-            if response.status &gt;= 200 and response.status &lt; 300:
-                result = (0, json_data)
-                return result
+            if 300 &gt; response.status &gt;= 200:
+                return json_data
             else:
                 retry_after = json_data.get(&#34;retry_after&#34;)
 
                 if retry_after is not None:
                     return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
                 else:
-                    result = (1, json_data.get(&#34;message&#34;) or json_data)
-                    return result</code></pre>
+                    self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)</code></pre>
 </details>
 </dd>
 </dl>

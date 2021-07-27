@@ -32,7 +32,6 @@ Client model for krema.
 &#34;&#34;&#34;
 
 from unikorn import kollektor
-from ..errors import FetchChannelFailed, InvalidTokenError, FetchUserFailed, ModifyClientUserFailed
 from ..utils import image_to_data_uri
 
 
@@ -115,19 +114,11 @@ class Client:
 
         Returns:
             None: Client token works.
-
-        Raises:
-            InvalidTokenError: Checking the token is failed, probably your token is broken.
         &#34;&#34;&#34;
 
         from .user import User
-        atom, result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
-
-        if atom == 1:
-            raise InvalidTokenError(
-                &#34;Token is invalid. Please check your token!&#34;)
-        else:
-            self.user = User(self, result)
+        result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
+        self.user = User(self, result)
 
     def start(self, token: str, bot: bool = True):
         &#34;&#34;&#34;Start the client.
@@ -264,19 +255,12 @@ class Client:
 
         Returns:
             Channel: Found channel.
-
-        Raises:
-            FetchChannelFailed: Fetching the channel is failed.
         &#34;&#34;&#34;
 
         from .channel import Channel
 
-        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
-
-        if atom == 0:
-            return Channel(self,  result)
-        else:
-            raise FetchChannelFailed(result)
+        result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
+        return Channel(self,  result)
 
     async def fetch_user(self, id: int = None):
         &#34;&#34;&#34;Fetch an User by ID.
@@ -286,19 +270,28 @@ class Client:
 
         Returns:
             User: Found user.
-
-        Raises:
-            FetchUserFailed: Fetching the user is failed.
         &#34;&#34;&#34;
 
         from .user import User
 
-        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+        result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+        return User(self,  result)
 
-        if atom == 0:
-            return User(self,  result)
-        else:
-            raise FetchUserFailed(result)
+    async def fetch_guild(self, guild_id: int, with_count: bool = False):
+        &#34;&#34;&#34;Fetch a Guild by ID.
+
+        Args:
+            guild_id (int): Guild ID.
+            with_count (bool, optional): if True, will return approximate member and presence counts for the guild. (default False)
+
+        Returns:
+            Guild: Found guild object.
+        &#34;&#34;&#34;
+
+        from .guild import Guild
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/guilds/{guild_id}?with_count={with_count}&#34;)
+        return Guild(self, result)
 
     async def edit(self, username: str, path: str):
         &#34;&#34;&#34;Edit client user.
@@ -309,22 +302,15 @@ class Client:
 
         Returns:
             User: Updated user.
-
-        Raises:
-            ModifyClientUserFailed: Editing the client user is failed.
         &#34;&#34;&#34;
 
         from .user import User
 
-        atom, result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+        result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
             &#34;username&#34;: username,
             &#34;avatar&#34;: image_to_data_uri(path)
         })
-
-        if atom == 0:
-            return User(self,  result)
-        else:
-            raise ModifyClientUserFailed(result)</code></pre>
+        return User(self,  result)</code></pre>
 </details>
 </section>
 <section>
@@ -455,19 +441,11 @@ class Client:
 
         Returns:
             None: Client token works.
-
-        Raises:
-            InvalidTokenError: Checking the token is failed, probably your token is broken.
         &#34;&#34;&#34;
 
         from .user import User
-        atom, result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
-
-        if atom == 1:
-            raise InvalidTokenError(
-                &#34;Token is invalid. Please check your token!&#34;)
-        else:
-            self.user = User(self, result)
+        result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
+        self.user = User(self, result)
 
     def start(self, token: str, bot: bool = True):
         &#34;&#34;&#34;Start the client.
@@ -604,19 +582,12 @@ class Client:
 
         Returns:
             Channel: Found channel.
-
-        Raises:
-            FetchChannelFailed: Fetching the channel is failed.
         &#34;&#34;&#34;
 
         from .channel import Channel
 
-        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
-
-        if atom == 0:
-            return Channel(self,  result)
-        else:
-            raise FetchChannelFailed(result)
+        result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
+        return Channel(self,  result)
 
     async def fetch_user(self, id: int = None):
         &#34;&#34;&#34;Fetch an User by ID.
@@ -626,19 +597,28 @@ class Client:
 
         Returns:
             User: Found user.
-
-        Raises:
-            FetchUserFailed: Fetching the user is failed.
         &#34;&#34;&#34;
 
         from .user import User
 
-        atom, result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+        result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+        return User(self,  result)
 
-        if atom == 0:
-            return User(self,  result)
-        else:
-            raise FetchUserFailed(result)
+    async def fetch_guild(self, guild_id: int, with_count: bool = False):
+        &#34;&#34;&#34;Fetch a Guild by ID.
+
+        Args:
+            guild_id (int): Guild ID.
+            with_count (bool, optional): if True, will return approximate member and presence counts for the guild. (default False)
+
+        Returns:
+            Guild: Found guild object.
+        &#34;&#34;&#34;
+
+        from .guild import Guild
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/guilds/{guild_id}?with_count={with_count}&#34;)
+        return Guild(self, result)
 
     async def edit(self, username: str, path: str):
         &#34;&#34;&#34;Edit client user.
@@ -649,22 +629,15 @@ class Client:
 
         Returns:
             User: Updated user.
-
-        Raises:
-            ModifyClientUserFailed: Editing the client user is failed.
         &#34;&#34;&#34;
 
         from .user import User
 
-        atom, result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+        result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
             &#34;username&#34;: username,
             &#34;avatar&#34;: image_to_data_uri(path)
         })
-
-        if atom == 0:
-            return User(self,  result)
-        else:
-            raise ModifyClientUserFailed(result)</code></pre>
+        return User(self,  result)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -706,11 +679,6 @@ def formatted_token(self) -&gt; str:
 <dl>
 <dt><code>None</code></dt>
 <dd>Client token works.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>InvalidTokenError</code></dt>
-<dd>Checking the token is failed, probably your token is broken.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -721,19 +689,11 @@ def formatted_token(self) -&gt; str:
 
     Returns:
         None: Client token works.
-
-    Raises:
-        InvalidTokenError: Checking the token is failed, probably your token is broken.
     &#34;&#34;&#34;
 
     from .user import User
-    atom, result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
-
-    if atom == 1:
-        raise InvalidTokenError(
-            &#34;Token is invalid. Please check your token!&#34;)
-    else:
-        self.user = User(self, result)</code></pre>
+    result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
+    self.user = User(self, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.edit"><code class="name flex">
@@ -752,11 +712,6 @@ def formatted_token(self) -&gt; str:
 <dl>
 <dt><code>User</code></dt>
 <dd>Updated user.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>ModifyClientUserFailed</code></dt>
-<dd>Editing the client user is failed.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -771,22 +726,15 @@ def formatted_token(self) -&gt; str:
 
     Returns:
         User: Updated user.
-
-    Raises:
-        ModifyClientUserFailed: Editing the client user is failed.
     &#34;&#34;&#34;
 
     from .user import User
 
-    atom, result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+    result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
         &#34;username&#34;: username,
         &#34;avatar&#34;: image_to_data_uri(path)
     })
-
-    if atom == 0:
-        return User(self,  result)
-    else:
-        raise ModifyClientUserFailed(result)</code></pre>
+    return User(self,  result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.event"><code class="name flex">
@@ -837,11 +785,6 @@ def formatted_token(self) -&gt; str:
 <dl>
 <dt><code>Channel</code></dt>
 <dd>Found channel.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>FetchChannelFailed</code></dt>
-<dd>Fetching the channel is failed.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -855,19 +798,50 @@ def formatted_token(self) -&gt; str:
 
     Returns:
         Channel: Found channel.
-
-    Raises:
-        FetchChannelFailed: Fetching the channel is failed.
     &#34;&#34;&#34;
 
     from .channel import Channel
 
-    atom, result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
+    result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
+    return Channel(self,  result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.fetch_guild"><code class="name flex">
+<span>async def <span class="ident">fetch_guild</span></span>(<span>self, guild_id: int, with_count: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch a Guild by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>guild_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Guild ID.</dd>
+<dt><strong><code>with_count</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>if True, will return approximate member and presence counts for the guild. (default False)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Guild</code></dt>
+<dd>Found guild object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_guild(self, guild_id: int, with_count: bool = False):
+    &#34;&#34;&#34;Fetch a Guild by ID.
 
-    if atom == 0:
-        return Channel(self,  result)
-    else:
-        raise FetchChannelFailed(result)</code></pre>
+    Args:
+        guild_id (int): Guild ID.
+        with_count (bool, optional): if True, will return approximate member and presence counts for the guild. (default False)
+
+    Returns:
+        Guild: Found guild object.
+    &#34;&#34;&#34;
+
+    from .guild import Guild
+
+    result = await self.http.request(&#34;GET&#34;, f&#34;/guilds/{guild_id}?with_count={with_count}&#34;)
+    return Guild(self, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.fetch_user"><code class="name flex">
@@ -884,11 +858,6 @@ def formatted_token(self) -&gt; str:
 <dl>
 <dt><code>User</code></dt>
 <dd>Found user.</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>FetchUserFailed</code></dt>
-<dd>Fetching the user is failed.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -902,19 +871,12 @@ def formatted_token(self) -&gt; str:
 
     Returns:
         User: Found user.
-
-    Raises:
-        FetchUserFailed: Fetching the user is failed.
     &#34;&#34;&#34;
 
     from .user import User
 
-    atom, result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
-
-    if atom == 0:
-        return User(self,  result)
-    else:
-        raise FetchUserFailed(result)</code></pre>
+    result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+    return User(self,  result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.start"><code class="name flex">
@@ -1006,6 +968,7 @@ def formatted_token(self) -&gt; str:
 <li><code><a title="krema.models.client.Client.edit" href="#krema.models.client.Client.edit">edit</a></code></li>
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_guild" href="#krema.models.client.Client.fetch_guild">fetch_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_user" href="#krema.models.client.Client.fetch_user">fetch_user</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>
 <li><code><a title="krema.models.client.Client.start" href="#krema.models.client.Client.start">start</a></code></li>

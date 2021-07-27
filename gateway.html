@@ -74,19 +74,46 @@ class Gateway:
         self._zlib = decompressobj()
         self._session: aiohttp.ClientSession = None
 
+        self._seq: int = None
+        self._session_id: str = None
+
         self._event_loop = asyncio.get_event_loop()
+
+        self.client.events.append(
+            (&#34;ready&#34;, self.__handle_session_id)
+        )
 
     async def __connect(self):
         &#34;&#34;&#34;Start WebSocket connection.&#34;&#34;&#34;
 
+        self.websocket, self._session = None, None
+
         self._session = aiohttp.ClientSession()
         self.websocket = await self._session.ws_connect(self.gateway)
+
+        # Send Resume
+        if self._session_id is not None:
+            print(&#34;resume at kardes&#34;)
+            await self.websocket.send_json({
+                &#34;op&#34;: 6,
+                &#34;d&#34;: {
+                    &#34;token&#34;: self.token,
+                    &#34;session_id&#34;: self._session_id,
+                    &#34;seq&#34;: self._seq
+                }
+            })
+
+    async def __handle_session_id(self, packet):
+        self._session_id = packet.get(&#34;session_id&#34;)
 
     async def __receiver(self):
         &#34;&#34;&#34;Receive messages from WebSocket.&#34;&#34;&#34;
 
         while True:
-            await self.__handle_packet(await self.websocket.receive())
+            result = await self.__handle_packet(await self.websocket.receive())
+
+            if result is not None:
+                return result
 
     async def __handle_packet(self, packet):
         &#34;&#34;&#34;Handle Packets.&#34;&#34;&#34;
@@ -96,7 +123,7 @@ class Gateway:
         if isinstance(packet.data, int) and len(str(packet.data)) == 4:
             # Reconnect Websocket
             if packet.data == 1001:
-                self._session.close()
+                await self._session.close()
                 self._session = None
                 return 1
             else:
@@ -105,11 +132,12 @@ class Gateway:
                 return 0
         elif isinstance(packet.data, type(None)):
             if packet.type == 0x101:
-                return 0x0
+                return 0
 
         if len(data) &lt; 4 or data[-4:] != b&#39;\x00\x00\xff\xff&#39;:
             return
 
+        # Compressor Decode
         self._buffer.extend(data)
         message = self._zlib.decompress(self._buffer).decode(&#34;utf-8&#34;)
         message = loads(message)
@@ -118,6 +146,12 @@ class Gateway:
 
         opcode, data, seq, event_type = message.get(
             &#34;op&#34;), message.get(&#34;d&#34;), message.get(&#34;s&#34;), message.get(&#34;t&#34;)
+
+        if seq is not None:
+            self._seq = seq
+
+        print(self._seq, self._session_id)
+        print(message, end=&#34;\n\n&#34;)
 
         if opcode == self.HELLO:
             interval = data[&#34;heartbeat_interval&#34;]
@@ -129,7 +163,9 @@ class Gateway:
                 self._event_loop.create_task(
                     self.__handle_event(data, event_type))
 
-            # print(message, end=&#34;\n\n&#34;)
+        # Reconnect
+        elif opcode == self.RECONNECT:
+            return 1
 
     async def __handle_event(self, event_data, event_type):
         if event_type in (&#34;message_create&#34;, &#34;message_update&#34;):
@@ -181,13 +217,12 @@ class Gateway:
         &#34;&#34;&#34;Send hearbeat to the WebSocket.&#34;&#34;&#34;
 
         while True:
+            await asyncio.sleep(interval // 1000)
             if self.websocket is not None:
                 await self.websocket.send_json({
                     &#34;op&#34;: self.HEARTBEAT,
-                    &#34;d&#34;: None
+                    &#34;d&#34;: self._seq
                 })
-
-                await asyncio.sleep(interval // 1000)
 
     async def start_connection(self):
         &#34;&#34;&#34;Start the Gateway Connection.&#34;&#34;&#34;
@@ -195,9 +230,10 @@ class Gateway:
         await self.__connect()
         result = await self.__receiver()
 
-        # Reconnect Websocket
+        # Reconnect
         if result == 1:
-            self.start_connection()</code></pre>
+            print(&#34;reconnect kardes.&#34;)
+            await self.start_connection()</code></pre>
 </details>
 </section>
 <section>
@@ -259,19 +295,46 @@ class Gateway:
         self._zlib = decompressobj()
         self._session: aiohttp.ClientSession = None
 
+        self._seq: int = None
+        self._session_id: str = None
+
         self._event_loop = asyncio.get_event_loop()
+
+        self.client.events.append(
+            (&#34;ready&#34;, self.__handle_session_id)
+        )
 
     async def __connect(self):
         &#34;&#34;&#34;Start WebSocket connection.&#34;&#34;&#34;
 
+        self.websocket, self._session = None, None
+
         self._session = aiohttp.ClientSession()
         self.websocket = await self._session.ws_connect(self.gateway)
+
+        # Send Resume
+        if self._session_id is not None:
+            print(&#34;resume at kardes&#34;)
+            await self.websocket.send_json({
+                &#34;op&#34;: 6,
+                &#34;d&#34;: {
+                    &#34;token&#34;: self.token,
+                    &#34;session_id&#34;: self._session_id,
+                    &#34;seq&#34;: self._seq
+                }
+            })
+
+    async def __handle_session_id(self, packet):
+        self._session_id = packet.get(&#34;session_id&#34;)
 
     async def __receiver(self):
         &#34;&#34;&#34;Receive messages from WebSocket.&#34;&#34;&#34;
 
         while True:
-            await self.__handle_packet(await self.websocket.receive())
+            result = await self.__handle_packet(await self.websocket.receive())
+
+            if result is not None:
+                return result
 
     async def __handle_packet(self, packet):
         &#34;&#34;&#34;Handle Packets.&#34;&#34;&#34;
@@ -281,7 +344,7 @@ class Gateway:
         if isinstance(packet.data, int) and len(str(packet.data)) == 4:
             # Reconnect Websocket
             if packet.data == 1001:
-                self._session.close()
+                await self._session.close()
                 self._session = None
                 return 1
             else:
@@ -290,11 +353,12 @@ class Gateway:
                 return 0
         elif isinstance(packet.data, type(None)):
             if packet.type == 0x101:
-                return 0x0
+                return 0
 
         if len(data) &lt; 4 or data[-4:] != b&#39;\x00\x00\xff\xff&#39;:
             return
 
+        # Compressor Decode
         self._buffer.extend(data)
         message = self._zlib.decompress(self._buffer).decode(&#34;utf-8&#34;)
         message = loads(message)
@@ -303,6 +367,12 @@ class Gateway:
 
         opcode, data, seq, event_type = message.get(
             &#34;op&#34;), message.get(&#34;d&#34;), message.get(&#34;s&#34;), message.get(&#34;t&#34;)
+
+        if seq is not None:
+            self._seq = seq
+
+        print(self._seq, self._session_id)
+        print(message, end=&#34;\n\n&#34;)
 
         if opcode == self.HELLO:
             interval = data[&#34;heartbeat_interval&#34;]
@@ -314,7 +384,9 @@ class Gateway:
                 self._event_loop.create_task(
                     self.__handle_event(data, event_type))
 
-            # print(message, end=&#34;\n\n&#34;)
+        # Reconnect
+        elif opcode == self.RECONNECT:
+            return 1
 
     async def __handle_event(self, event_data, event_type):
         if event_type in (&#34;message_create&#34;, &#34;message_update&#34;):
@@ -366,13 +438,12 @@ class Gateway:
         &#34;&#34;&#34;Send hearbeat to the WebSocket.&#34;&#34;&#34;
 
         while True:
+            await asyncio.sleep(interval // 1000)
             if self.websocket is not None:
                 await self.websocket.send_json({
                     &#34;op&#34;: self.HEARTBEAT,
-                    &#34;d&#34;: None
+                    &#34;d&#34;: self._seq
                 })
-
-                await asyncio.sleep(interval // 1000)
 
     async def start_connection(self):
         &#34;&#34;&#34;Start the Gateway Connection.&#34;&#34;&#34;
@@ -380,9 +451,10 @@ class Gateway:
         await self.__connect()
         result = await self.__receiver()
 
-        # Reconnect Websocket
+        # Reconnect
         if result == 1:
-            self.start_connection()</code></pre>
+            print(&#34;reconnect kardes.&#34;)
+            await self.start_connection()</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -456,9 +528,10 @@ class Gateway:
     await self.__connect()
     result = await self.__receiver()
 
-    # Reconnect Websocket
+    # Reconnect
     if result == 1:
-        self.start_connection()</code></pre>
+        print(&#34;reconnect kardes.&#34;)
+        await self.start_connection()</code></pre>
 </details>
 </dd>
 </dl>
