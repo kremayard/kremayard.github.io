@@ -93,7 +93,7 @@ class Gateway:
 
         # Send Resume
         if self._session_id is not None:
-            print(&#34;resume at kardes&#34;)
+            # print(&#34;resume at kardes&#34;)
             await self.websocket.send_json({
                 &#34;op&#34;: 6,
                 &#34;d&#34;: {
@@ -150,7 +150,7 @@ class Gateway:
         if seq is not None:
             self._seq = seq
 
-        print(self._seq, self._session_id)
+        # print(self._seq, self._session_id, asyncio.all_tasks(self._event_loop))
         print(message, end=&#34;\n\n&#34;)
 
         if opcode == self.HELLO:
@@ -232,7 +232,7 @@ class Gateway:
 
         # Reconnect
         if result == 1:
-            print(&#34;reconnect kardes.&#34;)
+            # print(&#34;reconnect.&#34;)
             await self.start_connection()</code></pre>
 </details>
 </section>
@@ -314,7 +314,7 @@ class Gateway:
 
         # Send Resume
         if self._session_id is not None:
-            print(&#34;resume at kardes&#34;)
+            # print(&#34;resume at kardes&#34;)
             await self.websocket.send_json({
                 &#34;op&#34;: 6,
                 &#34;d&#34;: {
@@ -371,7 +371,7 @@ class Gateway:
         if seq is not None:
             self._seq = seq
 
-        print(self._seq, self._session_id)
+        # print(self._seq, self._session_id, asyncio.all_tasks(self._event_loop))
         print(message, end=&#34;\n\n&#34;)
 
         if opcode == self.HELLO:
@@ -453,7 +453,7 @@ class Gateway:
 
         # Reconnect
         if result == 1:
-            print(&#34;reconnect kardes.&#34;)
+            # print(&#34;reconnect.&#34;)
             await self.start_connection()</code></pre>
 </details>
 <h3>Class variables</h3>
@@ -530,7 +530,7 @@ class Gateway:
 
     # Reconnect
     if result == 1:
-        print(&#34;reconnect kardes.&#34;)
+        # print(&#34;reconnect.&#34;)
         await self.start_connection()</code></pre>
 </details>
 </dd>

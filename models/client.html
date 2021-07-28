@@ -277,6 +277,21 @@ class Client:
         result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
         return User(self,  result)
 
+    async def create_guild(self, **kwargs):
+        &#34;&#34;&#34;Create a Guild with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-json-params.
+
+        Returns:
+            Guild: Created guild object.
+        &#34;&#34;&#34;
+
+        from .guild import Guild
+
+        result = await self.http.request(&#34;POST&#34;, f&#34;/guilds&#34;, json=kwargs)
+        return Guild(self, result)
+
     async def fetch_guild(self, guild_id: int, with_count: bool = False):
         &#34;&#34;&#34;Fetch a Guild by ID.
 
@@ -604,6 +619,21 @@ class Client:
         result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
         return User(self,  result)
 
+    async def create_guild(self, **kwargs):
+        &#34;&#34;&#34;Create a Guild with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-json-params.
+
+        Returns:
+            Guild: Created guild object.
+        &#34;&#34;&#34;
+
+        from .guild import Guild
+
+        result = await self.http.request(&#34;POST&#34;, f&#34;/guilds&#34;, json=kwargs)
+        return Guild(self, result)
+
     async def fetch_guild(self, guild_id: int, with_count: bool = False):
         &#34;&#34;&#34;Fetch a Guild by ID.
 
@@ -694,6 +724,41 @@ def formatted_token(self) -&gt; str:
     from .user import User
     result = await self.http.request(&#34;GET&#34;, &#34;/users/@me&#34;)
     self.user = User(self, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.create_guild"><code class="name flex">
+<span>async def <span class="ident">create_guild</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a Guild with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#create-guild-json-params.">https://discord.com/developers/docs/resources/guild#create-guild-json-params.</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Guild</code></dt>
+<dd>Created guild object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def create_guild(self, **kwargs):
+    &#34;&#34;&#34;Create a Guild with API params.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-json-params.
+
+    Returns:
+        Guild: Created guild object.
+    &#34;&#34;&#34;
+
+    from .guild import Guild
+
+    result = await self.http.request(&#34;POST&#34;, f&#34;/guilds&#34;, json=kwargs)
+    return Guild(self, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.edit"><code class="name flex">
@@ -965,6 +1030,7 @@ def formatted_token(self) -&gt; str:
 <h4><code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></h4>
 <ul class="two-column">
 <li><code><a title="krema.models.client.Client.check_token" href="#krema.models.client.Client.check_token">check_token</a></code></li>
+<li><code><a title="krema.models.client.Client.create_guild" href="#krema.models.client.Client.create_guild">create_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.edit" href="#krema.models.client.Client.edit">edit</a></code></li>
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>

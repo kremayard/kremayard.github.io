@@ -34,6 +34,7 @@ Models for guild and other related stuff.
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Union
+from ..utils import convert_iso, dict_to_query
 
 
 @dataclass
@@ -48,7 +49,6 @@ class Guild:
     &#34;&#34;&#34;
 
     def __init__(self, client, data: dict) -&gt; None:
-        from ..utils import convert_iso
         from .user import Member
         from .channel import Channel
 
@@ -121,6 +121,29 @@ class Guild:
         self.nsfw_level: int = data.get(&#34;nsfw_level&#34;)
         self.stage_instances: Union[list, None] = data.get(&#34;stage_instances&#34;)
 
+    async def edit(self, **kwargs):
+        &#34;&#34;&#34;Modify the Guild with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-json-params
+
+        Returns:
+            Guild: Updated guild object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}&#34;, json=kwargs)
+        return Guild(self.client, result)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete the Guild.
+
+        Returns:
+            True: Guild deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}&#34;)
+        return True
+
     async def fetch_emojis(self):
         &#34;&#34;&#34;Fetch all emojis in the Guild.
 
@@ -183,6 +206,94 @@ class Guild:
 
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
         return True
+
+    async def fetch_channels(self):
+        &#34;&#34;&#34;Fetch all Guild Channels.
+
+        Returns:
+            list: List of Channel objects. (Threads does not included.)
+        &#34;&#34;&#34;
+
+        from .channel import Channel
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/channels&#34;)
+        return [Channel(self.client, i) for i in result]
+
+    async def create_channel(self, **kwargs):
+        &#34;&#34;&#34;Create Guild Channel with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params
+
+        Returns:
+            Channel: Created Channel object.
+        &#34;&#34;&#34;
+
+        from .channel import Channel
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/channels&#34;, json=kwargs)
+        return Channel(self.client, result)
+
+    async def modify_channel_positions(self, parameters: list):
+        &#34;&#34;&#34;Modifiy Guild Channel positions with API params.
+
+        Args:
+            parameters: JSON list that contains https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions-json-params objects.
+
+        Returns:
+            True: Channel positions modified successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/channels&#34;, json=parameters)
+        return True
+
+    async def fetch_member(self, member_id: int):
+        &#34;&#34;&#34;Fetch a Member from Guild.
+
+        Args:
+            member_id (int): Member ID.
+
+        Returns:
+            Member: Found Member.
+        &#34;&#34;&#34;
+
+        from .user import Member
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;)
+        return Member(self.client, result)
+
+    async def fetch_member_list(self, **kwargs):
+        &#34;&#34;&#34;Fetch list of Guild Member with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#list-guild-members-query-string-params
+
+        Returns:
+            list: List of Guild Members.
+        &#34;&#34;&#34;
+
+        from .user import Member
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members{dict_to_query(kwargs)}&#34;)
+        return [Member(self.client, i) for i in result]
+
+    async def search_member(self, **kwargs):
+        &#34;&#34;&#34;Search Guild Member with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#search-guild-members-query-string-params
+
+        Returns:
+            list: List of Guild Members.
+        &#34;&#34;&#34;
+
+        from .user import Member
+
+        if &#34;limit&#34; not in kwargs:
+            kwargs[&#34;limit&#34;] = 25
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members/search{dict_to_query(kwargs)}&#34;)
+        return [Member(self.client, i) for i in result]
 
 
 @dataclass
@@ -317,7 +428,6 @@ class Guild:
     &#34;&#34;&#34;
 
     def __init__(self, client, data: dict) -&gt; None:
-        from ..utils import convert_iso
         from .user import Member
         from .channel import Channel
 
@@ -390,6 +500,29 @@ class Guild:
         self.nsfw_level: int = data.get(&#34;nsfw_level&#34;)
         self.stage_instances: Union[list, None] = data.get(&#34;stage_instances&#34;)
 
+    async def edit(self, **kwargs):
+        &#34;&#34;&#34;Modify the Guild with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-json-params
+
+        Returns:
+            Guild: Updated guild object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}&#34;, json=kwargs)
+        return Guild(self.client, result)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete the Guild.
+
+        Returns:
+            True: Guild deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}&#34;)
+        return True
+
     async def fetch_emojis(self):
         &#34;&#34;&#34;Fetch all emojis in the Guild.
 
@@ -451,10 +584,133 @@ class Guild:
         &#34;&#34;&#34;
 
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
-        return True</code></pre>
+        return True
+
+    async def fetch_channels(self):
+        &#34;&#34;&#34;Fetch all Guild Channels.
+
+        Returns:
+            list: List of Channel objects. (Threads does not included.)
+        &#34;&#34;&#34;
+
+        from .channel import Channel
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/channels&#34;)
+        return [Channel(self.client, i) for i in result]
+
+    async def create_channel(self, **kwargs):
+        &#34;&#34;&#34;Create Guild Channel with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params
+
+        Returns:
+            Channel: Created Channel object.
+        &#34;&#34;&#34;
+
+        from .channel import Channel
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/channels&#34;, json=kwargs)
+        return Channel(self.client, result)
+
+    async def modify_channel_positions(self, parameters: list):
+        &#34;&#34;&#34;Modifiy Guild Channel positions with API params.
+
+        Args:
+            parameters: JSON list that contains https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions-json-params objects.
+
+        Returns:
+            True: Channel positions modified successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/channels&#34;, json=parameters)
+        return True
+
+    async def fetch_member(self, member_id: int):
+        &#34;&#34;&#34;Fetch a Member from Guild.
+
+        Args:
+            member_id (int): Member ID.
+
+        Returns:
+            Member: Found Member.
+        &#34;&#34;&#34;
+
+        from .user import Member
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;)
+        return Member(self.client, result)
+
+    async def fetch_member_list(self, **kwargs):
+        &#34;&#34;&#34;Fetch list of Guild Member with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#list-guild-members-query-string-params
+
+        Returns:
+            list: List of Guild Members.
+        &#34;&#34;&#34;
+
+        from .user import Member
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members{dict_to_query(kwargs)}&#34;)
+        return [Member(self.client, i) for i in result]
+
+    async def search_member(self, **kwargs):
+        &#34;&#34;&#34;Search Guild Member with API params.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#search-guild-members-query-string-params
+
+        Returns:
+            list: List of Guild Members.
+        &#34;&#34;&#34;
+
+        from .user import Member
+
+        if &#34;limit&#34; not in kwargs:
+            kwargs[&#34;limit&#34;] = 25
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members/search{dict_to_query(kwargs)}&#34;)
+        return [Member(self.client, i) for i in result]</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="krema.models.guild.Guild.create_channel"><code class="name flex">
+<span>async def <span class="ident">create_channel</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create Guild Channel with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params">https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Channel</code></dt>
+<dd>Created Channel object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def create_channel(self, **kwargs):
+    &#34;&#34;&#34;Create Guild Channel with API params.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params
+
+    Returns:
+        Channel: Created Channel object.
+    &#34;&#34;&#34;
+
+    from .channel import Channel
+
+    result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/channels&#34;, json=kwargs)
+    return Channel(self.client, result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.create_emoji"><code class="name flex">
 <span>async def <span class="ident">create_emoji</span></span>(<span>self, **kwargs)</span>
 </code></dt>
@@ -488,6 +744,31 @@ class Guild:
     return Emoji(self.client, result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.delete"><code class="name flex">
+<span>async def <span class="ident">delete</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete the Guild.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Guild deleted successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete(self):
+    &#34;&#34;&#34;Delete the Guild.
+
+    Returns:
+        True: Guild deleted successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}&#34;)
+    return True</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.delete_emoji"><code class="name flex">
 <span>async def <span class="ident">delete_emoji</span></span>(<span>self, emoji_id: int)</span>
 </code></dt>
@@ -519,6 +800,66 @@ class Guild:
 
     await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
     return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.edit"><code class="name flex">
+<span>async def <span class="ident">edit</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Modify the Guild with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#modify-guild-json-params">https://discord.com/developers/docs/resources/guild#modify-guild-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Guild" href="#krema.models.guild.Guild">Guild</a></code></dt>
+<dd>Updated guild object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit(self, **kwargs):
+    &#34;&#34;&#34;Modify the Guild with API params.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-json-params
+
+    Returns:
+        Guild: Updated guild object.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}&#34;, json=kwargs)
+    return Guild(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_channels"><code class="name flex">
+<span>async def <span class="ident">fetch_channels</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch all Guild Channels.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Channel objects. (Threads does not included.)</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_channels(self):
+    &#34;&#34;&#34;Fetch all Guild Channels.
+
+    Returns:
+        list: List of Channel objects. (Threads does not included.)
+    &#34;&#34;&#34;
+
+    from .channel import Channel
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/channels&#34;)
+    return [Channel(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.fetch_emoji"><code class="name flex">
@@ -577,6 +918,147 @@ class Guild:
 
     result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/emojis&#34;)
     return [Emoji(self.client, i) for i in result]</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_member"><code class="name flex">
+<span>async def <span class="ident">fetch_member</span></span>(<span>self, member_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch a Member from Guild.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>member_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Member ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Member</code></dt>
+<dd>Found Member.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_member(self, member_id: int):
+    &#34;&#34;&#34;Fetch a Member from Guild.
+
+    Args:
+        member_id (int): Member ID.
+
+    Returns:
+        Member: Found Member.
+    &#34;&#34;&#34;
+
+    from .user import Member
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;)
+    return Member(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_member_list"><code class="name flex">
+<span>async def <span class="ident">fetch_member_list</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch list of Guild Member with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#list-guild-members-query-string-params">https://discord.com/developers/docs/resources/guild#list-guild-members-query-string-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Guild Members.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_member_list(self, **kwargs):
+    &#34;&#34;&#34;Fetch list of Guild Member with API params.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/guild#list-guild-members-query-string-params
+
+    Returns:
+        list: List of Guild Members.
+    &#34;&#34;&#34;
+
+    from .user import Member
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members{dict_to_query(kwargs)}&#34;)
+    return [Member(self.client, i) for i in result]</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.modify_channel_positions"><code class="name flex">
+<span>async def <span class="ident">modify_channel_positions</span></span>(<span>self, parameters: list)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Modifiy Guild Channel positions with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>parameters</code></strong></dt>
+<dd>JSON list that contains <a href="https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions-json-params">https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions-json-params</a> objects.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Channel positions modified successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def modify_channel_positions(self, parameters: list):
+    &#34;&#34;&#34;Modifiy Guild Channel positions with API params.
+
+    Args:
+        parameters: JSON list that contains https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions-json-params objects.
+
+    Returns:
+        True: Channel positions modified successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/channels&#34;, json=parameters)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.search_member"><code class="name flex">
+<span>async def <span class="ident">search_member</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Search Guild Member with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#search-guild-members-query-string-params">https://discord.com/developers/docs/resources/guild#search-guild-members-query-string-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Guild Members.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def search_member(self, **kwargs):
+    &#34;&#34;&#34;Search Guild Member with API params.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/guild#search-guild-members-query-string-params
+
+    Returns:
+        list: List of Guild Members.
+    &#34;&#34;&#34;
+
+    from .user import Member
+
+    if &#34;limit&#34; not in kwargs:
+        kwargs[&#34;limit&#34;] = 25
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members/search{dict_to_query(kwargs)}&#34;)
+    return [Member(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.update_emoji"><code class="name flex">
@@ -639,10 +1121,18 @@ class Guild:
 <li>
 <h4><code><a title="krema.models.guild.Guild" href="#krema.models.guild.Guild">Guild</a></code></h4>
 <ul class="">
+<li><code><a title="krema.models.guild.Guild.create_channel" href="#krema.models.guild.Guild.create_channel">create_channel</a></code></li>
 <li><code><a title="krema.models.guild.Guild.create_emoji" href="#krema.models.guild.Guild.create_emoji">create_emoji</a></code></li>
+<li><code><a title="krema.models.guild.Guild.delete" href="#krema.models.guild.Guild.delete">delete</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete_emoji" href="#krema.models.guild.Guild.delete_emoji">delete_emoji</a></code></li>
+<li><code><a title="krema.models.guild.Guild.edit" href="#krema.models.guild.Guild.edit">edit</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_channels" href="#krema.models.guild.Guild.fetch_channels">fetch_channels</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_emoji" href="#krema.models.guild.Guild.fetch_emoji">fetch_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_emojis" href="#krema.models.guild.Guild.fetch_emojis">fetch_emojis</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_member" href="#krema.models.guild.Guild.fetch_member">fetch_member</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_member_list" href="#krema.models.guild.Guild.fetch_member_list">fetch_member_list</a></code></li>
+<li><code><a title="krema.models.guild.Guild.modify_channel_positions" href="#krema.models.guild.Guild.modify_channel_positions">modify_channel_positions</a></code></li>
+<li><code><a title="krema.models.guild.Guild.search_member" href="#krema.models.guild.Guild.search_member">search_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.update_emoji" href="#krema.models.guild.Guild.update_emoji">update_emoji</a></code></li>
 </ul>
 </li>

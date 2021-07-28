@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>krema.errors API documentation</title>
-<meta name="description" content="Error classes for HTTP Exceptions." />
+<title>krema.types API documentation</title>
+<meta name="description" content="Krema part for Perms, Types, Intents etc..." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,53 +19,34 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>krema.errors</code></h1>
+<h1 class="title">Module <code>krema.types</code></h1>
 </header>
 <section id="section-intro">
-<p>Error classes for HTTP Exceptions.</p>
+<p>Krema part for Perms, Types, Intents etc&hellip;</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-Error classes for HTTP Exceptions.
+Krema part for Perms, Types, Intents etc...
 &#34;&#34;&#34;
 
 
-class NotFound(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 404 (not found).&#34;&#34;&#34;
+class ChannelTypes:
+    &#34;&#34;&#34;All Channel types in this class.&#34;&#34;&#34;
 
-    pass
-
-
-class BadRequest(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 400 (bad request).&#34;&#34;&#34;
-
-    pass
-
-
-class Forbidden(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 403 (forbidden).&#34;&#34;&#34;
-
-    pass
-
-
-class ServerError(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 500 &gt;= (internal server error).&#34;&#34;&#34;
-
-    pass
-
-
-class RateLimited(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 429 (rate-limited).&#34;&#34;&#34;
-
-    pass
-
-
-class UnexceptedStatus(Exception):
-    &#34;&#34;&#34;Raises when Discord returns other statuses.&#34;&#34;&#34;
-
-    pass</code></pre>
+    GUILD_TEXT: int = 0  # a text channel within a server
+    DM: int = 1  # a direct message between users
+    GUILD_VOICE: int = 2  # a voice channel within a server
+    GROUP_DM: int = 3  # a direct message between multiple users
+    GUILD_CATEGORY: int = 4  # an organizational category that contains up to 50 channels
+    GUILD_NEWS: int = 5  # a channel that users can follow and crosspost into their own server
+    GUILD_STORE: int = 6  # a channel in which game developers can sell their game on Discord
+    GUILD_NEWS_THREAD: int = 10  # a temporary sub-channel within a GUILD_NEWS channel
+    GUILD_PUBLIC_THREAD: int = 11  # a temporary sub-channel within a GUILD_TEXT channel
+    # a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
+    GUILD_PRIVATE_THREAD: int = 12
+    GUILD_STAGE_VOICE: int = 13  # a voice channel for hosting events with an audience</code></pre>
 </details>
 </section>
 <section>
@@ -77,131 +58,78 @@ class UnexceptedStatus(Exception):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="krema.errors.BadRequest"><code class="flex name class">
-<span>class <span class="ident">BadRequest</span></span>
-<span>(</span><span>*args, **kwargs)</span>
+<dt id="krema.types.ChannelTypes"><code class="flex name class">
+<span>class <span class="ident">ChannelTypes</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Raises when Discord returns 400 (bad request).</p></div>
+<div class="desc"><p>All Channel types in this class.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class BadRequest(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 400 (bad request).&#34;&#34;&#34;
+<pre><code class="python">class ChannelTypes:
+    &#34;&#34;&#34;All Channel types in this class.&#34;&#34;&#34;
 
-    pass</code></pre>
+    GUILD_TEXT: int = 0  # a text channel within a server
+    DM: int = 1  # a direct message between users
+    GUILD_VOICE: int = 2  # a voice channel within a server
+    GROUP_DM: int = 3  # a direct message between multiple users
+    GUILD_CATEGORY: int = 4  # an organizational category that contains up to 50 channels
+    GUILD_NEWS: int = 5  # a channel that users can follow and crosspost into their own server
+    GUILD_STORE: int = 6  # a channel in which game developers can sell their game on Discord
+    GUILD_NEWS_THREAD: int = 10  # a temporary sub-channel within a GUILD_NEWS channel
+    GUILD_PUBLIC_THREAD: int = 11  # a temporary sub-channel within a GUILD_TEXT channel
+    # a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
+    GUILD_PRIVATE_THREAD: int = 12
+    GUILD_STAGE_VOICE: int = 13  # a voice channel for hosting events with an audience</code></pre>
 </details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.Exception</li>
-<li>builtins.BaseException</li>
-</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="krema.types.ChannelTypes.DM"><code class="name">var <span class="ident">DM</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
-<dt id="krema.errors.Forbidden"><code class="flex name class">
-<span>class <span class="ident">Forbidden</span></span>
-<span>(</span><span>*args, **kwargs)</span>
-</code></dt>
+<dt id="krema.types.ChannelTypes.GROUP_DM"><code class="name">var <span class="ident">GROUP_DM</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Raises when Discord returns 403 (forbidden).</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class Forbidden(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 403 (forbidden).&#34;&#34;&#34;
-
-    pass</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.Exception</li>
-<li>builtins.BaseException</li>
-</ul>
+<div class="desc"></div>
 </dd>
-<dt id="krema.errors.NotFound"><code class="flex name class">
-<span>class <span class="ident">NotFound</span></span>
-<span>(</span><span>*args, **kwargs)</span>
-</code></dt>
+<dt id="krema.types.ChannelTypes.GUILD_CATEGORY"><code class="name">var <span class="ident">GUILD_CATEGORY</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Raises when Discord returns 404 (not found).</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class NotFound(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 404 (not found).&#34;&#34;&#34;
-
-    pass</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.Exception</li>
-<li>builtins.BaseException</li>
-</ul>
+<div class="desc"></div>
 </dd>
-<dt id="krema.errors.RateLimited"><code class="flex name class">
-<span>class <span class="ident">RateLimited</span></span>
-<span>(</span><span>*args, **kwargs)</span>
-</code></dt>
+<dt id="krema.types.ChannelTypes.GUILD_NEWS"><code class="name">var <span class="ident">GUILD_NEWS</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Raises when Discord returns 429 (rate-limited).</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class RateLimited(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 429 (rate-limited).&#34;&#34;&#34;
-
-    pass</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.Exception</li>
-<li>builtins.BaseException</li>
-</ul>
+<div class="desc"></div>
 </dd>
-<dt id="krema.errors.ServerError"><code class="flex name class">
-<span>class <span class="ident">ServerError</span></span>
-<span>(</span><span>*args, **kwargs)</span>
-</code></dt>
+<dt id="krema.types.ChannelTypes.GUILD_NEWS_THREAD"><code class="name">var <span class="ident">GUILD_NEWS_THREAD</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Raises when Discord returns 500 &gt;= (internal server error).</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ServerError(Exception):
-    &#34;&#34;&#34;Raises when Discord returns 500 &gt;= (internal server error).&#34;&#34;&#34;
-
-    pass</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.Exception</li>
-<li>builtins.BaseException</li>
-</ul>
+<div class="desc"></div>
 </dd>
-<dt id="krema.errors.UnexceptedStatus"><code class="flex name class">
-<span>class <span class="ident">UnexceptedStatus</span></span>
-<span>(</span><span>*args, **kwargs)</span>
-</code></dt>
+<dt id="krema.types.ChannelTypes.GUILD_PRIVATE_THREAD"><code class="name">var <span class="ident">GUILD_PRIVATE_THREAD</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Raises when Discord returns other statuses.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class UnexceptedStatus(Exception):
-    &#34;&#34;&#34;Raises when Discord returns other statuses.&#34;&#34;&#34;
-
-    pass</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.Exception</li>
-<li>builtins.BaseException</li>
-</ul>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.ChannelTypes.GUILD_PUBLIC_THREAD"><code class="name">var <span class="ident">GUILD_PUBLIC_THREAD</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.ChannelTypes.GUILD_STAGE_VOICE"><code class="name">var <span class="ident">GUILD_STAGE_VOICE</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.ChannelTypes.GUILD_STORE"><code class="name">var <span class="ident">GUILD_STORE</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.ChannelTypes.GUILD_TEXT"><code class="name">var <span class="ident">GUILD_TEXT</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.ChannelTypes.GUILD_VOICE"><code class="name">var <span class="ident">GUILD_VOICE</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -220,22 +148,20 @@ class UnexceptedStatus(Exception):
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="krema.errors.BadRequest" href="#krema.errors.BadRequest">BadRequest</a></code></h4>
-</li>
-<li>
-<h4><code><a title="krema.errors.Forbidden" href="#krema.errors.Forbidden">Forbidden</a></code></h4>
-</li>
-<li>
-<h4><code><a title="krema.errors.NotFound" href="#krema.errors.NotFound">NotFound</a></code></h4>
-</li>
-<li>
-<h4><code><a title="krema.errors.RateLimited" href="#krema.errors.RateLimited">RateLimited</a></code></h4>
-</li>
-<li>
-<h4><code><a title="krema.errors.ServerError" href="#krema.errors.ServerError">ServerError</a></code></h4>
-</li>
-<li>
-<h4><code><a title="krema.errors.UnexceptedStatus" href="#krema.errors.UnexceptedStatus">UnexceptedStatus</a></code></h4>
+<h4><code><a title="krema.types.ChannelTypes" href="#krema.types.ChannelTypes">ChannelTypes</a></code></h4>
+<ul class="">
+<li><code><a title="krema.types.ChannelTypes.DM" href="#krema.types.ChannelTypes.DM">DM</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GROUP_DM" href="#krema.types.ChannelTypes.GROUP_DM">GROUP_DM</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_CATEGORY" href="#krema.types.ChannelTypes.GUILD_CATEGORY">GUILD_CATEGORY</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_NEWS" href="#krema.types.ChannelTypes.GUILD_NEWS">GUILD_NEWS</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_NEWS_THREAD" href="#krema.types.ChannelTypes.GUILD_NEWS_THREAD">GUILD_NEWS_THREAD</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_PRIVATE_THREAD" href="#krema.types.ChannelTypes.GUILD_PRIVATE_THREAD">GUILD_PRIVATE_THREAD</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_PUBLIC_THREAD" href="#krema.types.ChannelTypes.GUILD_PUBLIC_THREAD">GUILD_PUBLIC_THREAD</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_STAGE_VOICE" href="#krema.types.ChannelTypes.GUILD_STAGE_VOICE">GUILD_STAGE_VOICE</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_STORE" href="#krema.types.ChannelTypes.GUILD_STORE">GUILD_STORE</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_TEXT" href="#krema.types.ChannelTypes.GUILD_TEXT">GUILD_TEXT</a></code></li>
+<li><code><a title="krema.types.ChannelTypes.GUILD_VOICE" href="#krema.types.ChannelTypes.GUILD_VOICE">GUILD_VOICE</a></code></li>
+</ul>
 </li>
 </ul>
 </li>

@@ -242,7 +242,32 @@ class Channel:
         from .message import Message
 
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/pins&#34;)
-        return [Message(self.client, i) for i in result]</code></pre>
+        return [Message(self.client, i) for i in result]
+
+    # async def edit_position(self, position: int, lock_permissions: bool = None, parent_id: int = None):
+    #     &#34;&#34;&#34;Edit Channel Position.
+
+    #     Args:
+    #         position (int): New position for Channel.
+    #         lock_permissions (bool, optional): Syncs the permission overwrites with the new parent, if moving to a new category.
+    #         parent_id (int, optional): the new parent (category) ID for the channel that is moved.
+
+    #     Returns:
+    #         True: Channel position updated successfully.
+    #     &#34;&#34;&#34;
+
+    #     param = [{&#34;id&#34;: self.id, &#34;position&#34;: position}]
+
+    #     if lock_permissions is not None:
+    #         param[0][&#34;lock_permissions&#34;] = lock_permissions
+
+    #     if parent_id is not None:
+    #         param[0][&#34;parent_id&#34;] = parent_id
+
+    #     print(param)
+
+    #     await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.guild_id}/channels&#34;, json=param)
+    #     return True</code></pre>
 </details>
 </section>
 <section>
@@ -529,7 +554,32 @@ class Channel:
         from .message import Message
 
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/pins&#34;)
-        return [Message(self.client, i) for i in result]</code></pre>
+        return [Message(self.client, i) for i in result]
+
+    # async def edit_position(self, position: int, lock_permissions: bool = None, parent_id: int = None):
+    #     &#34;&#34;&#34;Edit Channel Position.
+
+    #     Args:
+    #         position (int): New position for Channel.
+    #         lock_permissions (bool, optional): Syncs the permission overwrites with the new parent, if moving to a new category.
+    #         parent_id (int, optional): the new parent (category) ID for the channel that is moved.
+
+    #     Returns:
+    #         True: Channel position updated successfully.
+    #     &#34;&#34;&#34;
+
+    #     param = [{&#34;id&#34;: self.id, &#34;position&#34;: position}]
+
+    #     if lock_permissions is not None:
+    #         param[0][&#34;lock_permissions&#34;] = lock_permissions
+
+    #     if parent_id is not None:
+    #         param[0][&#34;parent_id&#34;] = parent_id
+
+    #     print(param)
+
+    #     await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.guild_id}/channels&#34;, json=param)
+    #     return True</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>

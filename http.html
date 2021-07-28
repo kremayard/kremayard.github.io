@@ -66,8 +66,13 @@ class HTTP:
             All of the Exceptions from `krema.errors` may raise.
         &#34;&#34;&#34;
 
+        extra_header = {}
+
+        if &#34;log_reason&#34; in kwargs:
+            extra_header[&#34;X-Audit-Log-Reason&#34;] = kwargs.get(&#34;log_reason&#34;)
+
         async with aiohttp.ClientSession() as session:
-            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
+            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;, **extra_header}, **kwargs) as response:
                 try:
                     json_data = await response.json()
                 except aiohttp.client_exceptions.ContentTypeError:
@@ -97,6 +102,8 @@ class HTTP:
             raise NotFound(result)
         elif status == 403:
             raise Forbidden(result)
+        elif status == 400:
+            raise BadRequest(result)
         elif status == 429:
             raise RateLimited(result)
         elif 600 &gt; status &gt;= 500:
@@ -159,8 +166,13 @@ class HTTP:
             All of the Exceptions from `krema.errors` may raise.
         &#34;&#34;&#34;
 
+        extra_header = {}
+
+        if &#34;log_reason&#34; in kwargs:
+            extra_header[&#34;X-Audit-Log-Reason&#34;] = kwargs.get(&#34;log_reason&#34;)
+
         async with aiohttp.ClientSession() as session:
-            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
+            async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;, **extra_header}, **kwargs) as response:
                 try:
                     json_data = await response.json()
                 except aiohttp.client_exceptions.ContentTypeError:
@@ -190,6 +202,8 @@ class HTTP:
             raise NotFound(result)
         elif status == 403:
             raise Forbidden(result)
+        elif status == 400:
+            raise BadRequest(result)
         elif status == 429:
             raise RateLimited(result)
         elif 600 &gt; status &gt;= 500:
@@ -235,8 +249,13 @@ class HTTP:
         All of the Exceptions from `krema.errors` may raise.
     &#34;&#34;&#34;
 
+    extra_header = {}
+
+    if &#34;log_reason&#34; in kwargs:
+        extra_header[&#34;X-Audit-Log-Reason&#34;] = kwargs.get(&#34;log_reason&#34;)
+
     async with aiohttp.ClientSession() as session:
-        async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;}, **kwargs) as response:
+        async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;, **extra_header}, **kwargs) as response:
             try:
                 json_data = await response.json()
             except aiohttp.client_exceptions.ContentTypeError:
