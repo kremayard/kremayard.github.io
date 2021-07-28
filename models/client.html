@@ -229,7 +229,64 @@ class Client:
             (i[1:], local[i]) for i in local if i.startswith(&#34;_&#34;)
         )
 
-    # Gateway Function
+    # Cache Functions
+    # ==================
+
+    def get_guild(self, guild_id: int):
+        &#34;&#34;&#34;Get Guild from Cache by ID.
+
+        Args:
+            guild_id (int): Guild ID.
+
+        Returns:
+            Guild: Found Guild object.
+            None: Guild is not Found.
+        &#34;&#34;&#34;
+
+        result = self.guilds.find(lambda g: g.id == guild_id)
+
+        if result != kollektor.Nothing:
+            return result
+        else:
+            return None
+
+    def get_channel(self, channel_id: int):
+        &#34;&#34;&#34;Get Channel from Cache by ID.
+
+        Args:
+            channel_id (int): Channel ID.
+
+        Returns:
+            Channel: Found Channel object.
+            None: Channel is not Found.
+        &#34;&#34;&#34;
+
+        result = self.channels.find(lambda c: c.id == channel_id)
+
+        if result != kollektor.Nothing:
+            return result
+        else:
+            return None
+
+    def get_message(self, message_id: int):
+        &#34;&#34;&#34;Get Message from Cache by ID.
+
+        Args:
+            message_id (int): Message ID.
+
+        Returns:
+            Message: Found Message object.
+            None: Message is not Found.
+        &#34;&#34;&#34;
+
+        result = self.messages.find(lambda m: m.id == message_id)
+
+        if result != kollektor.Nothing:
+            return result
+        else:
+            return None
+
+    # Gateway Functions
     # ==================
 
     async def update_presence(self, packet: dict):
@@ -321,11 +378,27 @@ class Client:
 
         from .user import User
 
-        result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+        result = await self.http.request(&#34;PATCH&#34;, &#34;/users/@me&#34;, json={
             &#34;username&#34;: username,
             &#34;avatar&#34;: image_to_data_uri(path)
         })
-        return User(self,  result)</code></pre>
+        return User(self,  result)
+
+    async def edit_nickname(self, guild_id: int, nick: str):
+        &#34;&#34;&#34;Edit Client User nickname from Guild.
+
+        Args:
+            guild_id (int): Guild ID.
+            nick (str): New nickname for Client User.
+
+        Returns:
+            True: Nickname updated successfully.
+        &#34;&#34;&#34;
+
+        await self.http.request(&#34;PATCH&#34;, f&#34;/guilds/{guild_id}/members/@me/nick&#34;, json={
+            &#34;nick&#34;: nick
+        })
+        return True</code></pre>
 </details>
 </section>
 <section>
@@ -571,7 +644,64 @@ class Client:
             (i[1:], local[i]) for i in local if i.startswith(&#34;_&#34;)
         )
 
-    # Gateway Function
+    # Cache Functions
+    # ==================
+
+    def get_guild(self, guild_id: int):
+        &#34;&#34;&#34;Get Guild from Cache by ID.
+
+        Args:
+            guild_id (int): Guild ID.
+
+        Returns:
+            Guild: Found Guild object.
+            None: Guild is not Found.
+        &#34;&#34;&#34;
+
+        result = self.guilds.find(lambda g: g.id == guild_id)
+
+        if result != kollektor.Nothing:
+            return result
+        else:
+            return None
+
+    def get_channel(self, channel_id: int):
+        &#34;&#34;&#34;Get Channel from Cache by ID.
+
+        Args:
+            channel_id (int): Channel ID.
+
+        Returns:
+            Channel: Found Channel object.
+            None: Channel is not Found.
+        &#34;&#34;&#34;
+
+        result = self.channels.find(lambda c: c.id == channel_id)
+
+        if result != kollektor.Nothing:
+            return result
+        else:
+            return None
+
+    def get_message(self, message_id: int):
+        &#34;&#34;&#34;Get Message from Cache by ID.
+
+        Args:
+            message_id (int): Message ID.
+
+        Returns:
+            Message: Found Message object.
+            None: Message is not Found.
+        &#34;&#34;&#34;
+
+        result = self.messages.find(lambda m: m.id == message_id)
+
+        if result != kollektor.Nothing:
+            return result
+        else:
+            return None
+
+    # Gateway Functions
     # ==================
 
     async def update_presence(self, packet: dict):
@@ -663,11 +793,27 @@ class Client:
 
         from .user import User
 
-        result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+        result = await self.http.request(&#34;PATCH&#34;, &#34;/users/@me&#34;, json={
             &#34;username&#34;: username,
             &#34;avatar&#34;: image_to_data_uri(path)
         })
-        return User(self,  result)</code></pre>
+        return User(self,  result)
+
+    async def edit_nickname(self, guild_id: int, nick: str):
+        &#34;&#34;&#34;Edit Client User nickname from Guild.
+
+        Args:
+            guild_id (int): Guild ID.
+            nick (str): New nickname for Client User.
+
+        Returns:
+            True: Nickname updated successfully.
+        &#34;&#34;&#34;
+
+        await self.http.request(&#34;PATCH&#34;, f&#34;/guilds/{guild_id}/members/@me/nick&#34;, json={
+            &#34;nick&#34;: nick
+        })
+        return True</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -795,11 +941,49 @@ def formatted_token(self) -&gt; str:
 
     from .user import User
 
-    result = await self.http.request(&#34;PATCH&#34;, f&#34;/users/@me&#34;, json={
+    result = await self.http.request(&#34;PATCH&#34;, &#34;/users/@me&#34;, json={
         &#34;username&#34;: username,
         &#34;avatar&#34;: image_to_data_uri(path)
     })
     return User(self,  result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.edit_nickname"><code class="name flex">
+<span>async def <span class="ident">edit_nickname</span></span>(<span>self, guild_id: int, nick: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit Client User nickname from Guild.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>guild_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Guild ID.</dd>
+<dt><strong><code>nick</code></strong> :&ensp;<code>str</code></dt>
+<dd>New nickname for Client User.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Nickname updated successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit_nickname(self, guild_id: int, nick: str):
+    &#34;&#34;&#34;Edit Client User nickname from Guild.
+
+    Args:
+        guild_id (int): Guild ID.
+        nick (str): New nickname for Client User.
+
+    Returns:
+        True: Nickname updated successfully.
+    &#34;&#34;&#34;
+
+    await self.http.request(&#34;PATCH&#34;, f&#34;/guilds/{guild_id}/members/@me/nick&#34;, json={
+        &#34;nick&#34;: nick
+    })
+    return True</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.event"><code class="name flex">
@@ -944,6 +1128,126 @@ def formatted_token(self) -&gt; str:
     return User(self,  result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.client.Client.get_channel"><code class="name flex">
+<span>def <span class="ident">get_channel</span></span>(<span>self, channel_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get Channel from Cache by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>channel_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Channel ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Channel</code></dt>
+<dd>Found Channel object.</dd>
+<dt><code>None</code></dt>
+<dd>Channel is not Found.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_channel(self, channel_id: int):
+    &#34;&#34;&#34;Get Channel from Cache by ID.
+
+    Args:
+        channel_id (int): Channel ID.
+
+    Returns:
+        Channel: Found Channel object.
+        None: Channel is not Found.
+    &#34;&#34;&#34;
+
+    result = self.channels.find(lambda c: c.id == channel_id)
+
+    if result != kollektor.Nothing:
+        return result
+    else:
+        return None</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.get_guild"><code class="name flex">
+<span>def <span class="ident">get_guild</span></span>(<span>self, guild_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get Guild from Cache by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>guild_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Guild ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Guild</code></dt>
+<dd>Found Guild object.</dd>
+<dt><code>None</code></dt>
+<dd>Guild is not Found.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_guild(self, guild_id: int):
+    &#34;&#34;&#34;Get Guild from Cache by ID.
+
+    Args:
+        guild_id (int): Guild ID.
+
+    Returns:
+        Guild: Found Guild object.
+        None: Guild is not Found.
+    &#34;&#34;&#34;
+
+    result = self.guilds.find(lambda g: g.id == guild_id)
+
+    if result != kollektor.Nothing:
+        return result
+    else:
+        return None</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.get_message"><code class="name flex">
+<span>def <span class="ident">get_message</span></span>(<span>self, message_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get Message from Cache by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>message_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Message ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Message</code></dt>
+<dd>Found Message object.</dd>
+<dt><code>None</code></dt>
+<dd>Message is not Found.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_message(self, message_id: int):
+    &#34;&#34;&#34;Get Message from Cache by ID.
+
+    Args:
+        message_id (int): Message ID.
+
+    Returns:
+        Message: Found Message object.
+        None: Message is not Found.
+    &#34;&#34;&#34;
+
+    result = self.messages.find(lambda m: m.id == message_id)
+
+    if result != kollektor.Nothing:
+        return result
+    else:
+        return None</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.start"><code class="name flex">
 <span>def <span class="ident">start</span></span>(<span>self, token: str, bot: bool = True)</span>
 </code></dt>
@@ -1032,11 +1336,15 @@ def formatted_token(self) -&gt; str:
 <li><code><a title="krema.models.client.Client.check_token" href="#krema.models.client.Client.check_token">check_token</a></code></li>
 <li><code><a title="krema.models.client.Client.create_guild" href="#krema.models.client.Client.create_guild">create_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.edit" href="#krema.models.client.Client.edit">edit</a></code></li>
+<li><code><a title="krema.models.client.Client.edit_nickname" href="#krema.models.client.Client.edit_nickname">edit_nickname</a></code></li>
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_guild" href="#krema.models.client.Client.fetch_guild">fetch_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_user" href="#krema.models.client.Client.fetch_user">fetch_user</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>
+<li><code><a title="krema.models.client.Client.get_channel" href="#krema.models.client.Client.get_channel">get_channel</a></code></li>
+<li><code><a title="krema.models.client.Client.get_guild" href="#krema.models.client.Client.get_guild">get_guild</a></code></li>
+<li><code><a title="krema.models.client.Client.get_message" href="#krema.models.client.Client.get_message">get_message</a></code></li>
 <li><code><a title="krema.models.client.Client.start" href="#krema.models.client.Client.start">start</a></code></li>
 <li><code><a title="krema.models.client.Client.update_presence" href="#krema.models.client.Client.update_presence">update_presence</a></code></li>
 </ul>

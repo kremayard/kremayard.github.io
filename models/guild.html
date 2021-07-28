@@ -295,6 +295,22 @@ class Guild:
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members/search{dict_to_query(kwargs)}&#34;)
         return [Member(self.client, i) for i in result]
 
+    async def edit_member(self, member_id: int, **kwargs):
+        &#34;&#34;&#34;Edit a Guild Member with API params.
+        
+        Args:
+            member_id (int): Member ID.
+            **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params
+
+        Returns:
+            Member: Updated Guild Member.
+        &#34;&#34;&#34;
+
+        from .user import Member
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, json=kwargs)
+        return Member(self.client, result)
+
 
 @dataclass
 class Emoji:
@@ -672,7 +688,23 @@ class Guild:
             kwargs[&#34;limit&#34;] = 25
 
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members/search{dict_to_query(kwargs)}&#34;)
-        return [Member(self.client, i) for i in result]</code></pre>
+        return [Member(self.client, i) for i in result]
+
+    async def edit_member(self, member_id: int, **kwargs):
+        &#34;&#34;&#34;Edit a Guild Member with API params.
+        
+        Args:
+            member_id (int): Member ID.
+            **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params
+
+        Returns:
+            Member: Updated Guild Member.
+        &#34;&#34;&#34;
+
+        from .user import Member
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, json=kwargs)
+        return Member(self.client, result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -833,6 +865,44 @@ class Guild:
 
     result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}&#34;, json=kwargs)
     return Guild(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.edit_member"><code class="name flex">
+<span>async def <span class="ident">edit_member</span></span>(<span>self, member_id: int, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit a Guild Member with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>member_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Member ID.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params">https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Member</code></dt>
+<dd>Updated Guild Member.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit_member(self, member_id: int, **kwargs):
+    &#34;&#34;&#34;Edit a Guild Member with API params.
+    
+    Args:
+        member_id (int): Member ID.
+        **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params
+
+    Returns:
+        Member: Updated Guild Member.
+    &#34;&#34;&#34;
+
+    from .user import Member
+
+    result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, json=kwargs)
+    return Member(self.client, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.fetch_channels"><code class="name flex">
@@ -1126,6 +1196,7 @@ class Guild:
 <li><code><a title="krema.models.guild.Guild.delete" href="#krema.models.guild.Guild.delete">delete</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete_emoji" href="#krema.models.guild.Guild.delete_emoji">delete_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit" href="#krema.models.guild.Guild.edit">edit</a></code></li>
+<li><code><a title="krema.models.guild.Guild.edit_member" href="#krema.models.guild.Guild.edit_member">edit_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_channels" href="#krema.models.guild.Guild.fetch_channels">fetch_channels</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_emoji" href="#krema.models.guild.Guild.fetch_emoji">fetch_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_emojis" href="#krema.models.guild.Guild.fetch_emojis">fetch_emojis</a></code></li>
