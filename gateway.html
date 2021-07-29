@@ -32,15 +32,16 @@ Gateway part of the krema.
 &#34;&#34;&#34;
 
 import asyncio
-import aiohttp
-from zlib import decompressobj
 from json import loads
+from typing import Union
+from zlib import decompressobj
+
+import aiohttp
 
 from .models import Message, Channel, Guild
 
 
 class Gateway:
-
     &#34;&#34;&#34;Base class for gateway.
 
     Args:
@@ -68,14 +69,14 @@ class Gateway:
         self.token: str = self.client.formatted_token
 
         self.gateway: str = &#34;wss://gateway.discord.gg/?v=9&amp;encoding=json&amp;compress=zlib-stream&#34;
-        self.websocket: aiohttp._WSRequestContextManager = None
+        self.websocket = None
 
         self._buffer: bytearray = bytearray()
         self._zlib = decompressobj()
-        self._session: aiohttp.ClientSession = None
+        self._session: Union[aiohttp.ClientSession, None] = None
 
-        self._seq: int = None
-        self._session_id: str = None
+        self._seq: Union[int, None] = None
+        self._session_id: Union[str, None] = None
 
         self._event_loop = asyncio.get_event_loop()
 
@@ -169,16 +170,20 @@ class Gateway:
 
     async def __handle_event(self, event_data, event_type):
         if event_type in (&#34;message_create&#34;, &#34;message_update&#34;):
+            if event_type == &#34;message_update&#34; and len(event_data) == 4:
+                # print(&#34;thread galiba bu&#34;)
+                return
+
             filtered = self.__filter_events(
-                event_type, (Message(self.client, event_data), ))
+                event_type, (Message(self.client, event_data),))
         elif event_type in (&#34;guild_create&#34;, &#34;guild_update&#34;):
             filtered = self.__filter_events(
-                event_type, (Guild(self.client, event_data), ))
-        elif event_type in (&#34;channel_create&#34;, &#34;channel_update&#34;, &#34;channel_delete&#34;):
+                event_type, (Guild(self.client, event_data),))
+        elif event_type in (&#34;channel_create&#34;, &#34;channel_update&#34;, &#34;channel_delete&#34;, &#34;thread_create&#34;, &#34;thread_update&#34;):
             filtered = self.__filter_events(
-                event_type, (Channel(self.client, event_data), ))
+                event_type, (Channel(self.client, event_data),))
         else:
-            filtered = self.__filter_events(event_type, (event_data, ))
+            filtered = self.__filter_events(event_type, (event_data,))
 
         await asyncio.gather(*filtered)
 
@@ -261,7 +266,6 @@ class Gateway:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Gateway:
-
     &#34;&#34;&#34;Base class for gateway.
 
     Args:
@@ -289,14 +293,14 @@ class Gateway:
         self.token: str = self.client.formatted_token
 
         self.gateway: str = &#34;wss://gateway.discord.gg/?v=9&amp;encoding=json&amp;compress=zlib-stream&#34;
-        self.websocket: aiohttp._WSRequestContextManager = None
+        self.websocket = None
 
         self._buffer: bytearray = bytearray()
         self._zlib = decompressobj()
-        self._session: aiohttp.ClientSession = None
+        self._session: Union[aiohttp.ClientSession, None] = None
 
-        self._seq: int = None
-        self._session_id: str = None
+        self._seq: Union[int, None] = None
+        self._session_id: Union[str, None] = None
 
         self._event_loop = asyncio.get_event_loop()
 
@@ -390,16 +394,20 @@ class Gateway:
 
     async def __handle_event(self, event_data, event_type):
         if event_type in (&#34;message_create&#34;, &#34;message_update&#34;):
+            if event_type == &#34;message_update&#34; and len(event_data) == 4:
+                # print(&#34;thread galiba bu&#34;)
+                return
+
             filtered = self.__filter_events(
-                event_type, (Message(self.client, event_data), ))
+                event_type, (Message(self.client, event_data),))
         elif event_type in (&#34;guild_create&#34;, &#34;guild_update&#34;):
             filtered = self.__filter_events(
-                event_type, (Guild(self.client, event_data), ))
-        elif event_type in (&#34;channel_create&#34;, &#34;channel_update&#34;, &#34;channel_delete&#34;):
+                event_type, (Guild(self.client, event_data),))
+        elif event_type in (&#34;channel_create&#34;, &#34;channel_update&#34;, &#34;channel_delete&#34;, &#34;thread_create&#34;, &#34;thread_update&#34;):
             filtered = self.__filter_events(
-                event_type, (Channel(self.client, event_data), ))
+                event_type, (Channel(self.client, event_data),))
         else:
-            filtered = self.__filter_events(event_type, (event_data, ))
+            filtered = self.__filter_events(event_type, (event_data,))
 
         await asyncio.gather(*filtered)
 

@@ -31,6 +31,8 @@
 Client model for krema.
 &#34;&#34;&#34;
 
+from typing import Union
+
 from unikorn import kollektor
 from ..utils import image_to_data_uri
 
@@ -55,14 +57,15 @@ class Client:
         connection (HTTP): Client http class.
     &#34;&#34;&#34;
 
-    def __init__(self, intents: int = 0, message_limit: int = 200, channel_limit: int = None, guild_limit: int = None) -&gt; None:
+    def __init__(self, intents: int = 0, message_limit: int = 200, channel_limit: int = None,
+                 guild_limit: int = None) -&gt; None:
         from .user import User
 
         self.intents: int = intents
 
         self.token: str = &#34;&#34;
         self.events: list = []
-        self.user: User = None
+        self.user: Union[User, None] = None
 
         self.messages: kollektor.Kollektor = kollektor.Kollektor(
             limit=message_limit, items=())
@@ -222,6 +225,28 @@ class Client:
                 self.channels.items = tuple(
                     i for i in self.channels.items if i.id != channel_packet.id)
 
+        # Thread Create Handler
+        async def _thread_create(channel):
+            self.channels.append(channel)
+
+        # Thread Update Handler
+        async def _thread_update(channel_packet):
+            for index, channel in enumerate(self.channels.items):
+                if channel.id == channel_packet.id:
+                    self.channels.update(index, channel_packet)
+                    break
+
+        # Thread Delete Handler
+        async def _thread_delete(channel_packet):
+            channel_id = channel_packet.get(&#34;id&#34;)
+
+            if channel_id is None:
+                return
+            else:
+                channel_id = int(channel_id)
+                self.channels.items = tuple(
+                    i for i in self.channels.items if i.id != channel_id)
+
         local = locals()
 
         # Load Events
@@ -286,6 +311,30 @@ class Client:
         else:
             return None
 
+    def get_thread(self, thread_id: int, list_thread_result: dict):
+        &#34;&#34;&#34;Get Thread-Channel with Thread ID.
+
+        Args:
+            thread_id (int): Thread-Channel ID.
+            list_thread_result (dict): The result from `&lt;Channel&gt;.list_...` functions.
+
+        Returns:
+            Channel: Found Thread-Channel object.
+            None: Thread-Channel is not Found.
+
+        Examples:
+            &gt;&gt;&gt; channel = client.get_channel(123)
+            &gt;&gt;&gt; thread_list = await channel.list_threads()
+            &gt;&gt;&gt; client.get_thread(456, thread_list)
+            Channel()
+        &#34;&#34;&#34;
+
+        for thread in list_thread_result[&#34;threads&#34;]:
+            if thread_id == thread.id:
+                return thread
+
+        return None
+
     # Gateway Functions
     # ==================
 
@@ -317,7 +366,7 @@ class Client:
         from .channel import Channel
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
-        return Channel(self,  result)
+        return Channel(self, result)
 
     async def fetch_user(self, id: int = None):
         &#34;&#34;&#34;Fetch an User by ID.
@@ -332,7 +381,7 @@ class Client:
         from .user import User
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
-        return User(self,  result)
+        return User(self, result)
 
     async def create_guild(self, **kwargs):
         &#34;&#34;&#34;Create a Guild with API params.
@@ -382,7 +431,7 @@ class Client:
             &#34;username&#34;: username,
             &#34;avatar&#34;: image_to_data_uri(path)
         })
-        return User(self,  result)
+        return User(self, result)
 
     async def edit_nickname(self, guild_id: int, nick: str):
         &#34;&#34;&#34;Edit Client User nickname from Guild.
@@ -470,14 +519,15 @@ class Client:
         connection (HTTP): Client http class.
     &#34;&#34;&#34;
 
-    def __init__(self, intents: int = 0, message_limit: int = 200, channel_limit: int = None, guild_limit: int = None) -&gt; None:
+    def __init__(self, intents: int = 0, message_limit: int = 200, channel_limit: int = None,
+                 guild_limit: int = None) -&gt; None:
         from .user import User
 
         self.intents: int = intents
 
         self.token: str = &#34;&#34;
         self.events: list = []
-        self.user: User = None
+        self.user: Union[User, None] = None
 
         self.messages: kollektor.Kollektor = kollektor.Kollektor(
             limit=message_limit, items=())
@@ -637,6 +687,28 @@ class Client:
                 self.channels.items = tuple(
                     i for i in self.channels.items if i.id != channel_packet.id)
 
+        # Thread Create Handler
+        async def _thread_create(channel):
+            self.channels.append(channel)
+
+        # Thread Update Handler
+        async def _thread_update(channel_packet):
+            for index, channel in enumerate(self.channels.items):
+                if channel.id == channel_packet.id:
+                    self.channels.update(index, channel_packet)
+                    break
+
+        # Thread Delete Handler
+        async def _thread_delete(channel_packet):
+            channel_id = channel_packet.get(&#34;id&#34;)
+
+            if channel_id is None:
+                return
+            else:
+                channel_id = int(channel_id)
+                self.channels.items = tuple(
+                    i for i in self.channels.items if i.id != channel_id)
+
         local = locals()
 
         # Load Events
@@ -701,6 +773,30 @@ class Client:
         else:
             return None
 
+    def get_thread(self, thread_id: int, list_thread_result: dict):
+        &#34;&#34;&#34;Get Thread-Channel with Thread ID.
+
+        Args:
+            thread_id (int): Thread-Channel ID.
+            list_thread_result (dict): The result from `&lt;Channel&gt;.list_...` functions.
+
+        Returns:
+            Channel: Found Thread-Channel object.
+            None: Thread-Channel is not Found.
+
+        Examples:
+            &gt;&gt;&gt; channel = client.get_channel(123)
+            &gt;&gt;&gt; thread_list = await channel.list_threads()
+            &gt;&gt;&gt; client.get_thread(456, thread_list)
+            Channel()
+        &#34;&#34;&#34;
+
+        for thread in list_thread_result[&#34;threads&#34;]:
+            if thread_id == thread.id:
+                return thread
+
+        return None
+
     # Gateway Functions
     # ==================
 
@@ -732,7 +828,7 @@ class Client:
         from .channel import Channel
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
-        return Channel(self,  result)
+        return Channel(self, result)
 
     async def fetch_user(self, id: int = None):
         &#34;&#34;&#34;Fetch an User by ID.
@@ -747,7 +843,7 @@ class Client:
         from .user import User
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
-        return User(self,  result)
+        return User(self, result)
 
     async def create_guild(self, **kwargs):
         &#34;&#34;&#34;Create a Guild with API params.
@@ -797,7 +893,7 @@ class Client:
             &#34;username&#34;: username,
             &#34;avatar&#34;: image_to_data_uri(path)
         })
-        return User(self,  result)
+        return User(self, result)
 
     async def edit_nickname(self, guild_id: int, nick: str):
         &#34;&#34;&#34;Edit Client User nickname from Guild.
@@ -945,7 +1041,7 @@ def formatted_token(self) -&gt; str:
         &#34;username&#34;: username,
         &#34;avatar&#34;: image_to_data_uri(path)
     })
-    return User(self,  result)</code></pre>
+    return User(self, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.edit_nickname"><code class="name flex">
@@ -1052,7 +1148,7 @@ def formatted_token(self) -&gt; str:
     from .channel import Channel
 
     result = await self.http.request(&#34;GET&#34;, f&#34;/channels/{id}&#34;)
-    return Channel(self,  result)</code></pre>
+    return Channel(self, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.fetch_guild"><code class="name flex">
@@ -1125,7 +1221,7 @@ def formatted_token(self) -&gt; str:
     from .user import User
 
     result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
-    return User(self,  result)</code></pre>
+    return User(self, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.get_channel"><code class="name flex">
@@ -1248,6 +1344,60 @@ def formatted_token(self) -&gt; str:
         return None</code></pre>
 </details>
 </dd>
+<dt id="krema.models.client.Client.get_thread"><code class="name flex">
+<span>def <span class="ident">get_thread</span></span>(<span>self, thread_id: int, list_thread_result: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get Thread-Channel with Thread ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>thread_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Thread-Channel ID.</dd>
+<dt><strong><code>list_thread_result</code></strong> :&ensp;<code>dict</code></dt>
+<dd>The result from <code>&lt;Channel&gt;.list_...</code> functions.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Channel</code></dt>
+<dd>Found Thread-Channel object.</dd>
+<dt><code>None</code></dt>
+<dd>Thread-Channel is not Found.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; channel = client.get_channel(123)
+&gt;&gt;&gt; thread_list = await channel.list_threads()
+&gt;&gt;&gt; client.get_thread(456, thread_list)
+Channel()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_thread(self, thread_id: int, list_thread_result: dict):
+    &#34;&#34;&#34;Get Thread-Channel with Thread ID.
+
+    Args:
+        thread_id (int): Thread-Channel ID.
+        list_thread_result (dict): The result from `&lt;Channel&gt;.list_...` functions.
+
+    Returns:
+        Channel: Found Thread-Channel object.
+        None: Thread-Channel is not Found.
+
+    Examples:
+        &gt;&gt;&gt; channel = client.get_channel(123)
+        &gt;&gt;&gt; thread_list = await channel.list_threads()
+        &gt;&gt;&gt; client.get_thread(456, thread_list)
+        Channel()
+    &#34;&#34;&#34;
+
+    for thread in list_thread_result[&#34;threads&#34;]:
+        if thread_id == thread.id:
+            return thread
+
+    return None</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.start"><code class="name flex">
 <span>def <span class="ident">start</span></span>(<span>self, token: str, bot: bool = True)</span>
 </code></dt>
@@ -1345,6 +1495,7 @@ def formatted_token(self) -&gt; str:
 <li><code><a title="krema.models.client.Client.get_channel" href="#krema.models.client.Client.get_channel">get_channel</a></code></li>
 <li><code><a title="krema.models.client.Client.get_guild" href="#krema.models.client.Client.get_guild">get_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.get_message" href="#krema.models.client.Client.get_message">get_message</a></code></li>
+<li><code><a title="krema.models.client.Client.get_thread" href="#krema.models.client.Client.get_thread">get_thread</a></code></li>
 <li><code><a title="krema.models.client.Client.start" href="#krema.models.client.Client.start">start</a></code></li>
 <li><code><a title="krema.models.client.Client.update_presence" href="#krema.models.client.Client.update_presence">update_presence</a></code></li>
 </ul>

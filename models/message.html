@@ -344,7 +344,21 @@ class Message:
         &#34;&#34;&#34;
 
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/pins/{self.id}&#34;)
-        return True</code></pre>
+        return True
+
+    async def start_thread(self, **kwargs):
+        &#34;&#34;&#34;Start a new Thread from Message.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#start-thread-with-message-json-params
+
+        Returns:
+            Channel: Created Thread Channel.
+        &#34;&#34;&#34;
+        from .channel import Channel
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/threads&#34;, json=kwargs)
+        return Channel(self.client, result)</code></pre>
 </details>
 </section>
 <section>
@@ -819,7 +833,21 @@ class Message:
         &#34;&#34;&#34;
 
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/channels/{self.channel_id}/pins/{self.id}&#34;)
-        return True</code></pre>
+        return True
+
+    async def start_thread(self, **kwargs):
+        &#34;&#34;&#34;Start a new Thread from Message.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#start-thread-with-message-json-params
+
+        Returns:
+            Channel: Created Thread Channel.
+        &#34;&#34;&#34;
+        from .channel import Channel
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/threads&#34;, json=kwargs)
+        return Channel(self.client, result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1114,6 +1142,40 @@ class Message:
     return Message(self.client, result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.message.Message.start_thread"><code class="name flex">
+<span>async def <span class="ident">start_thread</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a new Thread from Message.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#start-thread-with-message-json-params">https://discord.com/developers/docs/resources/channel#start-thread-with-message-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Channel</code></dt>
+<dd>Created Thread Channel.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def start_thread(self, **kwargs):
+    &#34;&#34;&#34;Start a new Thread from Message.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#start-thread-with-message-json-params
+
+    Returns:
+        Channel: Created Thread Channel.
+    &#34;&#34;&#34;
+    from .channel import Channel
+
+    result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.channel_id}/messages/{self.id}/threads&#34;, json=kwargs)
+    return Channel(self.client, result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.message.Message.unpin"><code class="name flex">
 <span>async def <span class="ident">unpin</span></span>(<span>self)</span>
 </code></dt>
@@ -1174,6 +1236,7 @@ class Message:
 <li><code><a title="krema.models.message.Message.fetch_reactions" href="#krema.models.message.Message.fetch_reactions">fetch_reactions</a></code></li>
 <li><code><a title="krema.models.message.Message.pin" href="#krema.models.message.Message.pin">pin</a></code></li>
 <li><code><a title="krema.models.message.Message.reply" href="#krema.models.message.Message.reply">reply</a></code></li>
+<li><code><a title="krema.models.message.Message.start_thread" href="#krema.models.message.Message.start_thread">start_thread</a></code></li>
 <li><code><a title="krema.models.message.Message.unpin" href="#krema.models.message.Message.unpin">unpin</a></code></li>
 </ul>
 </li>

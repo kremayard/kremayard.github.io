@@ -33,10 +33,13 @@ Models for channel and other related stuff.
 
 from dataclasses import dataclass
 from datetime import datetime
+from json import dumps
 from typing import Union
 
-from json import dumps
 from aiohttp import FormData
+
+from .user import ThreadMember
+from ..utils import dict_to_query
 
 
 @dataclass
@@ -243,6 +246,148 @@ class Channel:
 
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/pins&#34;)
         return [Message(self.client, i) for i in result]
+
+    async def start_thread(self, **kwargs):
+        &#34;&#34;&#34;Start a new Thread without Message.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#start-thread-without-message-json-params
+
+        Returns:
+            Channel: Created Thread Channel.
+        &#34;&#34;&#34;
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/threads&#34;, json=kwargs)
+        return Channel(self.client, result)
+
+    async def list_threads(self):
+        &#34;&#34;&#34;List all of the active Threads in the Channel.
+        
+        Returns:
+            dict: A dict that contains;
+
+                threads (list): List of Channel objects.
+
+                members (list): List of ThreadMember objects.
+
+                has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/threads/active&#34;)
+
+        result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+        result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+        return result
+
+    async def list_thread_members(self):
+        &#34;&#34;&#34;List Thread-Members in the Thread-Channel.
+        
+        Returns:
+            list: List of ThreadMember objects.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/thread-members&#34;)
+        return [ThreadMember(i) for i in result]
+
+    async def add_to_thread(self, member_id: int = None):
+        &#34;&#34;&#34;Add a Member to the Thread-Channel. (Channel must be a Thread-Channel.)
+        
+        Args:
+            member_id (int, optional): The Member will be Added to the Thread-Channel. (if not set, ClientUser will added.) 
+
+        Returns:
+            True: Added successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;PUT&#34;,
+                                       f&#34;/channels/{self.id}/thread-members/{&#39;@me&#39; if member_id is None else member_id}&#34;)
+        return True
+
+    async def remove_from_thread(self, member_id: int = None):
+        &#34;&#34;&#34;Remove a Member from Thread-Channel. (Channel must be a Thread-Channel.)
+        
+        Args:
+            member_id (int, optional): The Member will be Removed from Thread-Channel. (if not set, ClientUser will removed.) 
+
+        Returns:
+            True: Removed successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;,
+                                       f&#34;/channels/{self.id}/thread-members/{&#39;@me&#39; if member_id is None else member_id}&#34;)
+        return True
+
+    async def list_public_archived_threads(self, **kwargs):
+        &#34;&#34;&#34;List all of the public-archived Threads in the Channel.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params
+
+        Returns:
+            dict: A dict that contains;
+
+                threads (list): List of Channel objects.
+
+                members (list): List of ThreadMember objects.
+
+                has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;,
+                                                f&#34;/channels/{self.id}/threads/archived/public{dict_to_query(kwargs)}&#34;)
+
+        result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+        result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+        return result
+
+    async def list_private_archived_threads(self, **kwargs):
+        &#34;&#34;&#34;List all of the private-archived Threads in the Channel.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params
+
+        Returns:
+            dict: A dict that contains;
+
+                threads (list): List of Channel objects.
+
+                members (list): List of ThreadMember objects.
+
+                has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;,
+                                                f&#34;/channels/{self.id}/threads/archived/private{dict_to_query(kwargs)}&#34;)
+
+        result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+        result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+        return result
+
+    async def list_joined_private_archived_threads(self, **kwargs):
+        &#34;&#34;&#34;List all of the joined private-archived Threads in the Channel.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params
+
+        Returns:
+            dict: A dict that contains;
+
+                threads (list): List of Channel objects.
+
+                members (list): List of ThreadMember objects.
+
+                has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;,
+                                                f&#34;/channels/{self.id}/users/@me/threads/archived/private{dict_to_query(kwargs)}&#34;)
+
+        result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+        result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+        return result
 
     # async def edit_position(self, position: int, lock_permissions: bool = None, parent_id: int = None):
     #     &#34;&#34;&#34;Edit Channel Position.
@@ -556,6 +701,148 @@ class Channel:
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/pins&#34;)
         return [Message(self.client, i) for i in result]
 
+    async def start_thread(self, **kwargs):
+        &#34;&#34;&#34;Start a new Thread without Message.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#start-thread-without-message-json-params
+
+        Returns:
+            Channel: Created Thread Channel.
+        &#34;&#34;&#34;
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/threads&#34;, json=kwargs)
+        return Channel(self.client, result)
+
+    async def list_threads(self):
+        &#34;&#34;&#34;List all of the active Threads in the Channel.
+        
+        Returns:
+            dict: A dict that contains;
+
+                threads (list): List of Channel objects.
+
+                members (list): List of ThreadMember objects.
+
+                has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/threads/active&#34;)
+
+        result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+        result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+        return result
+
+    async def list_thread_members(self):
+        &#34;&#34;&#34;List Thread-Members in the Thread-Channel.
+        
+        Returns:
+            list: List of ThreadMember objects.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/thread-members&#34;)
+        return [ThreadMember(i) for i in result]
+
+    async def add_to_thread(self, member_id: int = None):
+        &#34;&#34;&#34;Add a Member to the Thread-Channel. (Channel must be a Thread-Channel.)
+        
+        Args:
+            member_id (int, optional): The Member will be Added to the Thread-Channel. (if not set, ClientUser will added.) 
+
+        Returns:
+            True: Added successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;PUT&#34;,
+                                       f&#34;/channels/{self.id}/thread-members/{&#39;@me&#39; if member_id is None else member_id}&#34;)
+        return True
+
+    async def remove_from_thread(self, member_id: int = None):
+        &#34;&#34;&#34;Remove a Member from Thread-Channel. (Channel must be a Thread-Channel.)
+        
+        Args:
+            member_id (int, optional): The Member will be Removed from Thread-Channel. (if not set, ClientUser will removed.) 
+
+        Returns:
+            True: Removed successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;,
+                                       f&#34;/channels/{self.id}/thread-members/{&#39;@me&#39; if member_id is None else member_id}&#34;)
+        return True
+
+    async def list_public_archived_threads(self, **kwargs):
+        &#34;&#34;&#34;List all of the public-archived Threads in the Channel.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params
+
+        Returns:
+            dict: A dict that contains;
+
+                threads (list): List of Channel objects.
+
+                members (list): List of ThreadMember objects.
+
+                has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;,
+                                                f&#34;/channels/{self.id}/threads/archived/public{dict_to_query(kwargs)}&#34;)
+
+        result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+        result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+        return result
+
+    async def list_private_archived_threads(self, **kwargs):
+        &#34;&#34;&#34;List all of the private-archived Threads in the Channel.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params
+
+        Returns:
+            dict: A dict that contains;
+
+                threads (list): List of Channel objects.
+
+                members (list): List of ThreadMember objects.
+
+                has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;,
+                                                f&#34;/channels/{self.id}/threads/archived/private{dict_to_query(kwargs)}&#34;)
+
+        result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+        result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+        return result
+
+    async def list_joined_private_archived_threads(self, **kwargs):
+        &#34;&#34;&#34;List all of the joined private-archived Threads in the Channel.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params
+
+        Returns:
+            dict: A dict that contains;
+
+                threads (list): List of Channel objects.
+
+                members (list): List of ThreadMember objects.
+
+                has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;,
+                                                f&#34;/channels/{self.id}/users/@me/threads/archived/private{dict_to_query(kwargs)}&#34;)
+
+        result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+        result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+        return result
+
     # async def edit_position(self, position: int, lock_permissions: bool = None, parent_id: int = None):
     #     &#34;&#34;&#34;Edit Channel Position.
 
@@ -583,6 +870,40 @@ class Channel:
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="krema.models.channel.Channel.add_to_thread"><code class="name flex">
+<span>async def <span class="ident">add_to_thread</span></span>(<span>self, member_id: int = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a Member to the Thread-Channel. (Channel must be a Thread-Channel.)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>member_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The Member will be Added to the Thread-Channel. (if not set, ClientUser will added.) </dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Added successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def add_to_thread(self, member_id: int = None):
+    &#34;&#34;&#34;Add a Member to the Thread-Channel. (Channel must be a Thread-Channel.)
+    
+    Args:
+        member_id (int, optional): The Member will be Added to the Thread-Channel. (if not set, ClientUser will added.) 
+
+    Returns:
+        True: Added successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;PUT&#34;,
+                                   f&#34;/channels/{self.id}/thread-members/{&#39;@me&#39; if member_id is None else member_id}&#34;)
+    return True</code></pre>
+</details>
+</dd>
 <dt id="krema.models.channel.Channel.delete"><code class="name flex">
 <span>async def <span class="ident">delete</span></span>(<span>self)</span>
 </code></dt>
@@ -743,6 +1064,218 @@ class Channel:
     return [Message(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
+<dt id="krema.models.channel.Channel.list_joined_private_archived_threads"><code class="name flex">
+<span>async def <span class="ident">list_joined_private_archived_threads</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all of the joined private-archived Threads in the Channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params">https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>
+<p>A dict that contains;</p>
+<p>threads (list): List of Channel objects.</p>
+<p>members (list): List of ThreadMember objects.</p>
+<p>has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.</p>
+</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def list_joined_private_archived_threads(self, **kwargs):
+    &#34;&#34;&#34;List all of the joined private-archived Threads in the Channel.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params
+
+    Returns:
+        dict: A dict that contains;
+
+            threads (list): List of Channel objects.
+
+            members (list): List of ThreadMember objects.
+
+            has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;,
+                                            f&#34;/channels/{self.id}/users/@me/threads/archived/private{dict_to_query(kwargs)}&#34;)
+
+    result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+    result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+    return result</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.list_private_archived_threads"><code class="name flex">
+<span>async def <span class="ident">list_private_archived_threads</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all of the private-archived Threads in the Channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params">https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>
+<p>A dict that contains;</p>
+<p>threads (list): List of Channel objects.</p>
+<p>members (list): List of ThreadMember objects.</p>
+<p>has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.</p>
+</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def list_private_archived_threads(self, **kwargs):
+    &#34;&#34;&#34;List all of the private-archived Threads in the Channel.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params
+
+    Returns:
+        dict: A dict that contains;
+
+            threads (list): List of Channel objects.
+
+            members (list): List of ThreadMember objects.
+
+            has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;,
+                                            f&#34;/channels/{self.id}/threads/archived/private{dict_to_query(kwargs)}&#34;)
+
+    result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+    result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+    return result</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.list_public_archived_threads"><code class="name flex">
+<span>async def <span class="ident">list_public_archived_threads</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all of the public-archived Threads in the Channel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params">https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>
+<p>A dict that contains;</p>
+<p>threads (list): List of Channel objects.</p>
+<p>members (list): List of ThreadMember objects.</p>
+<p>has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.</p>
+</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def list_public_archived_threads(self, **kwargs):
+    &#34;&#34;&#34;List all of the public-archived Threads in the Channel.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params
+
+    Returns:
+        dict: A dict that contains;
+
+            threads (list): List of Channel objects.
+
+            members (list): List of ThreadMember objects.
+
+            has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;,
+                                            f&#34;/channels/{self.id}/threads/archived/public{dict_to_query(kwargs)}&#34;)
+
+    result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+    result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+    return result</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.list_thread_members"><code class="name flex">
+<span>async def <span class="ident">list_thread_members</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List Thread-Members in the Thread-Channel.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of ThreadMember objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def list_thread_members(self):
+    &#34;&#34;&#34;List Thread-Members in the Thread-Channel.
+    
+    Returns:
+        list: List of ThreadMember objects.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/thread-members&#34;)
+    return [ThreadMember(i) for i in result]</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.list_threads"><code class="name flex">
+<span>async def <span class="ident">list_threads</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all of the active Threads in the Channel.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>
+<p>A dict that contains;</p>
+<p>threads (list): List of Channel objects.</p>
+<p>members (list): List of ThreadMember objects.</p>
+<p>has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.</p>
+</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def list_threads(self):
+    &#34;&#34;&#34;List all of the active Threads in the Channel.
+    
+    Returns:
+        dict: A dict that contains;
+
+            threads (list): List of Channel objects.
+
+            members (list): List of ThreadMember objects.
+
+            has_more (bool): whether there are potentially additional threads that could be returned on a subsequent call.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/threads/active&#34;)
+
+    result[&#34;threads&#34;] = [Channel(self.client, i) for i in result[&#34;threads&#34;]]
+    result[&#34;members&#34;] = [ThreadMember(i) for i in result[&#34;members&#34;]]
+
+    return result</code></pre>
+</details>
+</dd>
 <dt id="krema.models.channel.Channel.purge"><code class="name flex">
 <span>async def <span class="ident">purge</span></span>(<span>self, limit: int = 2)</span>
 </code></dt>
@@ -779,6 +1312,40 @@ class Channel:
     })
 
     return messages</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.remove_from_thread"><code class="name flex">
+<span>async def <span class="ident">remove_from_thread</span></span>(<span>self, member_id: int = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove a Member from Thread-Channel. (Channel must be a Thread-Channel.)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>member_id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The Member will be Removed from Thread-Channel. (if not set, ClientUser will removed.) </dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Removed successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def remove_from_thread(self, member_id: int = None):
+    &#34;&#34;&#34;Remove a Member from Thread-Channel. (Channel must be a Thread-Channel.)
+    
+    Args:
+        member_id (int, optional): The Member will be Removed from Thread-Channel. (if not set, ClientUser will removed.) 
+
+    Returns:
+        True: Removed successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;DELETE&#34;,
+                                   f&#34;/channels/{self.id}/thread-members/{&#39;@me&#39; if member_id is None else member_id}&#34;)
+    return True</code></pre>
 </details>
 </dd>
 <dt id="krema.models.channel.Channel.send"><code class="name flex">
@@ -827,6 +1394,38 @@ class Channel:
 
     result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/messages&#34;, **params)
     return Message(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.start_thread"><code class="name flex">
+<span>async def <span class="ident">start_thread</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start a new Thread without Message.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/channel#start-thread-without-message-json-params">https://discord.com/developers/docs/resources/channel#start-thread-without-message-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.channel.Channel" href="#krema.models.channel.Channel">Channel</a></code></dt>
+<dd>Created Thread Channel.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def start_thread(self, **kwargs):
+    &#34;&#34;&#34;Start a new Thread without Message.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/channel#start-thread-without-message-json-params
+
+    Returns:
+        Channel: Created Thread Channel.
+    &#34;&#34;&#34;
+    result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/threads&#34;, json=kwargs)
+    return Channel(self.client, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.channel.Channel.trigger_typing"><code class="name flex">
@@ -883,13 +1482,21 @@ class Channel:
 <li>
 <h4><code><a title="krema.models.channel.Channel" href="#krema.models.channel.Channel">Channel</a></code></h4>
 <ul class="">
+<li><code><a title="krema.models.channel.Channel.add_to_thread" href="#krema.models.channel.Channel.add_to_thread">add_to_thread</a></code></li>
 <li><code><a title="krema.models.channel.Channel.delete" href="#krema.models.channel.Channel.delete">delete</a></code></li>
 <li><code><a title="krema.models.channel.Channel.edit" href="#krema.models.channel.Channel.edit">edit</a></code></li>
 <li><code><a title="krema.models.channel.Channel.fetch_message" href="#krema.models.channel.Channel.fetch_message">fetch_message</a></code></li>
 <li><code><a title="krema.models.channel.Channel.fetch_messages" href="#krema.models.channel.Channel.fetch_messages">fetch_messages</a></code></li>
 <li><code><a title="krema.models.channel.Channel.fetch_pinned_messages" href="#krema.models.channel.Channel.fetch_pinned_messages">fetch_pinned_messages</a></code></li>
+<li><code><a title="krema.models.channel.Channel.list_joined_private_archived_threads" href="#krema.models.channel.Channel.list_joined_private_archived_threads">list_joined_private_archived_threads</a></code></li>
+<li><code><a title="krema.models.channel.Channel.list_private_archived_threads" href="#krema.models.channel.Channel.list_private_archived_threads">list_private_archived_threads</a></code></li>
+<li><code><a title="krema.models.channel.Channel.list_public_archived_threads" href="#krema.models.channel.Channel.list_public_archived_threads">list_public_archived_threads</a></code></li>
+<li><code><a title="krema.models.channel.Channel.list_thread_members" href="#krema.models.channel.Channel.list_thread_members">list_thread_members</a></code></li>
+<li><code><a title="krema.models.channel.Channel.list_threads" href="#krema.models.channel.Channel.list_threads">list_threads</a></code></li>
 <li><code><a title="krema.models.channel.Channel.purge" href="#krema.models.channel.Channel.purge">purge</a></code></li>
+<li><code><a title="krema.models.channel.Channel.remove_from_thread" href="#krema.models.channel.Channel.remove_from_thread">remove_from_thread</a></code></li>
 <li><code><a title="krema.models.channel.Channel.send" href="#krema.models.channel.Channel.send">send</a></code></li>
+<li><code><a title="krema.models.channel.Channel.start_thread" href="#krema.models.channel.Channel.start_thread">start_thread</a></code></li>
 <li><code><a title="krema.models.channel.Channel.trigger_typing" href="#krema.models.channel.Channel.trigger_typing">trigger_typing</a></code></li>
 </ul>
 </li>
