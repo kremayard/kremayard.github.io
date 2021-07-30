@@ -298,7 +298,7 @@ class Guild:
 
     async def edit_member(self, member_id: int, **kwargs):
         &#34;&#34;&#34;Edit a Guild Member with API params.
-        
+
         Args:
             member_id (int): Member ID.
             **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params
@@ -340,6 +340,87 @@ class Guild:
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/members/{member_id}/roles/{role_id}&#34;)
         return True
 
+    async def kick_member(self, member_id: int, reason: str = None):
+        &#34;&#34;&#34;Kick Member from Guild.
+
+        Args:
+            member_id (int): Member ID.
+            reason (str, optional): Kick reason.
+
+        Returns:
+            True: Member is kicked successfully.
+        &#34;&#34;&#34;
+
+        extra = {}
+
+        if reason is not None:
+            extra[&#34;log_reason&#34;] = reason
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, **extra)
+        return True
+
+    async def ban_member(self, member_id: int, reason: str = None, **kwargs):
+        &#34;&#34;&#34;Ban Member from Guild.
+
+        Args:
+            member_id (int): Member ID.
+            reason (str, optional): Ban reason.
+            **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-ban-json-params
+
+        Returns:
+            True: Member is banned successfully.
+        &#34;&#34;&#34;
+
+        extra = {&#34;json&#34;: kwargs}
+
+        if reason is not None:
+            extra[&#34;log_reason&#34;] = reason
+
+        await self.client.http.request(&#34;PUT&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;, **extra)
+        return True
+
+    async def fetch_bans(self):
+        &#34;&#34;&#34;Fetch all bans from Guild.
+
+        Returns:
+            list: List of Ban object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/bans&#34;)
+        return [Ban(self.client, i) for i in result]
+
+    async def fetch_ban(self, member_id: int):
+        &#34;&#34;&#34;Fetch a member ban from Guild.
+
+        Args:
+            member_id (int): Member ID.
+
+        Returns:
+            Ban: Found member&#39;s ban object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;)
+        return Ban(self.client, result)
+
+    async def unban_member(self, member_id: int, reason: str = None):
+        &#34;&#34;&#34;Un-ban a Member from Guild.
+
+        Args:
+            member_id (int): Member ID.
+            reason (str, optional): un-ban reason.
+
+        Returns:
+            True: Member is un-banned successfully.
+        &#34;&#34;&#34;
+
+        extra = {}
+
+        if reason is not None:
+            extra[&#34;log_reason&#34;] = reason
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;, **extra)
+        return True
+
 
 @dataclass
 class Emoji:
@@ -370,7 +451,30 @@ class Emoji:
         self.require_colons: Union[bool, None] = data.get(&#34;require_colons&#34;)
         self.managed: Union[bool, None] = data.get(&#34;managed&#34;)
         self.animated: Union[bool, None] = data.get(&#34;animated&#34;)
-        self.available: Union[bool, None] = data.get(&#34;available&#34;)</code></pre>
+        self.available: Union[bool, None] = data.get(&#34;available&#34;)
+
+
+@dataclass
+class Ban:
+    &#34;&#34;&#34;Ban class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        client (Client): Krema client.
+        reason (str, None): Ban reason.
+        user (User): Banned user object.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import User
+
+        self.client = client
+
+        self.reason: Union[str, None] = data.get(&#34;reason&#34;)
+        self.user: User = User(self.client, data.get(&#34;user&#34;))</code></pre>
 </details>
 </section>
 <section>
@@ -382,6 +486,55 @@ class Emoji:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="krema.models.guild.Ban"><code class="flex name class">
+<span>class <span class="ident">Ban</span></span>
+<span>(</span><span>client, data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Ban class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet from websocket.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>reason</code></strong> :&ensp;<code>str, None</code></dt>
+<dd>Ban reason.</dd>
+<dt><strong><code>user</code></strong> :&ensp;<code>User</code></dt>
+<dd>Banned user object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Ban:
+    &#34;&#34;&#34;Ban class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        client (Client): Krema client.
+        reason (str, None): Ban reason.
+        user (User): Banned user object.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import User
+
+        self.client = client
+
+        self.reason: Union[str, None] = data.get(&#34;reason&#34;)
+        self.user: User = User(self.client, data.get(&#34;user&#34;))</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Emoji"><code class="flex name class">
 <span>class <span class="ident">Emoji</span></span>
 <span>(</span><span>client, data: dict)</span>
@@ -721,7 +874,7 @@ class Guild:
 
     async def edit_member(self, member_id: int, **kwargs):
         &#34;&#34;&#34;Edit a Guild Member with API params.
-        
+
         Args:
             member_id (int): Member ID.
             **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params
@@ -761,6 +914,87 @@ class Guild:
         &#34;&#34;&#34;
 
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/members/{member_id}/roles/{role_id}&#34;)
+        return True
+
+    async def kick_member(self, member_id: int, reason: str = None):
+        &#34;&#34;&#34;Kick Member from Guild.
+
+        Args:
+            member_id (int): Member ID.
+            reason (str, optional): Kick reason.
+
+        Returns:
+            True: Member is kicked successfully.
+        &#34;&#34;&#34;
+
+        extra = {}
+
+        if reason is not None:
+            extra[&#34;log_reason&#34;] = reason
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, **extra)
+        return True
+
+    async def ban_member(self, member_id: int, reason: str = None, **kwargs):
+        &#34;&#34;&#34;Ban Member from Guild.
+
+        Args:
+            member_id (int): Member ID.
+            reason (str, optional): Ban reason.
+            **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-ban-json-params
+
+        Returns:
+            True: Member is banned successfully.
+        &#34;&#34;&#34;
+
+        extra = {&#34;json&#34;: kwargs}
+
+        if reason is not None:
+            extra[&#34;log_reason&#34;] = reason
+
+        await self.client.http.request(&#34;PUT&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;, **extra)
+        return True
+
+    async def fetch_bans(self):
+        &#34;&#34;&#34;Fetch all bans from Guild.
+
+        Returns:
+            list: List of Ban object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/bans&#34;)
+        return [Ban(self.client, i) for i in result]
+
+    async def fetch_ban(self, member_id: int):
+        &#34;&#34;&#34;Fetch a member ban from Guild.
+
+        Args:
+            member_id (int): Member ID.
+
+        Returns:
+            Ban: Found member&#39;s ban object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;)
+        return Ban(self.client, result)
+
+    async def unban_member(self, member_id: int, reason: str = None):
+        &#34;&#34;&#34;Un-ban a Member from Guild.
+
+        Args:
+            member_id (int): Member ID.
+            reason (str, optional): un-ban reason.
+
+        Returns:
+            True: Member is un-banned successfully.
+        &#34;&#34;&#34;
+
+        extra = {}
+
+        if reason is not None:
+            extra[&#34;log_reason&#34;] = reason
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;, **extra)
         return True</code></pre>
 </details>
 <h3>Methods</h3>
@@ -798,6 +1032,50 @@ class Guild:
     &#34;&#34;&#34;
 
     await self.client.http.request(&#34;PUT&#34;, f&#34;/guilds/{self.id}/members/{member_id}/roles/{role_id}&#34;)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.ban_member"><code class="name flex">
+<span>async def <span class="ident">ban_member</span></span>(<span>self, member_id: int, reason: str = None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Ban Member from Guild.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>member_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Member ID.</dd>
+<dt><strong><code>reason</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Ban reason.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#create-guild-ban-json-params">https://discord.com/developers/docs/resources/guild#create-guild-ban-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Member is banned successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def ban_member(self, member_id: int, reason: str = None, **kwargs):
+    &#34;&#34;&#34;Ban Member from Guild.
+
+    Args:
+        member_id (int): Member ID.
+        reason (str, optional): Ban reason.
+        **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-ban-json-params
+
+    Returns:
+        True: Member is banned successfully.
+    &#34;&#34;&#34;
+
+    extra = {&#34;json&#34;: kwargs}
+
+    if reason is not None:
+        extra[&#34;log_reason&#34;] = reason
+
+    await self.client.http.request(&#34;PUT&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;, **extra)
     return True</code></pre>
 </details>
 </dd>
@@ -983,7 +1261,7 @@ class Guild:
 </summary>
 <pre><code class="python">async def edit_member(self, member_id: int, **kwargs):
     &#34;&#34;&#34;Edit a Guild Member with API params.
-    
+
     Args:
         member_id (int): Member ID.
         **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params
@@ -996,6 +1274,64 @@ class Guild:
 
     result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, json=kwargs)
     return Member(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_ban"><code class="name flex">
+<span>async def <span class="ident">fetch_ban</span></span>(<span>self, member_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch a member ban from Guild.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>member_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Member ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Ban" href="#krema.models.guild.Ban">Ban</a></code></dt>
+<dd>Found member's ban object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_ban(self, member_id: int):
+    &#34;&#34;&#34;Fetch a member ban from Guild.
+
+    Args:
+        member_id (int): Member ID.
+
+    Returns:
+        Ban: Found member&#39;s ban object.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;)
+    return Ban(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_bans"><code class="name flex">
+<span>async def <span class="ident">fetch_bans</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch all bans from Guild.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Ban object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_bans(self):
+    &#34;&#34;&#34;Fetch all bans from Guild.
+
+    Returns:
+        list: List of Ban object.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/bans&#34;)
+    return [Ban(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.fetch_channels"><code class="name flex">
@@ -1153,6 +1489,47 @@ class Guild:
     return [Member(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.kick_member"><code class="name flex">
+<span>async def <span class="ident">kick_member</span></span>(<span>self, member_id: int, reason: str = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Kick Member from Guild.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>member_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Member ID.</dd>
+<dt><strong><code>reason</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Kick reason.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Member is kicked successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def kick_member(self, member_id: int, reason: str = None):
+    &#34;&#34;&#34;Kick Member from Guild.
+
+    Args:
+        member_id (int): Member ID.
+        reason (str, optional): Kick reason.
+
+    Returns:
+        True: Member is kicked successfully.
+    &#34;&#34;&#34;
+
+    extra = {}
+
+    if reason is not None:
+        extra[&#34;log_reason&#34;] = reason
+
+    await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, **extra)
+    return True</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.modify_channel_positions"><code class="name flex">
 <span>async def <span class="ident">modify_channel_positions</span></span>(<span>self, parameters: list)</span>
 </code></dt>
@@ -1260,6 +1637,47 @@ class Guild:
     return [Member(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.unban_member"><code class="name flex">
+<span>async def <span class="ident">unban_member</span></span>(<span>self, member_id: int, reason: str = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Un-ban a Member from Guild.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>member_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Member ID.</dd>
+<dt><strong><code>reason</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>un-ban reason.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Member is un-banned successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def unban_member(self, member_id: int, reason: str = None):
+    &#34;&#34;&#34;Un-ban a Member from Guild.
+
+    Args:
+        member_id (int): Member ID.
+        reason (str, optional): un-ban reason.
+
+    Returns:
+        True: Member is un-banned successfully.
+    &#34;&#34;&#34;
+
+    extra = {}
+
+    if reason is not None:
+        extra[&#34;log_reason&#34;] = reason
+
+    await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;, **extra)
+    return True</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.update_emoji"><code class="name flex">
 <span>async def <span class="ident">update_emoji</span></span>(<span>self, emoji_id: int, **kwargs)</span>
 </code></dt>
@@ -1315,26 +1733,34 @@ class Guild:
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="krema.models.guild.Ban" href="#krema.models.guild.Ban">Ban</a></code></h4>
+</li>
+<li>
 <h4><code><a title="krema.models.guild.Emoji" href="#krema.models.guild.Emoji">Emoji</a></code></h4>
 </li>
 <li>
 <h4><code><a title="krema.models.guild.Guild" href="#krema.models.guild.Guild">Guild</a></code></h4>
 <ul class="">
 <li><code><a title="krema.models.guild.Guild.add_member_role" href="#krema.models.guild.Guild.add_member_role">add_member_role</a></code></li>
+<li><code><a title="krema.models.guild.Guild.ban_member" href="#krema.models.guild.Guild.ban_member">ban_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.create_channel" href="#krema.models.guild.Guild.create_channel">create_channel</a></code></li>
 <li><code><a title="krema.models.guild.Guild.create_emoji" href="#krema.models.guild.Guild.create_emoji">create_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete" href="#krema.models.guild.Guild.delete">delete</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete_emoji" href="#krema.models.guild.Guild.delete_emoji">delete_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit" href="#krema.models.guild.Guild.edit">edit</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit_member" href="#krema.models.guild.Guild.edit_member">edit_member</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_ban" href="#krema.models.guild.Guild.fetch_ban">fetch_ban</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_bans" href="#krema.models.guild.Guild.fetch_bans">fetch_bans</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_channels" href="#krema.models.guild.Guild.fetch_channels">fetch_channels</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_emoji" href="#krema.models.guild.Guild.fetch_emoji">fetch_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_emojis" href="#krema.models.guild.Guild.fetch_emojis">fetch_emojis</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member" href="#krema.models.guild.Guild.fetch_member">fetch_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member_list" href="#krema.models.guild.Guild.fetch_member_list">fetch_member_list</a></code></li>
+<li><code><a title="krema.models.guild.Guild.kick_member" href="#krema.models.guild.Guild.kick_member">kick_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.modify_channel_positions" href="#krema.models.guild.Guild.modify_channel_positions">modify_channel_positions</a></code></li>
 <li><code><a title="krema.models.guild.Guild.remove_member_role" href="#krema.models.guild.Guild.remove_member_role">remove_member_role</a></code></li>
 <li><code><a title="krema.models.guild.Guild.search_member" href="#krema.models.guild.Guild.search_member">search_member</a></code></li>
+<li><code><a title="krema.models.guild.Guild.unban_member" href="#krema.models.guild.Guild.unban_member">unban_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.update_emoji" href="#krema.models.guild.Guild.update_emoji">update_emoji</a></code></li>
 </ul>
 </li>
