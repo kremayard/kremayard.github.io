@@ -421,6 +421,69 @@ class Guild:
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;, **extra)
         return True
 
+    async def fetch_roles(self):
+        &#34;&#34;&#34;Fetch all Guild Roles.
+
+        Returns:
+            list: List of Role objects.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/roles&#34;)
+        return [Role(i) for i in result]
+
+    async def create_role(self, **kwargs):
+        &#34;&#34;&#34;Fetch all Guild Roles.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-role-json-params
+
+        Returns:
+            Role: Created Role object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/roles&#34;, json=kwargs)
+        return Role(result)
+
+    async def modify_role_positions(self, parameters: list):
+        &#34;&#34;&#34;Modifiy Guild Role positions with API params.
+
+        Args:
+            parameters: JSON list that contains https://discord.com/developers/docs/resources/guild#modify-guild-role-positions-json-params objects.
+
+        Returns:
+            list: List of all Guild Roles.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/roles&#34;, json=parameters)
+        return [Role(i) for i in result]
+
+    async def edit_role(self, role_id: int, **kwargs):
+        &#34;&#34;&#34;Edit a Guild Role.
+
+        Args:
+            role_id (int): Role ID.
+            **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-role-json-params.
+
+        Returns:
+            Role: Updated Guild Role.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;, json=kwargs)
+        return Role(result)
+
+    async def delete_role(self, role_id: int):
+        &#34;&#34;&#34;Delete a Guild Role.
+
+        Args:
+            role_id (int): Role ID.
+
+        Returns:
+            True: Role deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;)
+        return True
+
 
 @dataclass
 class Emoji:
@@ -474,7 +537,38 @@ class Ban:
         self.client = client
 
         self.reason: Union[str, None] = data.get(&#34;reason&#34;)
-        self.user: User = User(self.client, data.get(&#34;user&#34;))</code></pre>
+        self.user: User = User(self.client, data.get(&#34;user&#34;))
+
+
+@dataclass
+class Role:
+    &#34;&#34;&#34;Role class.
+
+    Args:
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        id (int): Role ID.
+        name (str): Role name.
+        color (int): Role color.
+        hoist (bool): If this role is pinned in the user listing.
+        position (int): Role position.
+        permissions (str): Permission bit set.
+        managed (bool): Whether this role is managed by an integration.
+        mentionable (bool): Whether this role is mentionable.
+        tags (dict, None): Role tags object.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: dict) -&gt; None:
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.name: str = data.get(&#34;name&#34;)
+        self.color: int = data.get(&#34;color&#34;)
+        self.hoist: bool = data.get(&#34;hoist&#34;)
+        self.position: int = data.get(&#34;position&#34;)
+        self.permissions: str = data.get(&#34;permissions&#34;)
+        self.managed: bool = data.get(&#34;managed&#34;)
+        self.mentionable: bool = data.get(&#34;mentionable&#34;)
+        self.tags: dict = data.get(&#34;tags&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -995,6 +1089,69 @@ class Guild:
             extra[&#34;log_reason&#34;] = reason
 
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/bans/{member_id}&#34;, **extra)
+        return True
+
+    async def fetch_roles(self):
+        &#34;&#34;&#34;Fetch all Guild Roles.
+
+        Returns:
+            list: List of Role objects.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/roles&#34;)
+        return [Role(i) for i in result]
+
+    async def create_role(self, **kwargs):
+        &#34;&#34;&#34;Fetch all Guild Roles.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-role-json-params
+
+        Returns:
+            Role: Created Role object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/roles&#34;, json=kwargs)
+        return Role(result)
+
+    async def modify_role_positions(self, parameters: list):
+        &#34;&#34;&#34;Modifiy Guild Role positions with API params.
+
+        Args:
+            parameters: JSON list that contains https://discord.com/developers/docs/resources/guild#modify-guild-role-positions-json-params objects.
+
+        Returns:
+            list: List of all Guild Roles.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/roles&#34;, json=parameters)
+        return [Role(i) for i in result]
+
+    async def edit_role(self, role_id: int, **kwargs):
+        &#34;&#34;&#34;Edit a Guild Role.
+
+        Args:
+            role_id (int): Role ID.
+            **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-role-json-params.
+
+        Returns:
+            Role: Updated Guild Role.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;, json=kwargs)
+        return Role(result)
+
+    async def delete_role(self, role_id: int):
+        &#34;&#34;&#34;Delete a Guild Role.
+
+        Args:
+            role_id (int): Role ID.
+
+        Returns:
+            True: Role deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;)
         return True</code></pre>
 </details>
 <h3>Methods</h3>
@@ -1147,6 +1304,39 @@ class Guild:
     return Emoji(self.client, result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.create_role"><code class="name flex">
+<span>async def <span class="ident">create_role</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch all Guild Roles.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#create-guild-role-json-params">https://discord.com/developers/docs/resources/guild#create-guild-role-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Role" href="#krema.models.guild.Role">Role</a></code></dt>
+<dd>Created Role object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def create_role(self, **kwargs):
+    &#34;&#34;&#34;Fetch all Guild Roles.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/guild#create-guild-role-json-params
+
+    Returns:
+        Role: Created Role object.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/roles&#34;, json=kwargs)
+    return Role(result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.delete"><code class="name flex">
 <span>async def <span class="ident">delete</span></span>(<span>self)</span>
 </code></dt>
@@ -1202,6 +1392,39 @@ class Guild:
     &#34;&#34;&#34;
 
     await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.delete_role"><code class="name flex">
+<span>async def <span class="ident">delete_role</span></span>(<span>self, role_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete a Guild Role.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Role ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Role deleted successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete_role(self, role_id: int):
+    &#34;&#34;&#34;Delete a Guild Role.
+
+    Args:
+        role_id (int): Role ID.
+
+    Returns:
+        True: Role deleted successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;)
     return True</code></pre>
 </details>
 </dd>
@@ -1274,6 +1497,42 @@ class Guild:
 
     result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, json=kwargs)
     return Member(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.edit_role"><code class="name flex">
+<span>async def <span class="ident">edit_role</span></span>(<span>self, role_id: int, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit a Guild Role.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Role ID.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#modify-guild-role-json-params.">https://discord.com/developers/docs/resources/guild#modify-guild-role-json-params.</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.Role" href="#krema.models.guild.Role">Role</a></code></dt>
+<dd>Updated Guild Role.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit_role(self, role_id: int, **kwargs):
+    &#34;&#34;&#34;Edit a Guild Role.
+
+    Args:
+        role_id (int): Role ID.
+        **kwargs: https://discord.com/developers/docs/resources/guild#modify-guild-role-json-params.
+
+    Returns:
+        Role: Updated Guild Role.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;, json=kwargs)
+    return Role(result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.fetch_ban"><code class="name flex">
@@ -1489,6 +1748,31 @@ class Guild:
     return [Member(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.fetch_roles"><code class="name flex">
+<span>async def <span class="ident">fetch_roles</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch all Guild Roles.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Role objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_roles(self):
+    &#34;&#34;&#34;Fetch all Guild Roles.
+
+    Returns:
+        list: List of Role objects.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/roles&#34;)
+    return [Role(i) for i in result]</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.kick_member"><code class="name flex">
 <span>async def <span class="ident">kick_member</span></span>(<span>self, member_id: int, reason: str = None)</span>
 </code></dt>
@@ -1561,6 +1845,39 @@ class Guild:
 
     await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/channels&#34;, json=parameters)
     return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.modify_role_positions"><code class="name flex">
+<span>async def <span class="ident">modify_role_positions</span></span>(<span>self, parameters: list)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Modifiy Guild Role positions with API params.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>parameters</code></strong></dt>
+<dd>JSON list that contains <a href="https://discord.com/developers/docs/resources/guild#modify-guild-role-positions-json-params">https://discord.com/developers/docs/resources/guild#modify-guild-role-positions-json-params</a> objects.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of all Guild Roles.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def modify_role_positions(self, parameters: list):
+    &#34;&#34;&#34;Modifiy Guild Role positions with API params.
+
+    Args:
+        parameters: JSON list that contains https://discord.com/developers/docs/resources/guild#modify-guild-role-positions-json-params objects.
+
+    Returns:
+        list: List of all Guild Roles.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/roles&#34;, json=parameters)
+    return [Role(i) for i in result]</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.remove_member_role"><code class="name flex">
@@ -1716,6 +2033,73 @@ class Guild:
 </dd>
 </dl>
 </dd>
+<dt id="krema.models.guild.Role"><code class="flex name class">
+<span>class <span class="ident">Role</span></span>
+<span>(</span><span>data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Role class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet from websocket.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Role ID.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Role name.</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>int</code></dt>
+<dd>Role color.</dd>
+<dt><strong><code>hoist</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If this role is pinned in the user listing.</dd>
+<dt><strong><code>position</code></strong> :&ensp;<code>int</code></dt>
+<dd>Role position.</dd>
+<dt><strong><code>permissions</code></strong> :&ensp;<code>str</code></dt>
+<dd>Permission bit set.</dd>
+<dt><strong><code>managed</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Whether this role is managed by an integration.</dd>
+<dt><strong><code>mentionable</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Whether this role is mentionable.</dd>
+<dt><strong><code>tags</code></strong> :&ensp;<code>dict, None</code></dt>
+<dd>Role tags object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Role:
+    &#34;&#34;&#34;Role class.
+
+    Args:
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        id (int): Role ID.
+        name (str): Role name.
+        color (int): Role color.
+        hoist (bool): If this role is pinned in the user listing.
+        position (int): Role position.
+        permissions (str): Permission bit set.
+        managed (bool): Whether this role is managed by an integration.
+        mentionable (bool): Whether this role is mentionable.
+        tags (dict, None): Role tags object.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: dict) -&gt; None:
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.name: str = data.get(&#34;name&#34;)
+        self.color: int = data.get(&#34;color&#34;)
+        self.hoist: bool = data.get(&#34;hoist&#34;)
+        self.position: int = data.get(&#34;position&#34;)
+        self.permissions: str = data.get(&#34;permissions&#34;)
+        self.managed: bool = data.get(&#34;managed&#34;)
+        self.mentionable: bool = data.get(&#34;mentionable&#34;)
+        self.tags: dict = data.get(&#34;tags&#34;)</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 </article>
@@ -1745,10 +2129,13 @@ class Guild:
 <li><code><a title="krema.models.guild.Guild.ban_member" href="#krema.models.guild.Guild.ban_member">ban_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.create_channel" href="#krema.models.guild.Guild.create_channel">create_channel</a></code></li>
 <li><code><a title="krema.models.guild.Guild.create_emoji" href="#krema.models.guild.Guild.create_emoji">create_emoji</a></code></li>
+<li><code><a title="krema.models.guild.Guild.create_role" href="#krema.models.guild.Guild.create_role">create_role</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete" href="#krema.models.guild.Guild.delete">delete</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete_emoji" href="#krema.models.guild.Guild.delete_emoji">delete_emoji</a></code></li>
+<li><code><a title="krema.models.guild.Guild.delete_role" href="#krema.models.guild.Guild.delete_role">delete_role</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit" href="#krema.models.guild.Guild.edit">edit</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit_member" href="#krema.models.guild.Guild.edit_member">edit_member</a></code></li>
+<li><code><a title="krema.models.guild.Guild.edit_role" href="#krema.models.guild.Guild.edit_role">edit_role</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_ban" href="#krema.models.guild.Guild.fetch_ban">fetch_ban</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_bans" href="#krema.models.guild.Guild.fetch_bans">fetch_bans</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_channels" href="#krema.models.guild.Guild.fetch_channels">fetch_channels</a></code></li>
@@ -1756,13 +2143,18 @@ class Guild:
 <li><code><a title="krema.models.guild.Guild.fetch_emojis" href="#krema.models.guild.Guild.fetch_emojis">fetch_emojis</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member" href="#krema.models.guild.Guild.fetch_member">fetch_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member_list" href="#krema.models.guild.Guild.fetch_member_list">fetch_member_list</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_roles" href="#krema.models.guild.Guild.fetch_roles">fetch_roles</a></code></li>
 <li><code><a title="krema.models.guild.Guild.kick_member" href="#krema.models.guild.Guild.kick_member">kick_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.modify_channel_positions" href="#krema.models.guild.Guild.modify_channel_positions">modify_channel_positions</a></code></li>
+<li><code><a title="krema.models.guild.Guild.modify_role_positions" href="#krema.models.guild.Guild.modify_role_positions">modify_role_positions</a></code></li>
 <li><code><a title="krema.models.guild.Guild.remove_member_role" href="#krema.models.guild.Guild.remove_member_role">remove_member_role</a></code></li>
 <li><code><a title="krema.models.guild.Guild.search_member" href="#krema.models.guild.Guild.search_member">search_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.unban_member" href="#krema.models.guild.Guild.unban_member">unban_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.update_emoji" href="#krema.models.guild.Guild.update_emoji">update_emoji</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="krema.models.guild.Role" href="#krema.models.guild.Role">Role</a></code></h4>
 </li>
 </ul>
 </li>
