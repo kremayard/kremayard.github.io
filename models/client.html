@@ -34,7 +34,7 @@ Client model for krema.
 from typing import Union
 
 from unikorn import kollektor
-from ..utils import image_to_data_uri
+from ..utils import dict_to_query, image_to_data_uri
 
 
 class Client:
@@ -447,7 +447,38 @@ class Client:
         await self.http.request(&#34;PATCH&#34;, f&#34;/guilds/{guild_id}/members/@me/nick&#34;, json={
             &#34;nick&#34;: nick
         })
-        return True</code></pre>
+        return True
+
+    async def fetch_invite(self, invite_code: str, **kwargs):
+        &#34;&#34;&#34;Fetch Invite by Code.
+
+        Args:
+            invite_code (str): Invite Code.
+            **kwargs: https://discord.com/developers/docs/resources/invite#get-invite-query-string-params
+
+        Returns:
+            Invite: Found invite object.
+        &#34;&#34;&#34;
+
+        from .invite import Invite
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/invites/{invite_code}{dict_to_query(kwargs)}&#34;)
+        return Invite(self, result)
+
+    async def delete_invite(self, invite_code: str):
+        &#34;&#34;&#34;Delete Invite by Code.
+
+        Args:
+            invite_code (str): Invite Code.
+
+        Returns:
+            Invite: Found invite object.
+        &#34;&#34;&#34;
+
+        from .invite import Invite
+
+        result = await self.http.request(&#34;DELETE&#34;, f&#34;/invites/{invite_code}&#34;)
+        return Invite(self, result)</code></pre>
 </details>
 </section>
 <section>
@@ -909,7 +940,38 @@ class Client:
         await self.http.request(&#34;PATCH&#34;, f&#34;/guilds/{guild_id}/members/@me/nick&#34;, json={
             &#34;nick&#34;: nick
         })
-        return True</code></pre>
+        return True
+
+    async def fetch_invite(self, invite_code: str, **kwargs):
+        &#34;&#34;&#34;Fetch Invite by Code.
+
+        Args:
+            invite_code (str): Invite Code.
+            **kwargs: https://discord.com/developers/docs/resources/invite#get-invite-query-string-params
+
+        Returns:
+            Invite: Found invite object.
+        &#34;&#34;&#34;
+
+        from .invite import Invite
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/invites/{invite_code}{dict_to_query(kwargs)}&#34;)
+        return Invite(self, result)
+
+    async def delete_invite(self, invite_code: str):
+        &#34;&#34;&#34;Delete Invite by Code.
+
+        Args:
+            invite_code (str): Invite Code.
+
+        Returns:
+            Invite: Found invite object.
+        &#34;&#34;&#34;
+
+        from .invite import Invite
+
+        result = await self.http.request(&#34;DELETE&#34;, f&#34;/invites/{invite_code}&#34;)
+        return Invite(self, result)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -1001,6 +1063,41 @@ def formatted_token(self) -&gt; str:
 
     result = await self.http.request(&#34;POST&#34;, f&#34;/guilds&#34;, json=kwargs)
     return Guild(self, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.delete_invite"><code class="name flex">
+<span>async def <span class="ident">delete_invite</span></span>(<span>self, invite_code: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete Invite by Code.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>invite_code</code></strong> :&ensp;<code>str</code></dt>
+<dd>Invite Code.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Invite</code></dt>
+<dd>Found invite object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete_invite(self, invite_code: str):
+    &#34;&#34;&#34;Delete Invite by Code.
+
+    Args:
+        invite_code (str): Invite Code.
+
+    Returns:
+        Invite: Found invite object.
+    &#34;&#34;&#34;
+
+    from .invite import Invite
+
+    result = await self.http.request(&#34;DELETE&#34;, f&#34;/invites/{invite_code}&#34;)
+    return Invite(self, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.edit"><code class="name flex">
@@ -1187,6 +1284,44 @@ def formatted_token(self) -&gt; str:
 
     result = await self.http.request(&#34;GET&#34;, f&#34;/guilds/{guild_id}?with_count={with_count}&#34;)
     return Guild(self, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.fetch_invite"><code class="name flex">
+<span>async def <span class="ident">fetch_invite</span></span>(<span>self, invite_code: str, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch Invite by Code.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>invite_code</code></strong> :&ensp;<code>str</code></dt>
+<dd>Invite Code.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/invite#get-invite-query-string-params">https://discord.com/developers/docs/resources/invite#get-invite-query-string-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Invite</code></dt>
+<dd>Found invite object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_invite(self, invite_code: str, **kwargs):
+    &#34;&#34;&#34;Fetch Invite by Code.
+
+    Args:
+        invite_code (str): Invite Code.
+        **kwargs: https://discord.com/developers/docs/resources/invite#get-invite-query-string-params
+
+    Returns:
+        Invite: Found invite object.
+    &#34;&#34;&#34;
+
+    from .invite import Invite
+
+    result = await self.http.request(&#34;GET&#34;, f&#34;/invites/{invite_code}{dict_to_query(kwargs)}&#34;)
+    return Invite(self, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.fetch_user"><code class="name flex">
@@ -1485,11 +1620,13 @@ Channel()
 <ul class="two-column">
 <li><code><a title="krema.models.client.Client.check_token" href="#krema.models.client.Client.check_token">check_token</a></code></li>
 <li><code><a title="krema.models.client.Client.create_guild" href="#krema.models.client.Client.create_guild">create_guild</a></code></li>
+<li><code><a title="krema.models.client.Client.delete_invite" href="#krema.models.client.Client.delete_invite">delete_invite</a></code></li>
 <li><code><a title="krema.models.client.Client.edit" href="#krema.models.client.Client.edit">edit</a></code></li>
 <li><code><a title="krema.models.client.Client.edit_nickname" href="#krema.models.client.Client.edit_nickname">edit_nickname</a></code></li>
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_guild" href="#krema.models.client.Client.fetch_guild">fetch_guild</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_invite" href="#krema.models.client.Client.fetch_invite">fetch_invite</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_user" href="#krema.models.client.Client.fetch_user">fetch_user</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>
 <li><code><a title="krema.models.client.Client.get_channel" href="#krema.models.client.Client.get_channel">get_channel</a></code></li>

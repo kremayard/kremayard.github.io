@@ -72,6 +72,10 @@ class HTTP:
             extra_header[&#34;X-Audit-Log-Reason&#34;] = kwargs.get(&#34;log_reason&#34;)
             del kwargs[&#34;log_reason&#34;]
 
+        if &#34;content_type&#34; in kwargs:
+            extra_header[&#34;Content-Type&#34;] = kwargs[&#34;content_type&#34;]
+            del kwargs[&#34;content_type&#34;]
+
         async with aiohttp.ClientSession() as session:
             async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;, **extra_header}, **kwargs) as response:
                 try:
@@ -173,6 +177,10 @@ class HTTP:
             extra_header[&#34;X-Audit-Log-Reason&#34;] = kwargs.get(&#34;log_reason&#34;)
             del kwargs[&#34;log_reason&#34;]
 
+        if &#34;content_type&#34; in kwargs:
+            extra_header[&#34;Content-Type&#34;] = kwargs[&#34;content_type&#34;]
+            del kwargs[&#34;content_type&#34;]
+
         async with aiohttp.ClientSession() as session:
             async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;, **extra_header}, **kwargs) as response:
                 try:
@@ -256,6 +264,10 @@ class HTTP:
     if &#34;log_reason&#34; in kwargs:
         extra_header[&#34;X-Audit-Log-Reason&#34;] = kwargs.get(&#34;log_reason&#34;)
         del kwargs[&#34;log_reason&#34;]
+
+    if &#34;content_type&#34; in kwargs:
+        extra_header[&#34;Content-Type&#34;] = kwargs[&#34;content_type&#34;]
+        del kwargs[&#34;content_type&#34;]
 
     async with aiohttp.ClientSession() as session:
         async with session.request(method, f&#34;{self.url}{endpoint}&#34;, headers={&#34;Authorization&#34;: self.client.token, &#34;User-Agent&#34;: &#34;krema&#34;, **extra_header}, **kwargs) as response:
