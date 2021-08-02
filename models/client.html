@@ -478,7 +478,19 @@ class Client:
         from .invite import Invite
 
         result = await self.http.request(&#34;DELETE&#34;, f&#34;/invites/{invite_code}&#34;)
-        return Invite(self, result)</code></pre>
+        return Invite(self, result)
+
+    async def fetch_webhook(self, webhook_id: int):
+        &#34;&#34;&#34;Fetch Webhook by ID.
+
+        Returns:
+            Webhook: Found Webhook object.
+        &#34;&#34;&#34;
+
+        from .webhook import Webhook
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/webhooks/{webhook_id}&#34;)
+        return Webhook(self, result)</code></pre>
 </details>
 </section>
 <section>
@@ -971,7 +983,19 @@ class Client:
         from .invite import Invite
 
         result = await self.http.request(&#34;DELETE&#34;, f&#34;/invites/{invite_code}&#34;)
-        return Invite(self, result)</code></pre>
+        return Invite(self, result)
+
+    async def fetch_webhook(self, webhook_id: int):
+        &#34;&#34;&#34;Fetch Webhook by ID.
+
+        Returns:
+            Webhook: Found Webhook object.
+        &#34;&#34;&#34;
+
+        from .webhook import Webhook
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/webhooks/{webhook_id}&#34;)
+        return Webhook(self, result)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -1359,6 +1383,33 @@ def formatted_token(self) -&gt; str:
     return User(self, result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.client.Client.fetch_webhook"><code class="name flex">
+<span>async def <span class="ident">fetch_webhook</span></span>(<span>self, webhook_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch Webhook by ID.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Webhook</code></dt>
+<dd>Found Webhook object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_webhook(self, webhook_id: int):
+    &#34;&#34;&#34;Fetch Webhook by ID.
+
+    Returns:
+        Webhook: Found Webhook object.
+    &#34;&#34;&#34;
+
+    from .webhook import Webhook
+
+    result = await self.http.request(&#34;GET&#34;, f&#34;/webhooks/{webhook_id}&#34;)
+    return Webhook(self, result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.get_channel"><code class="name flex">
 <span>def <span class="ident">get_channel</span></span>(<span>self, channel_id: int)</span>
 </code></dt>
@@ -1628,6 +1679,7 @@ Channel()
 <li><code><a title="krema.models.client.Client.fetch_guild" href="#krema.models.client.Client.fetch_guild">fetch_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_invite" href="#krema.models.client.Client.fetch_invite">fetch_invite</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_user" href="#krema.models.client.Client.fetch_user">fetch_user</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_webhook" href="#krema.models.client.Client.fetch_webhook">fetch_webhook</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>
 <li><code><a title="krema.models.client.Client.get_channel" href="#krema.models.client.Client.get_channel">get_channel</a></code></li>
 <li><code><a title="krema.models.client.Client.get_guild" href="#krema.models.client.Client.get_guild">get_guild</a></code></li>

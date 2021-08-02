@@ -484,6 +484,18 @@ class Guild:
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;)
         return True
 
+    async def fetch_webhooks(self):
+        &#34;&#34;&#34;Fetch all Webhooks in the Guild.
+
+        Returns:
+            list: List of Webhook objects.
+        &#34;&#34;&#34;
+
+        from .webhook import Webhook
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/webhooks&#34;)
+        return [Webhook(self.client, i) for i in result]
+
 
 @dataclass
 class Emoji:
@@ -1152,7 +1164,19 @@ class Guild:
         &#34;&#34;&#34;
 
         await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;)
-        return True</code></pre>
+        return True
+
+    async def fetch_webhooks(self):
+        &#34;&#34;&#34;Fetch all Webhooks in the Guild.
+
+        Returns:
+            list: List of Webhook objects.
+        &#34;&#34;&#34;
+
+        from .webhook import Webhook
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/webhooks&#34;)
+        return [Webhook(self.client, i) for i in result]</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1773,6 +1797,33 @@ class Guild:
     return [Role(i) for i in result]</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.fetch_webhooks"><code class="name flex">
+<span>async def <span class="ident">fetch_webhooks</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch all Webhooks in the Guild.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Webhook objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_webhooks(self):
+    &#34;&#34;&#34;Fetch all Webhooks in the Guild.
+
+    Returns:
+        list: List of Webhook objects.
+    &#34;&#34;&#34;
+
+    from .webhook import Webhook
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/webhooks&#34;)
+    return [Webhook(self.client, i) for i in result]</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.kick_member"><code class="name flex">
 <span>async def <span class="ident">kick_member</span></span>(<span>self, member_id: int, reason: str = None)</span>
 </code></dt>
@@ -2144,6 +2195,7 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.fetch_member" href="#krema.models.guild.Guild.fetch_member">fetch_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member_list" href="#krema.models.guild.Guild.fetch_member_list">fetch_member_list</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_roles" href="#krema.models.guild.Guild.fetch_roles">fetch_roles</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_webhooks" href="#krema.models.guild.Guild.fetch_webhooks">fetch_webhooks</a></code></li>
 <li><code><a title="krema.models.guild.Guild.kick_member" href="#krema.models.guild.Guild.kick_member">kick_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.modify_channel_positions" href="#krema.models.guild.Guild.modify_channel_positions">modify_channel_positions</a></code></li>
 <li><code><a title="krema.models.guild.Guild.modify_role_positions" href="#krema.models.guild.Guild.modify_role_positions">modify_role_positions</a></code></li>

@@ -407,7 +407,7 @@ class Channel:
 
     async def create_invite(self, **kwargs):
         &#34;&#34;&#34;Create new invite in Channel.
-        
+
         Args:
             **kwargs: https://discord.com/developers/docs/resources/channel#create-channel-invite-json-params
 
@@ -419,6 +419,33 @@ class Channel:
 
         result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/invites&#34;, json=kwargs)
         return Invite(self.client, result)
+
+    async def create_webhook(self, **kwargs):
+        &#34;&#34;&#34;Create a Webhook.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/webhook#create-webhook-json-params
+
+        Returns:
+            Webhook: Created Webhook object.
+        &#34;&#34;&#34;
+
+        from .webhook import Webhook
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/webhooks&#34;, json=kwargs)
+        return Webhook(self.client, result)
+
+    async def fetch_webhooks(self):
+        &#34;&#34;&#34;Fetch all Webhooks in the Channel.
+
+        Returns:
+            list: List of Webhook objects.
+        &#34;&#34;&#34;
+
+        from .webhook import Webhook
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/webhooks&#34;)
+        return [Webhook(self.client, i) for i in result]
 
     # async def edit_position(self, position: int, lock_permissions: bool = None, parent_id: int = None):
     #     &#34;&#34;&#34;Edit Channel Position.
@@ -892,7 +919,7 @@ class Channel:
 
     async def create_invite(self, **kwargs):
         &#34;&#34;&#34;Create new invite in Channel.
-        
+
         Args:
             **kwargs: https://discord.com/developers/docs/resources/channel#create-channel-invite-json-params
 
@@ -904,6 +931,33 @@ class Channel:
 
         result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/invites&#34;, json=kwargs)
         return Invite(self.client, result)
+
+    async def create_webhook(self, **kwargs):
+        &#34;&#34;&#34;Create a Webhook.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/webhook#create-webhook-json-params
+
+        Returns:
+            Webhook: Created Webhook object.
+        &#34;&#34;&#34;
+
+        from .webhook import Webhook
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/webhooks&#34;, json=kwargs)
+        return Webhook(self.client, result)
+
+    async def fetch_webhooks(self):
+        &#34;&#34;&#34;Fetch all Webhooks in the Channel.
+
+        Returns:
+            list: List of Webhook objects.
+        &#34;&#34;&#34;
+
+        from .webhook import Webhook
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/webhooks&#34;)
+        return [Webhook(self.client, i) for i in result]
 
     # async def edit_position(self, position: int, lock_permissions: bool = None, parent_id: int = None):
     #     &#34;&#34;&#34;Edit Channel Position.
@@ -987,7 +1041,7 @@ class Channel:
 </summary>
 <pre><code class="python">async def create_invite(self, **kwargs):
     &#34;&#34;&#34;Create new invite in Channel.
-    
+
     Args:
         **kwargs: https://discord.com/developers/docs/resources/channel#create-channel-invite-json-params
 
@@ -999,6 +1053,41 @@ class Channel:
 
     result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/invites&#34;, json=kwargs)
     return Invite(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.create_webhook"><code class="name flex">
+<span>async def <span class="ident">create_webhook</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a Webhook.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/webhook#create-webhook-json-params">https://discord.com/developers/docs/resources/webhook#create-webhook-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Webhook</code></dt>
+<dd>Created Webhook object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def create_webhook(self, **kwargs):
+    &#34;&#34;&#34;Create a Webhook.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/webhook#create-webhook-json-params
+
+    Returns:
+        Webhook: Created Webhook object.
+    &#34;&#34;&#34;
+
+    from .webhook import Webhook
+
+    result = await self.client.http.request(&#34;POST&#34;, f&#34;/channels/{self.id}/webhooks&#34;, json=kwargs)
+    return Webhook(self.client, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.channel.Channel.delete"><code class="name flex">
@@ -1186,6 +1275,33 @@ class Channel:
 
     result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/pins&#34;)
     return [Message(self.client, i) for i in result]</code></pre>
+</details>
+</dd>
+<dt id="krema.models.channel.Channel.fetch_webhooks"><code class="name flex">
+<span>async def <span class="ident">fetch_webhooks</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch all Webhooks in the Channel.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Webhook objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_webhooks(self):
+    &#34;&#34;&#34;Fetch all Webhooks in the Channel.
+
+    Returns:
+        list: List of Webhook objects.
+    &#34;&#34;&#34;
+
+    from .webhook import Webhook
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/channels/{self.id}/webhooks&#34;)
+    return [Webhook(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
 <dt id="krema.models.channel.Channel.list_joined_private_archived_threads"><code class="name flex">
@@ -1612,12 +1728,14 @@ class Channel:
 <ul class="">
 <li><code><a title="krema.models.channel.Channel.add_to_thread" href="#krema.models.channel.Channel.add_to_thread">add_to_thread</a></code></li>
 <li><code><a title="krema.models.channel.Channel.create_invite" href="#krema.models.channel.Channel.create_invite">create_invite</a></code></li>
+<li><code><a title="krema.models.channel.Channel.create_webhook" href="#krema.models.channel.Channel.create_webhook">create_webhook</a></code></li>
 <li><code><a title="krema.models.channel.Channel.delete" href="#krema.models.channel.Channel.delete">delete</a></code></li>
 <li><code><a title="krema.models.channel.Channel.edit" href="#krema.models.channel.Channel.edit">edit</a></code></li>
 <li><code><a title="krema.models.channel.Channel.fetch_invites" href="#krema.models.channel.Channel.fetch_invites">fetch_invites</a></code></li>
 <li><code><a title="krema.models.channel.Channel.fetch_message" href="#krema.models.channel.Channel.fetch_message">fetch_message</a></code></li>
 <li><code><a title="krema.models.channel.Channel.fetch_messages" href="#krema.models.channel.Channel.fetch_messages">fetch_messages</a></code></li>
 <li><code><a title="krema.models.channel.Channel.fetch_pinned_messages" href="#krema.models.channel.Channel.fetch_pinned_messages">fetch_pinned_messages</a></code></li>
+<li><code><a title="krema.models.channel.Channel.fetch_webhooks" href="#krema.models.channel.Channel.fetch_webhooks">fetch_webhooks</a></code></li>
 <li><code><a title="krema.models.channel.Channel.list_joined_private_archived_threads" href="#krema.models.channel.Channel.list_joined_private_archived_threads">list_joined_private_archived_threads</a></code></li>
 <li><code><a title="krema.models.channel.Channel.list_private_archived_threads" href="#krema.models.channel.Channel.list_private_archived_threads">list_private_archived_threads</a></code></li>
 <li><code><a title="krema.models.channel.Channel.list_public_archived_threads" href="#krema.models.channel.Channel.list_public_archived_threads">list_public_archived_threads</a></code></li>
