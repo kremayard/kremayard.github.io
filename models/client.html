@@ -381,6 +381,7 @@ class Client:
         from .user import User
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+
         return User(self, result)
 
     async def create_guild(self, **kwargs):
@@ -430,6 +431,23 @@ class Client:
         result = await self.http.request(&#34;PATCH&#34;, &#34;/users/@me&#34;, json={
             &#34;username&#34;: username,
             &#34;avatar&#34;: image_to_data_uri(path)
+        })
+        return User(self, result)
+
+    async def edit_banner_color(self, color: int):
+        &#34;&#34;&#34;Change banned color.
+
+        Args:
+            color (int): New Banner Color.
+
+        Returns:
+            User: Updated user.
+        &#34;&#34;&#34;
+
+        from .user import User
+
+        result = await self.http.request(&#34;PATCH&#34;, &#34;/users/@me&#34;, json={
+            &#34;accent_color&#34;: color
         })
         return User(self, result)
 
@@ -886,6 +904,7 @@ class Client:
         from .user import User
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+
         return User(self, result)
 
     async def create_guild(self, **kwargs):
@@ -935,6 +954,23 @@ class Client:
         result = await self.http.request(&#34;PATCH&#34;, &#34;/users/@me&#34;, json={
             &#34;username&#34;: username,
             &#34;avatar&#34;: image_to_data_uri(path)
+        })
+        return User(self, result)
+
+    async def edit_banner_color(self, color: int):
+        &#34;&#34;&#34;Change banned color.
+
+        Args:
+            color (int): New Banner Color.
+
+        Returns:
+            User: Updated user.
+        &#34;&#34;&#34;
+
+        from .user import User
+
+        result = await self.http.request(&#34;PATCH&#34;, &#34;/users/@me&#34;, json={
+            &#34;accent_color&#34;: color
         })
         return User(self, result)
 
@@ -1165,6 +1201,43 @@ def formatted_token(self) -&gt; str:
     return User(self, result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.client.Client.edit_banner_color"><code class="name flex">
+<span>async def <span class="ident">edit_banner_color</span></span>(<span>self, color: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Change banned color.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>color</code></strong> :&ensp;<code>int</code></dt>
+<dd>New Banner Color.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>User</code></dt>
+<dd>Updated user.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit_banner_color(self, color: int):
+    &#34;&#34;&#34;Change banned color.
+
+    Args:
+        color (int): New Banner Color.
+
+    Returns:
+        User: Updated user.
+    &#34;&#34;&#34;
+
+    from .user import User
+
+    result = await self.http.request(&#34;PATCH&#34;, &#34;/users/@me&#34;, json={
+        &#34;accent_color&#34;: color
+    })
+    return User(self, result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.edit_nickname"><code class="name flex">
 <span>async def <span class="ident">edit_nickname</span></span>(<span>self, guild_id: int, nick: str)</span>
 </code></dt>
@@ -1380,6 +1453,7 @@ def formatted_token(self) -&gt; str:
     from .user import User
 
     result = await self.http.request(&#34;GET&#34;, f&#34;/users/{id if id is not None else &#39;@me&#39;}&#34;)
+
     return User(self, result)</code></pre>
 </details>
 </dd>
@@ -1673,6 +1747,7 @@ Channel()
 <li><code><a title="krema.models.client.Client.create_guild" href="#krema.models.client.Client.create_guild">create_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.delete_invite" href="#krema.models.client.Client.delete_invite">delete_invite</a></code></li>
 <li><code><a title="krema.models.client.Client.edit" href="#krema.models.client.Client.edit">edit</a></code></li>
+<li><code><a title="krema.models.client.Client.edit_banner_color" href="#krema.models.client.Client.edit_banner_color">edit_banner_color</a></code></li>
 <li><code><a title="krema.models.client.Client.edit_nickname" href="#krema.models.client.Client.edit_nickname">edit_nickname</a></code></li>
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>

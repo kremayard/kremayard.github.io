@@ -68,6 +68,9 @@ class User:
         self.username: str = data.get(&#34;username&#34;)
         self.discriminator: str = data.get(&#34;discriminator&#34;)
         self.avatar: Union[str, None] = data.get(&#34;avatar&#34;)
+        self.banner: Union[str, None] = data.get(&#34;banner&#34;)
+        self.banner_color: Union[str, None] = data.get(&#34;banner_color&#34;)
+        self.accent_color: Union[int, None] = data.get(&#34;accent_color&#34;)
         self.bot: bool = data.get(&#34;bot&#34;, False)
         self.system: Union[bool, None] = data.get(&#34;system&#34;)
         self.mfa_enabled: Union[bool, None] = data.get(&#34;mfa_enabled&#34;)
@@ -104,7 +107,8 @@ class Member:
         from ..utils import convert_iso
         self.client = client
 
-        self.user: Union[User, None] = User(self.client, data.get(&#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
+        self.user: Union[User, None] = User(self.client, data.get(
+            &#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
         self.nick: Union[str, None] = data.get(&#34;nick&#34;)
         self.roles: list = data.get(&#34;roles&#34;)
         self.pending: Union[bool, None] = data.get(&#34;pending&#34;)
@@ -217,7 +221,8 @@ class Member:
         from ..utils import convert_iso
         self.client = client
 
-        self.user: Union[User, None] = User(self.client, data.get(&#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
+        self.user: Union[User, None] = User(self.client, data.get(
+            &#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
         self.nick: Union[str, None] = data.get(&#34;nick&#34;)
         self.roles: list = data.get(&#34;roles&#34;)
         self.pending: Union[bool, None] = data.get(&#34;pending&#34;)
@@ -362,6 +367,9 @@ class User:
         self.username: str = data.get(&#34;username&#34;)
         self.discriminator: str = data.get(&#34;discriminator&#34;)
         self.avatar: Union[str, None] = data.get(&#34;avatar&#34;)
+        self.banner: Union[str, None] = data.get(&#34;banner&#34;)
+        self.banner_color: Union[str, None] = data.get(&#34;banner_color&#34;)
+        self.accent_color: Union[int, None] = data.get(&#34;accent_color&#34;)
         self.bot: bool = data.get(&#34;bot&#34;, False)
         self.system: Union[bool, None] = data.get(&#34;system&#34;)
         self.mfa_enabled: Union[bool, None] = data.get(&#34;mfa_enabled&#34;)
