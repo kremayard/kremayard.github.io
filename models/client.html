@@ -508,7 +508,22 @@ class Client:
         from .webhook import Webhook
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/webhooks/{webhook_id}&#34;)
-        return Webhook(self, result)</code></pre>
+        return Webhook(self, result)
+
+    async def fetch_sticker(self, sticker_id: int):
+        &#34;&#34;&#34;Fetch Sticker by ID.
+
+        Args:
+            sticker_id (int): Sticker ID.
+
+        Returns:
+            Sticker: Found Sticker object.
+        &#34;&#34;&#34;
+
+        from .sticker import Sticker
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/stickers/{sticker_id}&#34;)
+        return Sticker(self, result)</code></pre>
 </details>
 </section>
 <section>
@@ -1031,7 +1046,22 @@ class Client:
         from .webhook import Webhook
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/webhooks/{webhook_id}&#34;)
-        return Webhook(self, result)</code></pre>
+        return Webhook(self, result)
+
+    async def fetch_sticker(self, sticker_id: int):
+        &#34;&#34;&#34;Fetch Sticker by ID.
+
+        Args:
+            sticker_id (int): Sticker ID.
+
+        Returns:
+            Sticker: Found Sticker object.
+        &#34;&#34;&#34;
+
+        from .sticker import Sticker
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/stickers/{sticker_id}&#34;)
+        return Sticker(self, result)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -1421,6 +1451,41 @@ def formatted_token(self) -&gt; str:
     return Invite(self, result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.client.Client.fetch_sticker"><code class="name flex">
+<span>async def <span class="ident">fetch_sticker</span></span>(<span>self, sticker_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch Sticker by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>sticker_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Sticker ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Sticker</code></dt>
+<dd>Found Sticker object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_sticker(self, sticker_id: int):
+    &#34;&#34;&#34;Fetch Sticker by ID.
+
+    Args:
+        sticker_id (int): Sticker ID.
+
+    Returns:
+        Sticker: Found Sticker object.
+    &#34;&#34;&#34;
+
+    from .sticker import Sticker
+
+    result = await self.http.request(&#34;GET&#34;, f&#34;/stickers/{sticker_id}&#34;)
+    return Sticker(self, result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.client.Client.fetch_user"><code class="name flex">
 <span>async def <span class="ident">fetch_user</span></span>(<span>self, id: int = None)</span>
 </code></dt>
@@ -1753,6 +1818,7 @@ Channel()
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_guild" href="#krema.models.client.Client.fetch_guild">fetch_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_invite" href="#krema.models.client.Client.fetch_invite">fetch_invite</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_sticker" href="#krema.models.client.Client.fetch_sticker">fetch_sticker</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_user" href="#krema.models.client.Client.fetch_user">fetch_user</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_webhook" href="#krema.models.client.Client.fetch_webhook">fetch_webhook</a></code></li>
 <li><code><a title="krema.models.client.Client.formatted_token" href="#krema.models.client.Client.formatted_token">formatted_token</a></code></li>

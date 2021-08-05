@@ -35,6 +35,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Union
 
+from aiohttp.formdata import FormData
+
 from ..utils import convert_iso, dict_to_query
 
 
@@ -495,6 +497,66 @@ class Guild:
 
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/webhooks&#34;)
         return [Webhook(self.client, i) for i in result]
+
+    async def list_stickers(self):
+        &#34;&#34;&#34;List all of the stickers from Guild.
+
+        Returns:
+            list: List of Sticker objects.
+        &#34;&#34;&#34;
+
+        from .sticker import Sticker
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/stickers&#34;)
+        return [Sticker(self.client, i) for i in result]
+
+    async def fetch_sticker(self, sticker_id: int):
+        &#34;&#34;&#34;Fetch Guild Sticker by ID.
+
+        Returns:
+            Sticker: Found sticker object.
+        &#34;&#34;&#34;
+
+        from .sticker import Sticker
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/stickers/{sticker_id}&#34;)
+        return Sticker(self.client, result)
+
+    async def create_sticker(self, name: str, description: str, tags: str, image: str):
+        &#34;&#34;&#34;Create a Sticker.
+
+        Args:
+            name (str): Sticker name.
+            description (str): Sticker description.
+            tags (str): The Discord name of a unicode emoji representing the sticker&#39;s expression (2-200 characters)
+            image (str): Image path to upload. (max 500kb.)
+
+        Returns:
+            Sticker: Created sticker object.
+        &#34;&#34;&#34;
+
+        from .sticker import Sticker
+
+        data = FormData()
+
+        image_name = image.split(&#39;/&#39;)
+
+        if len(image_name) == 1:
+            image_name = image.split(&#34;\\&#34;)[-1]
+        else:
+            image_name = image_name[-1]
+
+        with open(image, &#34;rb&#34;) as f:
+            image_data = f.read()
+
+        data.add_field(name=&#34;name&#34;, value=name)
+        data.add_field(name=&#34;description&#34;, value=description)
+        data.add_field(name=&#34;tags&#34;, value=tags)
+        data.add_field(name=&#34;file&#34;, value=image_data, filename=image_name,
+                       content_type=f&#34;image/{image.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)}&#34;)
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/stickers&#34;, data=data)
+        return Sticker(self.client, result)
 
 
 @dataclass
@@ -1176,7 +1238,67 @@ class Guild:
         from .webhook import Webhook
 
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/webhooks&#34;)
-        return [Webhook(self.client, i) for i in result]</code></pre>
+        return [Webhook(self.client, i) for i in result]
+
+    async def list_stickers(self):
+        &#34;&#34;&#34;List all of the stickers from Guild.
+
+        Returns:
+            list: List of Sticker objects.
+        &#34;&#34;&#34;
+
+        from .sticker import Sticker
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/stickers&#34;)
+        return [Sticker(self.client, i) for i in result]
+
+    async def fetch_sticker(self, sticker_id: int):
+        &#34;&#34;&#34;Fetch Guild Sticker by ID.
+
+        Returns:
+            Sticker: Found sticker object.
+        &#34;&#34;&#34;
+
+        from .sticker import Sticker
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/stickers/{sticker_id}&#34;)
+        return Sticker(self.client, result)
+
+    async def create_sticker(self, name: str, description: str, tags: str, image: str):
+        &#34;&#34;&#34;Create a Sticker.
+
+        Args:
+            name (str): Sticker name.
+            description (str): Sticker description.
+            tags (str): The Discord name of a unicode emoji representing the sticker&#39;s expression (2-200 characters)
+            image (str): Image path to upload. (max 500kb.)
+
+        Returns:
+            Sticker: Created sticker object.
+        &#34;&#34;&#34;
+
+        from .sticker import Sticker
+
+        data = FormData()
+
+        image_name = image.split(&#39;/&#39;)
+
+        if len(image_name) == 1:
+            image_name = image.split(&#34;\\&#34;)[-1]
+        else:
+            image_name = image_name[-1]
+
+        with open(image, &#34;rb&#34;) as f:
+            image_data = f.read()
+
+        data.add_field(name=&#34;name&#34;, value=name)
+        data.add_field(name=&#34;description&#34;, value=description)
+        data.add_field(name=&#34;tags&#34;, value=tags)
+        data.add_field(name=&#34;file&#34;, value=image_data, filename=image_name,
+                       content_type=f&#34;image/{image.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)}&#34;)
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/stickers&#34;, data=data)
+        return Sticker(self.client, result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1359,6 +1481,68 @@ class Guild:
 
     result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/roles&#34;, json=kwargs)
     return Role(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.create_sticker"><code class="name flex">
+<span>async def <span class="ident">create_sticker</span></span>(<span>self, name: str, description: str, tags: str, image: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a Sticker.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Sticker name.</dd>
+<dt><strong><code>description</code></strong> :&ensp;<code>str</code></dt>
+<dd>Sticker description.</dd>
+<dt><strong><code>tags</code></strong> :&ensp;<code>str</code></dt>
+<dd>The Discord name of a unicode emoji representing the sticker's expression (2-200 characters)</dd>
+<dt><strong><code>image</code></strong> :&ensp;<code>str</code></dt>
+<dd>Image path to upload. (max 500kb.)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Sticker</code></dt>
+<dd>Created sticker object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def create_sticker(self, name: str, description: str, tags: str, image: str):
+    &#34;&#34;&#34;Create a Sticker.
+
+    Args:
+        name (str): Sticker name.
+        description (str): Sticker description.
+        tags (str): The Discord name of a unicode emoji representing the sticker&#39;s expression (2-200 characters)
+        image (str): Image path to upload. (max 500kb.)
+
+    Returns:
+        Sticker: Created sticker object.
+    &#34;&#34;&#34;
+
+    from .sticker import Sticker
+
+    data = FormData()
+
+    image_name = image.split(&#39;/&#39;)
+
+    if len(image_name) == 1:
+        image_name = image.split(&#34;\\&#34;)[-1]
+    else:
+        image_name = image_name[-1]
+
+    with open(image, &#34;rb&#34;) as f:
+        image_data = f.read()
+
+    data.add_field(name=&#34;name&#34;, value=name)
+    data.add_field(name=&#34;description&#34;, value=description)
+    data.add_field(name=&#34;tags&#34;, value=tags)
+    data.add_field(name=&#34;file&#34;, value=image_data, filename=image_name,
+                   content_type=f&#34;image/{image.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)}&#34;)
+
+    result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/stickers&#34;, data=data)
+    return Sticker(self.client, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.delete"><code class="name flex">
@@ -1797,6 +1981,33 @@ class Guild:
     return [Role(i) for i in result]</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.fetch_sticker"><code class="name flex">
+<span>async def <span class="ident">fetch_sticker</span></span>(<span>self, sticker_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch Guild Sticker by ID.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Sticker</code></dt>
+<dd>Found sticker object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_sticker(self, sticker_id: int):
+    &#34;&#34;&#34;Fetch Guild Sticker by ID.
+
+    Returns:
+        Sticker: Found sticker object.
+    &#34;&#34;&#34;
+
+    from .sticker import Sticker
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/stickers/{sticker_id}&#34;)
+    return Sticker(self.client, result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.fetch_webhooks"><code class="name flex">
 <span>async def <span class="ident">fetch_webhooks</span></span>(<span>self)</span>
 </code></dt>
@@ -1863,6 +2074,33 @@ class Guild:
 
     await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/members/{member_id}&#34;, **extra)
     return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.list_stickers"><code class="name flex">
+<span>async def <span class="ident">list_stickers</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List all of the stickers from Guild.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Sticker objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def list_stickers(self):
+    &#34;&#34;&#34;List all of the stickers from Guild.
+
+    Returns:
+        list: List of Sticker objects.
+    &#34;&#34;&#34;
+
+    from .sticker import Sticker
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/stickers&#34;)
+    return [Sticker(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.modify_channel_positions"><code class="name flex">
@@ -2181,6 +2419,7 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.create_channel" href="#krema.models.guild.Guild.create_channel">create_channel</a></code></li>
 <li><code><a title="krema.models.guild.Guild.create_emoji" href="#krema.models.guild.Guild.create_emoji">create_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.create_role" href="#krema.models.guild.Guild.create_role">create_role</a></code></li>
+<li><code><a title="krema.models.guild.Guild.create_sticker" href="#krema.models.guild.Guild.create_sticker">create_sticker</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete" href="#krema.models.guild.Guild.delete">delete</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete_emoji" href="#krema.models.guild.Guild.delete_emoji">delete_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete_role" href="#krema.models.guild.Guild.delete_role">delete_role</a></code></li>
@@ -2195,8 +2434,10 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.fetch_member" href="#krema.models.guild.Guild.fetch_member">fetch_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member_list" href="#krema.models.guild.Guild.fetch_member_list">fetch_member_list</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_roles" href="#krema.models.guild.Guild.fetch_roles">fetch_roles</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_sticker" href="#krema.models.guild.Guild.fetch_sticker">fetch_sticker</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_webhooks" href="#krema.models.guild.Guild.fetch_webhooks">fetch_webhooks</a></code></li>
 <li><code><a title="krema.models.guild.Guild.kick_member" href="#krema.models.guild.Guild.kick_member">kick_member</a></code></li>
+<li><code><a title="krema.models.guild.Guild.list_stickers" href="#krema.models.guild.Guild.list_stickers">list_stickers</a></code></li>
 <li><code><a title="krema.models.guild.Guild.modify_channel_positions" href="#krema.models.guild.Guild.modify_channel_positions">modify_channel_positions</a></code></li>
 <li><code><a title="krema.models.guild.Guild.modify_role_positions" href="#krema.models.guild.Guild.modify_role_positions">modify_role_positions</a></code></li>
 <li><code><a title="krema.models.guild.Guild.remove_member_role" href="#krema.models.guild.Guild.remove_member_role">remove_member_role</a></code></li>

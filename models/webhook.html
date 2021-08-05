@@ -133,6 +133,62 @@ class Webhook:
             params[&#34;json&#34;] = kwargs
 
         await self.client.http.request(&#34;POST&#34;, f&#34;/webhooks/{self.id}/{self.token}{dict_to_query(query)}&#34;, **params)
+        return True
+
+    async def fetch_message(self, message_id: int):
+        &#34;&#34;&#34;Fetch Webhook Message by ID.
+
+        Args:
+            message_id (int): Webhook Message ID.
+
+        Returns:
+            Message: Found Message object.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;)
+        return Message(self.client, result)
+
+    async def edit_message(self, message_id: int, file: dict = None, **kwargs):
+        &#34;&#34;&#34;Edit Webhook Message by ID.
+
+        Args:
+            message_id (int): Webhook Message ID.
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
+            **kwargs: https://discord.com/developers/docs/resources/webhook#edit-webhook-message-jsonform-params
+
+        Returns:
+            Message: Updated Message object.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                kwargs), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = kwargs
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;, **params)
+        return Message(self.client, result)
+
+    async def delete_message(self, message_id: int):
+        &#34;&#34;&#34;Delete Webhook Message by ID.
+
+        Args:
+            message_id (int): Webhook Message ID.
+
+        Returns:
+            True: Message deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;)
         return True</code></pre>
 </details>
 </section>
@@ -284,6 +340,62 @@ class Webhook:
             params[&#34;json&#34;] = kwargs
 
         await self.client.http.request(&#34;POST&#34;, f&#34;/webhooks/{self.id}/{self.token}{dict_to_query(query)}&#34;, **params)
+        return True
+
+    async def fetch_message(self, message_id: int):
+        &#34;&#34;&#34;Fetch Webhook Message by ID.
+
+        Args:
+            message_id (int): Webhook Message ID.
+
+        Returns:
+            Message: Found Message object.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;)
+        return Message(self.client, result)
+
+    async def edit_message(self, message_id: int, file: dict = None, **kwargs):
+        &#34;&#34;&#34;Edit Webhook Message by ID.
+
+        Args:
+            message_id (int): Webhook Message ID.
+            file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
+            **kwargs: https://discord.com/developers/docs/resources/webhook#edit-webhook-message-jsonform-params
+
+        Returns:
+            Message: Updated Message object.
+        &#34;&#34;&#34;
+
+        from .message import Message
+
+        params, payload = {}, FormData()
+
+        if file is not None:
+            payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+                kwargs), content_type=&#34;application/json&#34;)
+            payload.add_field(**file)
+
+            params[&#34;data&#34;] = payload
+        else:
+            params[&#34;json&#34;] = kwargs
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;, **params)
+        return Message(self.client, result)
+
+    async def delete_message(self, message_id: int):
+        &#34;&#34;&#34;Delete Webhook Message by ID.
+
+        Args:
+            message_id (int): Webhook Message ID.
+
+        Returns:
+            True: Message deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;)
         return True</code></pre>
 </details>
 <h3>Methods</h3>
@@ -310,6 +422,39 @@ class Webhook:
     &#34;&#34;&#34;
 
     await self.client.http.request(&#34;DELETE&#34;, f&#34;/webhooks/{self.id}&#34;)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.webhook.Webhook.delete_message"><code class="name flex">
+<span>async def <span class="ident">delete_message</span></span>(<span>self, message_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete Webhook Message by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>message_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Webhook Message ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Message deleted successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete_message(self, message_id: int):
+    &#34;&#34;&#34;Delete Webhook Message by ID.
+
+    Args:
+        message_id (int): Webhook Message ID.
+
+    Returns:
+        True: Message deleted successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;DELETE&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;)
     return True</code></pre>
 </details>
 </dd>
@@ -344,6 +489,58 @@ class Webhook:
 
     result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/webhooks/{self.id}&#34;, json=kwargs)
     return Webhook(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.webhook.Webhook.edit_message"><code class="name flex">
+<span>async def <span class="ident">edit_message</span></span>(<span>self, message_id: int, file: dict = None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit Webhook Message by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>message_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Webhook Message ID.</dd>
+<dt><strong><code>file</code></strong> :&ensp;<code>dict</code></dt>
+<dd>For send a message / embed attachment with file, use <code><a title="krema.utils.file_builder" href="../utils.html#krema.utils.file_builder">file_builder()</a></code> for make it easier.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/webhook#edit-webhook-message-jsonform-params">https://discord.com/developers/docs/resources/webhook#edit-webhook-message-jsonform-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Message</code></dt>
+<dd>Updated Message object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit_message(self, message_id: int, file: dict = None, **kwargs):
+    &#34;&#34;&#34;Edit Webhook Message by ID.
+
+    Args:
+        message_id (int): Webhook Message ID.
+        file (dict): For send a message / embed attachment with file, use `krema.utils.file_builder` for make it easier.
+        **kwargs: https://discord.com/developers/docs/resources/webhook#edit-webhook-message-jsonform-params
+
+    Returns:
+        Message: Updated Message object.
+    &#34;&#34;&#34;
+
+    from .message import Message
+
+    params, payload = {}, FormData()
+
+    if file is not None:
+        payload.add_field(name=&#39;payload_json&#39;, value=dumps(
+            kwargs), content_type=&#34;application/json&#34;)
+        payload.add_field(**file)
+
+        params[&#34;data&#34;] = payload
+    else:
+        params[&#34;json&#34;] = kwargs
+
+    result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;, **params)
+    return Message(self.client, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.webhook.Webhook.execute"><code class="name flex">
@@ -395,6 +592,41 @@ class Webhook:
     return True</code></pre>
 </details>
 </dd>
+<dt id="krema.models.webhook.Webhook.fetch_message"><code class="name flex">
+<span>async def <span class="ident">fetch_message</span></span>(<span>self, message_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch Webhook Message by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>message_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Webhook Message ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Message</code></dt>
+<dd>Found Message object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_message(self, message_id: int):
+    &#34;&#34;&#34;Fetch Webhook Message by ID.
+
+    Args:
+        message_id (int): Webhook Message ID.
+
+    Returns:
+        Message: Found Message object.
+    &#34;&#34;&#34;
+
+    from .message import Message
+
+    result = await self.client.http.request(&#34;POST&#34;, f&#34;/webhooks/{self.id}/{self.token}/messages/{message_id}&#34;)
+    return Message(self.client, result)</code></pre>
+</details>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -415,10 +647,13 @@ class Webhook:
 <ul>
 <li>
 <h4><code><a title="krema.models.webhook.Webhook" href="#krema.models.webhook.Webhook">Webhook</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="krema.models.webhook.Webhook.delete" href="#krema.models.webhook.Webhook.delete">delete</a></code></li>
+<li><code><a title="krema.models.webhook.Webhook.delete_message" href="#krema.models.webhook.Webhook.delete_message">delete_message</a></code></li>
 <li><code><a title="krema.models.webhook.Webhook.edit" href="#krema.models.webhook.Webhook.edit">edit</a></code></li>
+<li><code><a title="krema.models.webhook.Webhook.edit_message" href="#krema.models.webhook.Webhook.edit_message">edit_message</a></code></li>
 <li><code><a title="krema.models.webhook.Webhook.execute" href="#krema.models.webhook.Webhook.execute">execute</a></code></li>
+<li><code><a title="krema.models.webhook.Webhook.fetch_message" href="#krema.models.webhook.Webhook.fetch_message">fetch_message</a></code></li>
 </ul>
 </li>
 </ul>
