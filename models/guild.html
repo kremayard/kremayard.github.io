@@ -558,6 +558,21 @@ class Guild:
         result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/stickers&#34;, data=data)
         return Sticker(self.client, result)
 
+    async def fetch_application_command(self, command_id: int):
+        &#34;&#34;&#34;Fetch guild application command.
+
+        Args:
+            command_id (int): Command ID.
+
+        Returns:
+            ApplicationCommand: Found Command object.
+        &#34;&#34;&#34;
+
+        from .client import ApplicationCommand
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/applications/{self.client.user.id}/guilds/{self.id}/commands/{command_id}&#34;)
+        return ApplicationCommand(self.client, result)
+
 
 @dataclass
 class Emoji:
@@ -1298,7 +1313,22 @@ class Guild:
                        content_type=f&#34;image/{image.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)}&#34;)
 
         result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/stickers&#34;, data=data)
-        return Sticker(self.client, result)</code></pre>
+        return Sticker(self.client, result)
+
+    async def fetch_application_command(self, command_id: int):
+        &#34;&#34;&#34;Fetch guild application command.
+
+        Args:
+            command_id (int): Command ID.
+
+        Returns:
+            ApplicationCommand: Found Command object.
+        &#34;&#34;&#34;
+
+        from .client import ApplicationCommand
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/applications/{self.client.user.id}/guilds/{self.id}/commands/{command_id}&#34;)
+        return ApplicationCommand(self.client, result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1741,6 +1771,41 @@ class Guild:
 
     result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/roles/{role_id}&#34;, json=kwargs)
     return Role(result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_application_command"><code class="name flex">
+<span>async def <span class="ident">fetch_application_command</span></span>(<span>self, command_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch guild application command.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>command_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Command ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ApplicationCommand</code></dt>
+<dd>Found Command object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_application_command(self, command_id: int):
+    &#34;&#34;&#34;Fetch guild application command.
+
+    Args:
+        command_id (int): Command ID.
+
+    Returns:
+        ApplicationCommand: Found Command object.
+    &#34;&#34;&#34;
+
+    from .client import ApplicationCommand
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/applications/{self.client.user.id}/guilds/{self.id}/commands/{command_id}&#34;)
+    return ApplicationCommand(self.client, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.fetch_ban"><code class="name flex">
@@ -2426,6 +2491,7 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.edit" href="#krema.models.guild.Guild.edit">edit</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit_member" href="#krema.models.guild.Guild.edit_member">edit_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit_role" href="#krema.models.guild.Guild.edit_role">edit_role</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_application_command" href="#krema.models.guild.Guild.fetch_application_command">fetch_application_command</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_ban" href="#krema.models.guild.Guild.fetch_ban">fetch_ban</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_bans" href="#krema.models.guild.Guild.fetch_bans">fetch_bans</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_channels" href="#krema.models.guild.Guild.fetch_channels">fetch_channels</a></code></li>

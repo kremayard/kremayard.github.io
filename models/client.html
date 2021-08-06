@@ -539,6 +539,29 @@ class Client:
     #     result = await self.http.request(&#34;POST&#34;, f&#34;/applications/{self.user.id}/commands&#34;, json=kwargs)
     #     return True
 
+    async def fetch_application_commands(self):
+        &#34;&#34;&#34;Fetch global application commands.
+
+        Returns:
+            list: List of ApplicationCommand objects.
+        &#34;&#34;&#34;
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/applications/{self.user.id}/commands&#34;)
+        return [ApplicationCommand(self, i) for i in result]
+
+    async def fetch_application_command(self, command_id: int):
+        &#34;&#34;&#34;Fetch global application command by ID.
+
+        Args:
+            command_id (int): Command ID.
+
+        Returns:
+            ApplicationCommand: Found Command object.
+        &#34;&#34;&#34;
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/applications/{self.user.id}/commands/{command_id}&#34;)
+        return ApplicationCommand(self, result)
+
 
 @dataclass
 class Interaction:
@@ -591,7 +614,62 @@ class Interaction:
             &#34;type&#34;: type,
             &#34;data&#34;: kwargs
         })
-        return</code></pre>
+        return
+
+
+@dataclass
+class ApplicationCommand:
+    &#34;&#34;&#34;Application command class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        client (Client): Krema client.
+        id (int): Command ID.
+        application_id (int): Application ID.
+        name (str): Command name.
+        description (str): Command description.
+        options (list, None): Command option(s).
+        default_permission (bool, None): Whether the command is enabled by default when the app is added to a guild.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        self.client = client
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.application_id: int = int(data.get(&#34;application_id&#34;))
+        self.guild_id: Union[int, None] = int(
+            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
+        self.name: str = data.get(&#34;name&#34;)
+        self.description: str = data.get(&#34;description&#34;)
+        self.options: Union[list, None] = data.get(&#34;options&#34;)
+        self.default_permission: Union[bool,
+                                       None] = data.get(&#34;default_permission&#34;)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete application command.
+
+        Returns:
+            True: Command deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/applications/{self.application_id}/{f&#39;guilds/{self.guild_id}/&#39; if self.guild_id is not None else &#39;&#39;}commands/{self.id}&#34;)
+        return True
+
+    async def edit(self, **kwargs):
+        &#34;&#34;&#34;Edit application command.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command-json-params
+
+        Returns:
+            ApplicationCommand: Updated command application object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/applications/{self.application_id}/{f&#39;guilds/{self.guild_id}/&#39; if self.guild_id is not None else &#39;&#39;}commands/{self.id}&#34;, json=kwargs)
+        return ApplicationCommand(self.client, result)</code></pre>
 </details>
 </section>
 <section>
@@ -603,6 +681,156 @@ class Interaction:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="krema.models.client.ApplicationCommand"><code class="flex name class">
+<span>class <span class="ident">ApplicationCommand</span></span>
+<span>(</span><span>client, data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Application command class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet from websocket.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Command ID.</dd>
+<dt><strong><code>application_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Application ID.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Command name.</dd>
+<dt><strong><code>description</code></strong> :&ensp;<code>str</code></dt>
+<dd>Command description.</dd>
+<dt><strong><code>options</code></strong> :&ensp;<code>list, None</code></dt>
+<dd>Command option(s).</dd>
+<dt><strong><code>default_permission</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>Whether the command is enabled by default when the app is added to a guild.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ApplicationCommand:
+    &#34;&#34;&#34;Application command class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        client (Client): Krema client.
+        id (int): Command ID.
+        application_id (int): Application ID.
+        name (str): Command name.
+        description (str): Command description.
+        options (list, None): Command option(s).
+        default_permission (bool, None): Whether the command is enabled by default when the app is added to a guild.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        self.client = client
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.application_id: int = int(data.get(&#34;application_id&#34;))
+        self.guild_id: Union[int, None] = int(
+            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
+        self.name: str = data.get(&#34;name&#34;)
+        self.description: str = data.get(&#34;description&#34;)
+        self.options: Union[list, None] = data.get(&#34;options&#34;)
+        self.default_permission: Union[bool,
+                                       None] = data.get(&#34;default_permission&#34;)
+
+    async def delete(self):
+        &#34;&#34;&#34;Delete application command.
+
+        Returns:
+            True: Command deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/applications/{self.application_id}/{f&#39;guilds/{self.guild_id}/&#39; if self.guild_id is not None else &#39;&#39;}commands/{self.id}&#34;)
+        return True
+
+    async def edit(self, **kwargs):
+        &#34;&#34;&#34;Edit application command.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command-json-params
+
+        Returns:
+            ApplicationCommand: Updated command application object.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/applications/{self.application_id}/{f&#39;guilds/{self.guild_id}/&#39; if self.guild_id is not None else &#39;&#39;}commands/{self.id}&#34;, json=kwargs)
+        return ApplicationCommand(self.client, result)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="krema.models.client.ApplicationCommand.delete"><code class="name flex">
+<span>async def <span class="ident">delete</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete application command.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Command deleted successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete(self):
+    &#34;&#34;&#34;Delete application command.
+
+    Returns:
+        True: Command deleted successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;DELETE&#34;, f&#34;/applications/{self.application_id}/{f&#39;guilds/{self.guild_id}/&#39; if self.guild_id is not None else &#39;&#39;}commands/{self.id}&#34;)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.ApplicationCommand.edit"><code class="name flex">
+<span>async def <span class="ident">edit</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Edit application command.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command-json-params">https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command-json-params</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.client.ApplicationCommand" href="#krema.models.client.ApplicationCommand">ApplicationCommand</a></code></dt>
+<dd>Updated command application object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def edit(self, **kwargs):
+    &#34;&#34;&#34;Edit application command.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command-json-params
+
+    Returns:
+        ApplicationCommand: Updated command application object.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/applications/{self.application_id}/{f&#39;guilds/{self.guild_id}/&#39; if self.guild_id is not None else &#39;&#39;}commands/{self.id}&#34;, json=kwargs)
+    return ApplicationCommand(self.client, result)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="krema.models.client.Client"><code class="flex name class">
 <span>class <span class="ident">Client</span></span>
 <span>(</span><span>intents: int = 0, message_limit: int = 200, channel_limit: int = None, guild_limit: int = None)</span>
@@ -1142,7 +1370,30 @@ class Interaction:
     #     &#34;&#34;&#34;
 
     #     result = await self.http.request(&#34;POST&#34;, f&#34;/applications/{self.user.id}/commands&#34;, json=kwargs)
-    #     return True</code></pre>
+    #     return True
+
+    async def fetch_application_commands(self):
+        &#34;&#34;&#34;Fetch global application commands.
+
+        Returns:
+            list: List of ApplicationCommand objects.
+        &#34;&#34;&#34;
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/applications/{self.user.id}/commands&#34;)
+        return [ApplicationCommand(self, i) for i in result]
+
+    async def fetch_application_command(self, command_id: int):
+        &#34;&#34;&#34;Fetch global application command by ID.
+
+        Args:
+            command_id (int): Command ID.
+
+        Returns:
+            ApplicationCommand: Found Command object.
+        &#34;&#34;&#34;
+
+        result = await self.http.request(&#34;GET&#34;, f&#34;/applications/{self.user.id}/commands/{command_id}&#34;)
+        return ApplicationCommand(self, result)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -1419,6 +1670,64 @@ def formatted_token(self) -&gt; str:
         return wrapper()
 
     return decorator</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.fetch_application_command"><code class="name flex">
+<span>async def <span class="ident">fetch_application_command</span></span>(<span>self, command_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch global application command by ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>command_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Command ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.client.ApplicationCommand" href="#krema.models.client.ApplicationCommand">ApplicationCommand</a></code></dt>
+<dd>Found Command object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_application_command(self, command_id: int):
+    &#34;&#34;&#34;Fetch global application command by ID.
+
+    Args:
+        command_id (int): Command ID.
+
+    Returns:
+        ApplicationCommand: Found Command object.
+    &#34;&#34;&#34;
+
+    result = await self.http.request(&#34;GET&#34;, f&#34;/applications/{self.user.id}/commands/{command_id}&#34;)
+    return ApplicationCommand(self, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.client.Client.fetch_application_commands"><code class="name flex">
+<span>async def <span class="ident">fetch_application_commands</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch global application commands.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of ApplicationCommand objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_application_commands(self):
+    &#34;&#34;&#34;Fetch global application commands.
+
+    Returns:
+        list: List of ApplicationCommand objects.
+    &#34;&#34;&#34;
+
+    result = await self.http.request(&#34;GET&#34;, f&#34;/applications/{self.user.id}/commands&#34;)
+    return [ApplicationCommand(self, i) for i in result]</code></pre>
 </details>
 </dd>
 <dt id="krema.models.client.Client.fetch_channel"><code class="name flex">
@@ -2006,8 +2315,15 @@ class Interaction:
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="krema.models.client.ApplicationCommand" href="#krema.models.client.ApplicationCommand">ApplicationCommand</a></code></h4>
+<ul class="">
+<li><code><a title="krema.models.client.ApplicationCommand.delete" href="#krema.models.client.ApplicationCommand.delete">delete</a></code></li>
+<li><code><a title="krema.models.client.ApplicationCommand.edit" href="#krema.models.client.ApplicationCommand.edit">edit</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="krema.models.client.Client.check_token" href="#krema.models.client.Client.check_token">check_token</a></code></li>
 <li><code><a title="krema.models.client.Client.create_guild" href="#krema.models.client.Client.create_guild">create_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.delete_invite" href="#krema.models.client.Client.delete_invite">delete_invite</a></code></li>
@@ -2015,6 +2331,8 @@ class Interaction:
 <li><code><a title="krema.models.client.Client.edit_banner_color" href="#krema.models.client.Client.edit_banner_color">edit_banner_color</a></code></li>
 <li><code><a title="krema.models.client.Client.edit_nickname" href="#krema.models.client.Client.edit_nickname">edit_nickname</a></code></li>
 <li><code><a title="krema.models.client.Client.event" href="#krema.models.client.Client.event">event</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_application_command" href="#krema.models.client.Client.fetch_application_command">fetch_application_command</a></code></li>
+<li><code><a title="krema.models.client.Client.fetch_application_commands" href="#krema.models.client.Client.fetch_application_commands">fetch_application_commands</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_channel" href="#krema.models.client.Client.fetch_channel">fetch_channel</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_guild" href="#krema.models.client.Client.fetch_guild">fetch_guild</a></code></li>
 <li><code><a title="krema.models.client.Client.fetch_invite" href="#krema.models.client.Client.fetch_invite">fetch_invite</a></code></li>
