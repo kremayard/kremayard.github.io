@@ -46,7 +46,33 @@ class ChannelTypes:
     GUILD_PUBLIC_THREAD: int = 11  # a temporary sub-channel within a GUILD_TEXT channel
     # a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
     GUILD_PRIVATE_THREAD: int = 12
-    GUILD_STAGE_VOICE: int = 13  # a voice channel for hosting events with an audience</code></pre>
+    GUILD_STAGE_VOICE: int = 13  # a voice channel for hosting events with an audience
+
+
+class Intents:
+    &#34;&#34;&#34;Intent constants.&#34;&#34;&#34;
+
+    GUILDS: int = 1 &lt;&lt; 0
+    GUILD_MEMBERS: int = 1 &lt;&lt; 1
+    GUILD_BANS: int = 1 &lt;&lt; 2
+    GUILD_EMOJIS_AND_STICKERS: int = 1 &lt;&lt; 3
+    GUILD_INTEGRATIONS: int = 1 &lt;&lt; 4
+    GUILD_WEBHOOKS: int = 1 &lt;&lt; 5
+    GUILD_INVITES: int = 1 &lt;&lt; 6
+    GUILD_VOICE_STATES: int = 1 &lt;&lt; 7
+    GUILD_PRESENCES: int = 1 &lt;&lt; 8
+    GUILD_MESSAGES: int = 1 &lt;&lt; 9
+    GUILD_MESSAGE_REACTIONS: int = 1 &lt;&lt; 10
+    GUILD_MESSAGE_TYPING: int = 1 &lt;&lt; 11
+    DIRECT_MESSAGES: int = 1 &lt;&lt; 12
+    DIRECT_MESSAGE_REACTIONS: int = 1 &lt;&lt; 13
+    DIRECT_MESSAGE_TYPING: int = 1 &lt;&lt; 14
+
+    def All(self):
+        attrs = [i for i in dir(self) if not i.startswith(&#34;__&#34;) and i != &#34;All&#34;]
+        result = sum(int(getattr(self, i)) for i in attrs)
+
+        return result</code></pre>
 </details>
 </section>
 <section>
@@ -131,6 +157,123 @@ class ChannelTypes:
 </dd>
 </dl>
 </dd>
+<dt id="krema.types.Intents"><code class="flex name class">
+<span>class <span class="ident">Intents</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Intent constants.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Intents:
+    &#34;&#34;&#34;Intent constants.&#34;&#34;&#34;
+
+    GUILDS: int = 1 &lt;&lt; 0
+    GUILD_MEMBERS: int = 1 &lt;&lt; 1
+    GUILD_BANS: int = 1 &lt;&lt; 2
+    GUILD_EMOJIS_AND_STICKERS: int = 1 &lt;&lt; 3
+    GUILD_INTEGRATIONS: int = 1 &lt;&lt; 4
+    GUILD_WEBHOOKS: int = 1 &lt;&lt; 5
+    GUILD_INVITES: int = 1 &lt;&lt; 6
+    GUILD_VOICE_STATES: int = 1 &lt;&lt; 7
+    GUILD_PRESENCES: int = 1 &lt;&lt; 8
+    GUILD_MESSAGES: int = 1 &lt;&lt; 9
+    GUILD_MESSAGE_REACTIONS: int = 1 &lt;&lt; 10
+    GUILD_MESSAGE_TYPING: int = 1 &lt;&lt; 11
+    DIRECT_MESSAGES: int = 1 &lt;&lt; 12
+    DIRECT_MESSAGE_REACTIONS: int = 1 &lt;&lt; 13
+    DIRECT_MESSAGE_TYPING: int = 1 &lt;&lt; 14
+
+    def All(self):
+        attrs = [i for i in dir(self) if not i.startswith(&#34;__&#34;) and i != &#34;All&#34;]
+        result = sum(int(getattr(self, i)) for i in attrs)
+
+        return result</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="krema.types.Intents.DIRECT_MESSAGES"><code class="name">var <span class="ident">DIRECT_MESSAGES</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.DIRECT_MESSAGE_REACTIONS"><code class="name">var <span class="ident">DIRECT_MESSAGE_REACTIONS</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.DIRECT_MESSAGE_TYPING"><code class="name">var <span class="ident">DIRECT_MESSAGE_TYPING</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILDS"><code class="name">var <span class="ident">GUILDS</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_BANS"><code class="name">var <span class="ident">GUILD_BANS</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_EMOJIS_AND_STICKERS"><code class="name">var <span class="ident">GUILD_EMOJIS_AND_STICKERS</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_INTEGRATIONS"><code class="name">var <span class="ident">GUILD_INTEGRATIONS</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_INVITES"><code class="name">var <span class="ident">GUILD_INVITES</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_MEMBERS"><code class="name">var <span class="ident">GUILD_MEMBERS</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_MESSAGES"><code class="name">var <span class="ident">GUILD_MESSAGES</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_MESSAGE_REACTIONS"><code class="name">var <span class="ident">GUILD_MESSAGE_REACTIONS</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_MESSAGE_TYPING"><code class="name">var <span class="ident">GUILD_MESSAGE_TYPING</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_PRESENCES"><code class="name">var <span class="ident">GUILD_PRESENCES</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_VOICE_STATES"><code class="name">var <span class="ident">GUILD_VOICE_STATES</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="krema.types.Intents.GUILD_WEBHOOKS"><code class="name">var <span class="ident">GUILD_WEBHOOKS</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="krema.types.Intents.All"><code class="name flex">
+<span>def <span class="ident">All</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def All(self):
+    attrs = [i for i in dir(self) if not i.startswith(&#34;__&#34;) and i != &#34;All&#34;]
+    result = sum(int(getattr(self, i)) for i in attrs)
+
+    return result</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 </dl>
 </section>
 </article>
@@ -161,6 +304,27 @@ class ChannelTypes:
 <li><code><a title="krema.types.ChannelTypes.GUILD_STORE" href="#krema.types.ChannelTypes.GUILD_STORE">GUILD_STORE</a></code></li>
 <li><code><a title="krema.types.ChannelTypes.GUILD_TEXT" href="#krema.types.ChannelTypes.GUILD_TEXT">GUILD_TEXT</a></code></li>
 <li><code><a title="krema.types.ChannelTypes.GUILD_VOICE" href="#krema.types.ChannelTypes.GUILD_VOICE">GUILD_VOICE</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="krema.types.Intents" href="#krema.types.Intents">Intents</a></code></h4>
+<ul class="">
+<li><code><a title="krema.types.Intents.All" href="#krema.types.Intents.All">All</a></code></li>
+<li><code><a title="krema.types.Intents.DIRECT_MESSAGES" href="#krema.types.Intents.DIRECT_MESSAGES">DIRECT_MESSAGES</a></code></li>
+<li><code><a title="krema.types.Intents.DIRECT_MESSAGE_REACTIONS" href="#krema.types.Intents.DIRECT_MESSAGE_REACTIONS">DIRECT_MESSAGE_REACTIONS</a></code></li>
+<li><code><a title="krema.types.Intents.DIRECT_MESSAGE_TYPING" href="#krema.types.Intents.DIRECT_MESSAGE_TYPING">DIRECT_MESSAGE_TYPING</a></code></li>
+<li><code><a title="krema.types.Intents.GUILDS" href="#krema.types.Intents.GUILDS">GUILDS</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_BANS" href="#krema.types.Intents.GUILD_BANS">GUILD_BANS</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_EMOJIS_AND_STICKERS" href="#krema.types.Intents.GUILD_EMOJIS_AND_STICKERS">GUILD_EMOJIS_AND_STICKERS</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_INTEGRATIONS" href="#krema.types.Intents.GUILD_INTEGRATIONS">GUILD_INTEGRATIONS</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_INVITES" href="#krema.types.Intents.GUILD_INVITES">GUILD_INVITES</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_MEMBERS" href="#krema.types.Intents.GUILD_MEMBERS">GUILD_MEMBERS</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_MESSAGES" href="#krema.types.Intents.GUILD_MESSAGES">GUILD_MESSAGES</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_MESSAGE_REACTIONS" href="#krema.types.Intents.GUILD_MESSAGE_REACTIONS">GUILD_MESSAGE_REACTIONS</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_MESSAGE_TYPING" href="#krema.types.Intents.GUILD_MESSAGE_TYPING">GUILD_MESSAGE_TYPING</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_PRESENCES" href="#krema.types.Intents.GUILD_PRESENCES">GUILD_PRESENCES</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_VOICE_STATES" href="#krema.types.Intents.GUILD_VOICE_STATES">GUILD_VOICE_STATES</a></code></li>
+<li><code><a title="krema.types.Intents.GUILD_WEBHOOKS" href="#krema.types.Intents.GUILD_WEBHOOKS">GUILD_WEBHOOKS</a></code></li>
 </ul>
 </li>
 </ul>

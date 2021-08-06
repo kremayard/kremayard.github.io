@@ -39,6 +39,7 @@ from zlib import decompressobj
 import aiohttp
 
 from .models import Message, Channel, Guild
+from .models import Interaction
 
 
 class Gateway:
@@ -182,6 +183,9 @@ class Gateway:
         elif event_type in (&#34;channel_create&#34;, &#34;channel_update&#34;, &#34;channel_delete&#34;, &#34;thread_create&#34;, &#34;thread_update&#34;):
             filtered = self.__filter_events(
                 event_type, (Channel(self.client, event_data),))
+        elif event_type == &#34;interaction_create&#34;:
+            filtered = self.__filter_events(
+                event_type, (Interaction(self.client, event_data),))
         else:
             filtered = self.__filter_events(event_type, (event_data,))
 
@@ -406,6 +410,9 @@ class Gateway:
         elif event_type in (&#34;channel_create&#34;, &#34;channel_update&#34;, &#34;channel_delete&#34;, &#34;thread_create&#34;, &#34;thread_update&#34;):
             filtered = self.__filter_events(
                 event_type, (Channel(self.client, event_data),))
+        elif event_type == &#34;interaction_create&#34;:
+            filtered = self.__filter_events(
+                event_type, (Interaction(self.client, event_data),))
         else:
             filtered = self.__filter_events(event_type, (event_data,))
 

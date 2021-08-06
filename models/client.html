@@ -31,6 +31,7 @@
 Client model for krema.
 &#34;&#34;&#34;
 
+from dataclasses import dataclass
 from typing import Union
 
 from unikorn import kollektor
@@ -523,7 +524,74 @@ class Client:
         from .sticker import Sticker
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/stickers/{sticker_id}&#34;)
-        return Sticker(self, result)</code></pre>
+        return Sticker(self, result)
+
+    # async def create_global_slash_command(self, **kwargs):
+    #     &#34;&#34;&#34;Create a global slash command.
+
+    #     Args:
+    #         params (dict): Slash command parameters.
+
+    #     Returns:
+    #         True: Command added successfully.
+    #     &#34;&#34;&#34;
+
+    #     result = await self.http.request(&#34;POST&#34;, f&#34;/applications/{self.user.id}/commands&#34;, json=kwargs)
+    #     return True
+
+
+@dataclass
+class Interaction:
+    &#34;&#34;&#34;Interaction class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        client (Client): Krema client.
+        Other things are same with https://discord.com/developers/docs/interactions/slash-commands#interaction-object-interaction-structure.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import Member, User
+        from .message import Message
+
+        self.client = client
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.application_id: int = int(data.get(&#34;application_id&#34;))
+        self.type: int = data.get(&#34;type&#34;)
+        self.data: Union[dict, None] = data.get(&#34;data&#34;)
+        self.guild_id: Union[int, None] = int(
+            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
+        self.channel_id: Union[int, None] = int(
+            data.get(&#34;channel_id&#34;)) if data.get(&#34;channel_id&#34;) is not None else None
+        self.member: Union[Member, None] = Member(self.client, data.get(
+            &#34;member&#34;)) if data.get(&#34;member&#34;) is not None else None
+        self.user: Union[User, None] = User(self.client, data.get(
+            &#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
+        self.token: str = data.get(&#34;token&#34;)
+        self.version: int = data.get(&#34;version&#34;)
+        self.message: Union[Message, None] = Message(self.client, data.get(
+            &#34;message&#34;)) if data.get(&#34;message&#34;) is not None else None
+
+    async def reply(self, type: int, **kwargs):
+        &#34;&#34;&#34;Reply to the interaction (must be used for finish the interaction.).
+
+        Args:
+            type (int): https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-callback-type
+            **kwargs: https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-application-command-callback-data-structure
+
+        Returns:
+            True: Response sent successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;POST&#34;, f&#34;/interactions/{self.id}/{self.token}/callback&#34;, json={
+            &#34;type&#34;: type,
+            &#34;data&#34;: kwargs
+        })
+        return</code></pre>
 </details>
 </section>
 <section>
@@ -1061,7 +1129,20 @@ class Client:
         from .sticker import Sticker
 
         result = await self.http.request(&#34;GET&#34;, f&#34;/stickers/{sticker_id}&#34;)
-        return Sticker(self, result)</code></pre>
+        return Sticker(self, result)
+
+    # async def create_global_slash_command(self, **kwargs):
+    #     &#34;&#34;&#34;Create a global slash command.
+
+    #     Args:
+    #         params (dict): Slash command parameters.
+
+    #     Returns:
+    #         True: Command added successfully.
+    #     &#34;&#34;&#34;
+
+    #     result = await self.http.request(&#34;POST&#34;, f&#34;/applications/{self.user.id}/commands&#34;, json=kwargs)
+    #     return True</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -1789,6 +1870,125 @@ Channel()
 </dd>
 </dl>
 </dd>
+<dt id="krema.models.client.Interaction"><code class="flex name class">
+<span>class <span class="ident">Interaction</span></span>
+<span>(</span><span>client, data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Interaction class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet from websocket.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code><a title="krema.models.client.Client" href="#krema.models.client.Client">Client</a></code></dt>
+<dd>Krema client.</dd>
+</dl>
+<p>Other things are same with <a href="https://discord.com/developers/docs/interactions/slash-commands#interaction-object-interaction-structure.">https://discord.com/developers/docs/interactions/slash-commands#interaction-object-interaction-structure.</a></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Interaction:
+    &#34;&#34;&#34;Interaction class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet from websocket.
+
+    Attributes:
+        client (Client): Krema client.
+        Other things are same with https://discord.com/developers/docs/interactions/slash-commands#interaction-object-interaction-structure.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import Member, User
+        from .message import Message
+
+        self.client = client
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.application_id: int = int(data.get(&#34;application_id&#34;))
+        self.type: int = data.get(&#34;type&#34;)
+        self.data: Union[dict, None] = data.get(&#34;data&#34;)
+        self.guild_id: Union[int, None] = int(
+            data.get(&#34;guild_id&#34;)) if data.get(&#34;guild_id&#34;) is not None else None
+        self.channel_id: Union[int, None] = int(
+            data.get(&#34;channel_id&#34;)) if data.get(&#34;channel_id&#34;) is not None else None
+        self.member: Union[Member, None] = Member(self.client, data.get(
+            &#34;member&#34;)) if data.get(&#34;member&#34;) is not None else None
+        self.user: Union[User, None] = User(self.client, data.get(
+            &#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
+        self.token: str = data.get(&#34;token&#34;)
+        self.version: int = data.get(&#34;version&#34;)
+        self.message: Union[Message, None] = Message(self.client, data.get(
+            &#34;message&#34;)) if data.get(&#34;message&#34;) is not None else None
+
+    async def reply(self, type: int, **kwargs):
+        &#34;&#34;&#34;Reply to the interaction (must be used for finish the interaction.).
+
+        Args:
+            type (int): https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-callback-type
+            **kwargs: https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-application-command-callback-data-structure
+
+        Returns:
+            True: Response sent successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;POST&#34;, f&#34;/interactions/{self.id}/{self.token}/callback&#34;, json={
+            &#34;type&#34;: type,
+            &#34;data&#34;: kwargs
+        })
+        return</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="krema.models.client.Interaction.reply"><code class="name flex">
+<span>async def <span class="ident">reply</span></span>(<span>self, type: int, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reply to the interaction (must be used for finish the interaction.).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>type</code></strong> :&ensp;<code>int</code></dt>
+<dd><a href="https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-callback-type">https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-callback-type</a></dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-application-command-callback-data-structure">https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-application-command-callback-data-structure</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Response sent successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def reply(self, type: int, **kwargs):
+    &#34;&#34;&#34;Reply to the interaction (must be used for finish the interaction.).
+
+    Args:
+        type (int): https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-callback-type
+        **kwargs: https://discord.com/developers/docs/interactions/slash-commands#interaction-response-object-interaction-application-command-callback-data-structure
+
+    Returns:
+        True: Response sent successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;POST&#34;, f&#34;/interactions/{self.id}/{self.token}/callback&#34;, json={
+        &#34;type&#34;: type,
+        &#34;data&#34;: kwargs
+    })
+    return</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 </dl>
 </section>
 </article>
@@ -1828,6 +2028,12 @@ Channel()
 <li><code><a title="krema.models.client.Client.get_thread" href="#krema.models.client.Client.get_thread">get_thread</a></code></li>
 <li><code><a title="krema.models.client.Client.start" href="#krema.models.client.Client.start">start</a></code></li>
 <li><code><a title="krema.models.client.Client.update_presence" href="#krema.models.client.Client.update_presence">update_presence</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="krema.models.client.Interaction" href="#krema.models.client.Interaction">Interaction</a></code></h4>
+<ul class="">
+<li><code><a title="krema.models.client.Interaction.reply" href="#krema.models.client.Interaction.reply">reply</a></code></li>
 </ul>
 </li>
 </ul>
