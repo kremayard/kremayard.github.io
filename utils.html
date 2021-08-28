@@ -114,7 +114,37 @@ def image_to_data_uri(path: str):
         img_bytes = f.read()
         encrypt = b64encode(img_bytes).decode()
 
-        return f&#34;data:image/{f.name.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)};base64,{encrypt}&#34;</code></pre>
+        return f&#34;data:image/{f.name.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)};base64,{encrypt}&#34;
+
+
+def paginate(text: str, max_len: int) -&gt; list:
+    &#34;&#34;&#34;Simple generator that paginates text.
+
+    Args:
+        text (str): string.
+        max_len (int): How long after the text will be cut.
+
+    Returns:
+        list: Array with fragmented text.
+
+    Examples:
+    &gt;&gt;&gt; krema.utils.paginate(&#34;hello&#34;, 2)
+    [&#34;he&#34;, &#34;ll&#34;, &#34;o&#34;]
+    &#34;&#34;&#34;
+
+    last = 0
+    pages = []
+
+    for curr in range(0, len(text)):
+        if curr % max_len == 0:
+            pages.append(text[last:curr])
+            last = curr
+            appd_index = curr
+
+    if appd_index != len(text)-1:
+        pages.append(text[last:curr])
+
+    return [i for i in pages if i != &#34;&#34;]</code></pre>
 </details>
 </section>
 <section>
@@ -294,6 +324,61 @@ def image_to_data_uri(path: str):
         return f&#34;data:image/{f.name.split(&#39;.&#39;)[-1].replace(&#39;jpg&#39;, &#39;jpeg&#39;)};base64,{encrypt}&#34;</code></pre>
 </details>
 </dd>
+<dt id="krema.utils.paginate"><code class="name flex">
+<span>def <span class="ident">paginate</span></span>(<span>text: str, max_len: int) ‑> list</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Simple generator that paginates text.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>text</code></strong> :&ensp;<code>str</code></dt>
+<dd>string.</dd>
+<dt><strong><code>max_len</code></strong> :&ensp;<code>int</code></dt>
+<dd>How long after the text will be cut.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>Array with fragmented text.</dd>
+</dl>
+<p>Examples:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; krema.utils.paginate(&quot;hello&quot;, 2)
+[&quot;he&quot;, &quot;ll&quot;, &quot;o&quot;]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def paginate(text: str, max_len: int) -&gt; list:
+    &#34;&#34;&#34;Simple generator that paginates text.
+
+    Args:
+        text (str): string.
+        max_len (int): How long after the text will be cut.
+
+    Returns:
+        list: Array with fragmented text.
+
+    Examples:
+    &gt;&gt;&gt; krema.utils.paginate(&#34;hello&#34;, 2)
+    [&#34;he&#34;, &#34;ll&#34;, &#34;o&#34;]
+    &#34;&#34;&#34;
+
+    last = 0
+    pages = []
+
+    for curr in range(0, len(text)):
+        if curr % max_len == 0:
+            pages.append(text[last:curr])
+            last = curr
+            appd_index = curr
+
+    if appd_index != len(text)-1:
+        pages.append(text[last:curr])
+
+    return [i for i in pages if i != &#34;&#34;]</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -316,6 +401,7 @@ def image_to_data_uri(path: str):
 <li><code><a title="krema.utils.dict_to_query" href="#krema.utils.dict_to_query">dict_to_query</a></code></li>
 <li><code><a title="krema.utils.file_builder" href="#krema.utils.file_builder">file_builder</a></code></li>
 <li><code><a title="krema.utils.image_to_data_uri" href="#krema.utils.image_to_data_uri">image_to_data_uri</a></code></li>
+<li><code><a title="krema.utils.paginate" href="#krema.utils.paginate">paginate</a></code></li>
 </ul>
 </li>
 </ul>
