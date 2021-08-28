@@ -69,17 +69,15 @@ class Invite:
         from .channel import Channel
         from .user import User
 
-        self.client = client
-
         self.code: str = data.get(&#34;code&#34;)
-        self.guild: Union[Guild, None] = Guild(self.client, data.get(
+        self.guild: Union[Guild, None] = Guild(client, data.get(
             &#34;guild&#34;)) if data.get(&#34;guild&#34;) is not None else None
-        self.channel: Union[Channel, None] = Channel(self.client, data.get(
+        self.channel: Union[Channel, None] = Channel(client, data.get(
             &#34;channel&#34;)) if data.get(&#34;channel&#34;) is not None else None
-        self.inviter: Union[User, None] = User(self.client, data.get(
+        self.inviter: Union[User, None] = User(client, data.get(
             &#34;inviter&#34;)) if data.get(&#34;inviter&#34;) is not None else None
         self.target_type: Union[int, None] = data.get(&#34;target_type&#34;)
-        self.target_user: Union[User, None] = User(self.client, data.get(
+        self.target_user: Union[User, None] = User(client, data.get(
             &#34;target_user&#34;)) if data.get(&#34;target_user&#34;) is not None else None
         self.target_application: Union[dict,
                                        None] = data.get(&#34;target_application&#34;)
@@ -191,17 +189,15 @@ class Invite:
         from .channel import Channel
         from .user import User
 
-        self.client = client
-
         self.code: str = data.get(&#34;code&#34;)
-        self.guild: Union[Guild, None] = Guild(self.client, data.get(
+        self.guild: Union[Guild, None] = Guild(client, data.get(
             &#34;guild&#34;)) if data.get(&#34;guild&#34;) is not None else None
-        self.channel: Union[Channel, None] = Channel(self.client, data.get(
+        self.channel: Union[Channel, None] = Channel(client, data.get(
             &#34;channel&#34;)) if data.get(&#34;channel&#34;) is not None else None
-        self.inviter: Union[User, None] = User(self.client, data.get(
+        self.inviter: Union[User, None] = User(client, data.get(
             &#34;inviter&#34;)) if data.get(&#34;inviter&#34;) is not None else None
         self.target_type: Union[int, None] = data.get(&#34;target_type&#34;)
-        self.target_user: Union[User, None] = User(self.client, data.get(
+        self.target_user: Union[User, None] = User(client, data.get(
             &#34;target_user&#34;)) if data.get(&#34;target_user&#34;) is not None else None
         self.target_application: Union[dict,
                                        None] = data.get(&#34;target_application&#34;)

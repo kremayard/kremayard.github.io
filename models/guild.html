@@ -573,6 +573,41 @@ class Guild:
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/applications/{self.client.user.id}/guilds/{self.id}/commands/{command_id}&#34;)
         return ApplicationCommand(self.client, result)
 
+    async def fetch_integrations(self):
+        &#34;&#34;&#34;Fetch guild integrations.
+
+        Returns:
+            list: List of Integration objects.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/integrations&#34;)
+        return [Integration(self.client, i) for i in result]
+
+    async def delete_integration(self, integration_id: int):
+        &#34;&#34;&#34;Fetch guild integrations.
+
+        Args:
+            integration_id (int): Integration Id.
+
+        Returns:
+            True: Integration deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/integrations/{integration_id}&#34;)
+        return True
+
+    async def fetch_vanity_url(self):
+        &#34;&#34;&#34;Fetch vanity url for guild.
+
+        Returns:
+            Invite: Partial invite object.
+        &#34;&#34;&#34;
+
+        from .invite import Invite
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/vanity-url&#34;)
+        return Invite(self.client, result)
+
 
 @dataclass
 class Emoji:
@@ -657,7 +692,89 @@ class Role:
         self.permissions: str = data.get(&#34;permissions&#34;)
         self.managed: bool = data.get(&#34;managed&#34;)
         self.mentionable: bool = data.get(&#34;mentionable&#34;)
-        self.tags: dict = data.get(&#34;tags&#34;)</code></pre>
+        self.tags: dict = data.get(&#34;tags&#34;)
+
+
+@dataclass
+class Integration:
+    &#34;&#34;&#34;Integration class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet.
+
+    Attributes:
+        client (Client): Krema client.
+        id (int): Integration Id.
+        name (str): Integration name.
+        type (str): Integration type (twitch, youtube, or discord).
+        enabled (bool): Is this integration enabled.
+        syncing (bool, None): Is this integration syncing.
+        role_id (int, None): Id that this integration uses for &#34;subscribers&#34;.
+        enable_emoticons (bool, None): Whether emoticons should be synced for this integration.
+        expire_behavior (int, None): The behavior of expiring subscribers.
+        expire_grace_period (int, None): The grace period (in days) before expiring subscribers .
+        user (User, None): User for this integration.
+        account (dict): Integration account information.
+        synced_at (datetime, None): When this integration was last synced.
+        subscriber_count (int, None): How many subscribers this integration has.
+        revoked (bool, None): Has this integration been revoked.
+        application (IntegrationApplication, None): The bot/OAuth2 application for discord integrations.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import User
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.name: str = data.get(&#34;name&#34;)
+        self.type: str = data.get(&#34;type&#34;)
+        self.enabled: bool = data.get(&#34;enabled&#34;)
+        self.syncing: Union[bool, None] = data.get(&#34;syncing&#34;)
+        self.role_id: int = int(data.get(&#34;role_id&#34;)) if data.get(
+            &#34;role_id&#34;) is not None else None
+        self.enable_emoticons: Union[bool, None] = data.get(&#34;enable_emoticons&#34;)
+        self.expire_behavior: Union[int, None] = data.get(&#34;expire_behavior&#34;)
+        self.expire_grace_period: Union[int,
+                                        None] = data.get(&#34;expire_grace_period&#34;)
+        self.user: Union[User, None] = User(client, data.get(
+            &#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
+        self.account: dict = data.get(&#34;account&#34;)
+        self.synced_at: Union[datetime, None] = convert_iso(
+            data.get(&#34;synced_at&#34;)) if data.get(&#34;synced_at&#34;) is not None else None
+        self.subscriber_count: Union[int, None] = data.get(&#34;subscriber_count&#34;)
+        self.revoked: Union[bool, None] = data.get(&#34;revoked&#34;)
+        self.application: Union[IntegrationApplication, None] = IntegrationApplication(
+            client, data.get(&#34;application&#34;)) if data.get(&#34;application&#34;) is not None else None
+
+
+@dataclass
+class IntegrationApplication:
+    &#34;&#34;&#34;Integration application class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet.
+
+    Attributes:
+        client (Client): Krema client.
+        id (int): App Id.
+        name (str): App name.
+        icon (str, None): App icon hash.
+        description (str): App description.
+        summary (str): App summary.
+        bot (User, None): The bot associated with this application.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import User
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.name: str = data.get(&#34;string&#34;)
+        self.icon: Union[str, None] = data.get(&#34;icon&#34;)
+        self.description: str = data.get(&#34;description&#34;)
+        self.summary: str = data.get(&#34;summary&#34;)
+        self.bot: Union[User, None] = User(client, data.get(
+            &#34;bot&#34;)) if data.get(&#34;bot&#34;) is not None else None</code></pre>
 </details>
 </section>
 <section>
@@ -1328,7 +1445,42 @@ class Guild:
         from .client import ApplicationCommand
 
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/applications/{self.client.user.id}/guilds/{self.id}/commands/{command_id}&#34;)
-        return ApplicationCommand(self.client, result)</code></pre>
+        return ApplicationCommand(self.client, result)
+
+    async def fetch_integrations(self):
+        &#34;&#34;&#34;Fetch guild integrations.
+
+        Returns:
+            list: List of Integration objects.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/integrations&#34;)
+        return [Integration(self.client, i) for i in result]
+
+    async def delete_integration(self, integration_id: int):
+        &#34;&#34;&#34;Fetch guild integrations.
+
+        Args:
+            integration_id (int): Integration Id.
+
+        Returns:
+            True: Integration deleted successfully.
+        &#34;&#34;&#34;
+
+        await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/integrations/{integration_id}&#34;)
+        return True
+
+    async def fetch_vanity_url(self):
+        &#34;&#34;&#34;Fetch vanity url for guild.
+
+        Returns:
+            Invite: Partial invite object.
+        &#34;&#34;&#34;
+
+        from .invite import Invite
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/vanity-url&#34;)
+        return Invite(self.client, result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1630,6 +1782,39 @@ class Guild:
     &#34;&#34;&#34;
 
     await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/emojis/{emoji_id}&#34;)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.delete_integration"><code class="name flex">
+<span>async def <span class="ident">delete_integration</span></span>(<span>self, integration_id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch guild integrations.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>integration_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Integration Id.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>True</code></dt>
+<dd>Integration deleted successfully.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete_integration(self, integration_id: int):
+    &#34;&#34;&#34;Fetch guild integrations.
+
+    Args:
+        integration_id (int): Integration Id.
+
+    Returns:
+        True: Integration deleted successfully.
+    &#34;&#34;&#34;
+
+    await self.client.http.request(&#34;DELETE&#34;, f&#34;/guilds/{self.id}/integrations/{integration_id}&#34;)
     return True</code></pre>
 </details>
 </dd>
@@ -1951,6 +2136,31 @@ class Guild:
     return [Emoji(self.client, i) for i in result]</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.fetch_integrations"><code class="name flex">
+<span>async def <span class="ident">fetch_integrations</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch guild integrations.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>List of Integration objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_integrations(self):
+    &#34;&#34;&#34;Fetch guild integrations.
+
+    Returns:
+        list: List of Integration objects.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/integrations&#34;)
+    return [Integration(self.client, i) for i in result]</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.fetch_member"><code class="name flex">
 <span>async def <span class="ident">fetch_member</span></span>(<span>self, member_id: int)</span>
 </code></dt>
@@ -2071,6 +2281,33 @@ class Guild:
 
     result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/stickers/{sticker_id}&#34;)
     return Sticker(self.client, result)</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_vanity_url"><code class="name flex">
+<span>async def <span class="ident">fetch_vanity_url</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch vanity url for guild.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Invite</code></dt>
+<dd>Partial invite object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_vanity_url(self):
+    &#34;&#34;&#34;Fetch vanity url for guild.
+
+    Returns:
+        Invite: Partial invite object.
+    &#34;&#34;&#34;
+
+    from .invite import Invite
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/vanity-url&#34;)
+    return Invite(self.client, result)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.fetch_webhooks"><code class="name flex">
@@ -2387,6 +2624,174 @@ class Guild:
 </dd>
 </dl>
 </dd>
+<dt id="krema.models.guild.Integration"><code class="flex name class">
+<span>class <span class="ident">Integration</span></span>
+<span>(</span><span>client, data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Integration class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Integration Id.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Integration name.</dd>
+<dt><strong><code>type</code></strong> :&ensp;<code>str</code></dt>
+<dd>Integration type (twitch, youtube, or discord).</dd>
+<dt><strong><code>enabled</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Is this integration enabled.</dd>
+<dt><strong><code>syncing</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>Is this integration syncing.</dd>
+<dt><strong><code>role_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>Id that this integration uses for "subscribers".</dd>
+<dt><strong><code>enable_emoticons</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>Whether emoticons should be synced for this integration.</dd>
+<dt><strong><code>expire_behavior</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>The behavior of expiring subscribers.</dd>
+<dt><strong><code>expire_grace_period</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>The grace period (in days) before expiring subscribers .</dd>
+<dt><strong><code>user</code></strong> :&ensp;<code>User, None</code></dt>
+<dd>User for this integration.</dd>
+<dt><strong><code>account</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Integration account information.</dd>
+<dt><strong><code>synced_at</code></strong> :&ensp;<code>datetime, None</code></dt>
+<dd>When this integration was last synced.</dd>
+<dt><strong><code>subscriber_count</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>How many subscribers this integration has.</dd>
+<dt><strong><code>revoked</code></strong> :&ensp;<code>bool, None</code></dt>
+<dd>Has this integration been revoked.</dd>
+<dt><strong><code>application</code></strong> :&ensp;<code><a title="krema.models.guild.IntegrationApplication" href="#krema.models.guild.IntegrationApplication">IntegrationApplication</a>, None</code></dt>
+<dd>The bot/OAuth2 application for discord integrations.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Integration:
+    &#34;&#34;&#34;Integration class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet.
+
+    Attributes:
+        client (Client): Krema client.
+        id (int): Integration Id.
+        name (str): Integration name.
+        type (str): Integration type (twitch, youtube, or discord).
+        enabled (bool): Is this integration enabled.
+        syncing (bool, None): Is this integration syncing.
+        role_id (int, None): Id that this integration uses for &#34;subscribers&#34;.
+        enable_emoticons (bool, None): Whether emoticons should be synced for this integration.
+        expire_behavior (int, None): The behavior of expiring subscribers.
+        expire_grace_period (int, None): The grace period (in days) before expiring subscribers .
+        user (User, None): User for this integration.
+        account (dict): Integration account information.
+        synced_at (datetime, None): When this integration was last synced.
+        subscriber_count (int, None): How many subscribers this integration has.
+        revoked (bool, None): Has this integration been revoked.
+        application (IntegrationApplication, None): The bot/OAuth2 application for discord integrations.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import User
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.name: str = data.get(&#34;name&#34;)
+        self.type: str = data.get(&#34;type&#34;)
+        self.enabled: bool = data.get(&#34;enabled&#34;)
+        self.syncing: Union[bool, None] = data.get(&#34;syncing&#34;)
+        self.role_id: int = int(data.get(&#34;role_id&#34;)) if data.get(
+            &#34;role_id&#34;) is not None else None
+        self.enable_emoticons: Union[bool, None] = data.get(&#34;enable_emoticons&#34;)
+        self.expire_behavior: Union[int, None] = data.get(&#34;expire_behavior&#34;)
+        self.expire_grace_period: Union[int,
+                                        None] = data.get(&#34;expire_grace_period&#34;)
+        self.user: Union[User, None] = User(client, data.get(
+            &#34;user&#34;)) if data.get(&#34;user&#34;) is not None else None
+        self.account: dict = data.get(&#34;account&#34;)
+        self.synced_at: Union[datetime, None] = convert_iso(
+            data.get(&#34;synced_at&#34;)) if data.get(&#34;synced_at&#34;) is not None else None
+        self.subscriber_count: Union[int, None] = data.get(&#34;subscriber_count&#34;)
+        self.revoked: Union[bool, None] = data.get(&#34;revoked&#34;)
+        self.application: Union[IntegrationApplication, None] = IntegrationApplication(
+            client, data.get(&#34;application&#34;)) if data.get(&#34;application&#34;) is not None else None</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.IntegrationApplication"><code class="flex name class">
+<span>class <span class="ident">IntegrationApplication</span></span>
+<span>(</span><span>client, data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Integration application class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>App Id.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>App name.</dd>
+<dt><strong><code>icon</code></strong> :&ensp;<code>str, None</code></dt>
+<dd>App icon hash.</dd>
+<dt><strong><code>description</code></strong> :&ensp;<code>str</code></dt>
+<dd>App description.</dd>
+<dt><strong><code>summary</code></strong> :&ensp;<code>str</code></dt>
+<dd>App summary.</dd>
+<dt><strong><code>bot</code></strong> :&ensp;<code>User, None</code></dt>
+<dd>The bot associated with this application.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class IntegrationApplication:
+    &#34;&#34;&#34;Integration application class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet.
+
+    Attributes:
+        client (Client): Krema client.
+        id (int): App Id.
+        name (str): App name.
+        icon (str, None): App icon hash.
+        description (str): App description.
+        summary (str): App summary.
+        bot (User, None): The bot associated with this application.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .user import User
+
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.name: str = data.get(&#34;string&#34;)
+        self.icon: Union[str, None] = data.get(&#34;icon&#34;)
+        self.description: str = data.get(&#34;description&#34;)
+        self.summary: str = data.get(&#34;summary&#34;)
+        self.bot: Union[User, None] = User(client, data.get(
+            &#34;bot&#34;)) if data.get(&#34;bot&#34;) is not None else None</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Role"><code class="flex name class">
 <span>class <span class="ident">Role</span></span>
 <span>(</span><span>data: dict)</span>
@@ -2487,6 +2892,7 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.create_sticker" href="#krema.models.guild.Guild.create_sticker">create_sticker</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete" href="#krema.models.guild.Guild.delete">delete</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete_emoji" href="#krema.models.guild.Guild.delete_emoji">delete_emoji</a></code></li>
+<li><code><a title="krema.models.guild.Guild.delete_integration" href="#krema.models.guild.Guild.delete_integration">delete_integration</a></code></li>
 <li><code><a title="krema.models.guild.Guild.delete_role" href="#krema.models.guild.Guild.delete_role">delete_role</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit" href="#krema.models.guild.Guild.edit">edit</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit_member" href="#krema.models.guild.Guild.edit_member">edit_member</a></code></li>
@@ -2497,10 +2903,12 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.fetch_channels" href="#krema.models.guild.Guild.fetch_channels">fetch_channels</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_emoji" href="#krema.models.guild.Guild.fetch_emoji">fetch_emoji</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_emojis" href="#krema.models.guild.Guild.fetch_emojis">fetch_emojis</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_integrations" href="#krema.models.guild.Guild.fetch_integrations">fetch_integrations</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member" href="#krema.models.guild.Guild.fetch_member">fetch_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member_list" href="#krema.models.guild.Guild.fetch_member_list">fetch_member_list</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_roles" href="#krema.models.guild.Guild.fetch_roles">fetch_roles</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_sticker" href="#krema.models.guild.Guild.fetch_sticker">fetch_sticker</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_vanity_url" href="#krema.models.guild.Guild.fetch_vanity_url">fetch_vanity_url</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_webhooks" href="#krema.models.guild.Guild.fetch_webhooks">fetch_webhooks</a></code></li>
 <li><code><a title="krema.models.guild.Guild.kick_member" href="#krema.models.guild.Guild.kick_member">kick_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.list_stickers" href="#krema.models.guild.Guild.list_stickers">list_stickers</a></code></li>
@@ -2511,6 +2919,12 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.unban_member" href="#krema.models.guild.Guild.unban_member">unban_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.update_emoji" href="#krema.models.guild.Guild.update_emoji">update_emoji</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="krema.models.guild.Integration" href="#krema.models.guild.Integration">Integration</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.models.guild.IntegrationApplication" href="#krema.models.guild.IntegrationApplication">IntegrationApplication</a></code></h4>
 </li>
 <li>
 <h4><code><a title="krema.models.guild.Role" href="#krema.models.guild.Role">Role</a></code></h4>

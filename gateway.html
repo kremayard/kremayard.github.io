@@ -35,11 +35,13 @@ import asyncio
 from json import loads
 from typing import Union
 from zlib import decompressobj
+import traceback
+import sys
 
 import aiohttp
 
 from .models import Message, Channel, Guild
-from .models import Interaction
+from .models import Interaction, ApplicationCommand, User
 
 
 class Gateway:
@@ -95,7 +97,6 @@ class Gateway:
 
         # Send Resume
         if self._session_id is not None:
-            # print(&#34;resume at kardes&#34;)
             await self.websocket.send_json({
                 &#34;op&#34;: 6,
                 &#34;d&#34;: {
@@ -162,8 +163,19 @@ class Gateway:
         elif opcode == self.DISPATCH:
             event_type = event_type.lower()
             if event_type in (i[0] for i in self.client.events):
-                self._event_loop.create_task(
-                    self.__handle_event(data, event_type))
+                # self._event_loop.create_task(
+                #    self.__handle_event(data, event_type))
+                try:
+                    await self.__handle_event(data, event_type)
+                except Exception as error:
+                    error = getattr(error, &#39;original&#39;, error)
+                    print(&#34;Unexcepted error while handling the event: &#34;,
+                          file=sys.stderr)
+                    traceback.print_exception(
+                        type(error),
+                        error,
+                        error.__traceback__,
+                        file=sys.stderr)
 
         # Reconnect
         elif opcode == self.RECONNECT:
@@ -172,7 +184,6 @@ class Gateway:
     async def __handle_event(self, event_data, event_type):
         if event_type in (&#34;message_create&#34;, &#34;message_update&#34;):
             if event_type == &#34;message_update&#34; and len(event_data) == 4:
-                # print(&#34;thread galiba bu&#34;)
                 return
 
             filtered = self.__filter_events(
@@ -186,6 +197,13 @@ class Gateway:
         elif event_type == &#34;interaction_create&#34;:
             filtered = self.__filter_events(
                 event_type, (Interaction(self.client, event_data),))
+        elif event_type in (&#34;application_command_create&#34;, &#34;application_command_update&#34;, &#34;application_command_delete&#34;):
+            filtered = self.__filter_events(
+                event_type, (ApplicationCommand(self.client, event_data),))
+        elif event_type in (&#34;guild_ban_add&#34;, &#34;guild_ban_remove&#34;):
+            event_data[&#34;user&#34;] = User(self.client, event_data.get(
+                &#34;user&#34;)) if event_data.get(&#34;user&#34;) else None
+            filtered = self.__filter_events(event_type, (event_data,))
         else:
             filtered = self.__filter_events(event_type, (event_data,))
 
@@ -241,7 +259,6 @@ class Gateway:
 
         # Reconnect
         if result == 1:
-            # print(&#34;reconnect.&#34;)
             await self.start_connection()</code></pre>
 </details>
 </section>
@@ -322,7 +339,6 @@ class Gateway:
 
         # Send Resume
         if self._session_id is not None:
-            # print(&#34;resume at kardes&#34;)
             await self.websocket.send_json({
                 &#34;op&#34;: 6,
                 &#34;d&#34;: {
@@ -389,8 +405,19 @@ class Gateway:
         elif opcode == self.DISPATCH:
             event_type = event_type.lower()
             if event_type in (i[0] for i in self.client.events):
-                self._event_loop.create_task(
-                    self.__handle_event(data, event_type))
+                # self._event_loop.create_task(
+                #    self.__handle_event(data, event_type))
+                try:
+                    await self.__handle_event(data, event_type)
+                except Exception as error:
+                    error = getattr(error, &#39;original&#39;, error)
+                    print(&#34;Unexcepted error while handling the event: &#34;,
+                          file=sys.stderr)
+                    traceback.print_exception(
+                        type(error),
+                        error,
+                        error.__traceback__,
+                        file=sys.stderr)
 
         # Reconnect
         elif opcode == self.RECONNECT:
@@ -399,7 +426,6 @@ class Gateway:
     async def __handle_event(self, event_data, event_type):
         if event_type in (&#34;message_create&#34;, &#34;message_update&#34;):
             if event_type == &#34;message_update&#34; and len(event_data) == 4:
-                # print(&#34;thread galiba bu&#34;)
                 return
 
             filtered = self.__filter_events(
@@ -413,6 +439,13 @@ class Gateway:
         elif event_type == &#34;interaction_create&#34;:
             filtered = self.__filter_events(
                 event_type, (Interaction(self.client, event_data),))
+        elif event_type in (&#34;application_command_create&#34;, &#34;application_command_update&#34;, &#34;application_command_delete&#34;):
+            filtered = self.__filter_events(
+                event_type, (ApplicationCommand(self.client, event_data),))
+        elif event_type in (&#34;guild_ban_add&#34;, &#34;guild_ban_remove&#34;):
+            event_data[&#34;user&#34;] = User(self.client, event_data.get(
+                &#34;user&#34;)) if event_data.get(&#34;user&#34;) else None
+            filtered = self.__filter_events(event_type, (event_data,))
         else:
             filtered = self.__filter_events(event_type, (event_data,))
 
@@ -468,7 +501,6 @@ class Gateway:
 
         # Reconnect
         if result == 1:
-            # print(&#34;reconnect.&#34;)
             await self.start_connection()</code></pre>
 </details>
 <h3>Class variables</h3>
@@ -545,7 +577,6 @@ class Gateway:
 
     # Reconnect
     if result == 1:
-        # print(&#34;reconnect.&#34;)
         await self.start_connection()</code></pre>
 </details>
 </dd>

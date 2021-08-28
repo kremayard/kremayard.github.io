@@ -32,6 +32,7 @@ Http part of the krema.
 &#34;&#34;&#34;
 
 import asyncio
+import json
 from typing import Union
 import aiohttp
 from .errors import *
@@ -48,6 +49,8 @@ class HTTP:
 
         self.client: Client = client
         self.url: str = &#34;https://discord.com/api/v9&#34;
+        self.remaining: int = 5
+        self.reset_after: float = 0.0
 
         pass
 
@@ -65,6 +68,10 @@ class HTTP:
         Raises:
             All of the Exceptions from `krema.errors` may raise.
         &#34;&#34;&#34;
+
+        # Check ratelimit
+        if self.remaining is not None and int(self.remaining) &lt; 1:
+            return await self.__run_task_when_ratelimit_reset(self.reset_after, method, endpoint, **kwargs)
 
         extra_header = {}
 
@@ -89,17 +96,15 @@ class HTTP:
                         self.__raise_for_status(response.status, body_text)
 
                 if 300 &gt; response.status &gt;= 200:
+                    self.remaining = response.headers.get(&#34;x-ratelimit-remaining&#34;)
+                    self.reset_after = float(response.headers.get(&#34;x-ratelimit-reset-after&#34;)) if response.headers.get(&#34;x-ratelimit-reset-after&#34;) is not None else 69.0
                     return json_data
                 else:
-                    retry_after = json_data.get(&#34;retry_after&#34;)
-
-                    if retry_after is not None:
-                        return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
-                    else:
-                        self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)
+                    self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)
 
     async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, **kwargs):
         await asyncio.sleep(ratelimit + 0.1)
+        self.remaining = 69.0
         return await self.request(method, endpoint, **kwargs)
 
     def __raise_for_status(self, status: int, result: str):
@@ -153,6 +158,8 @@ class HTTP:
 
         self.client: Client = client
         self.url: str = &#34;https://discord.com/api/v9&#34;
+        self.remaining: int = 5
+        self.reset_after: float = 0.0
 
         pass
 
@@ -170,6 +177,10 @@ class HTTP:
         Raises:
             All of the Exceptions from `krema.errors` may raise.
         &#34;&#34;&#34;
+
+        # Check ratelimit
+        if self.remaining is not None and int(self.remaining) &lt; 1:
+            return await self.__run_task_when_ratelimit_reset(self.reset_after, method, endpoint, **kwargs)
 
         extra_header = {}
 
@@ -194,17 +205,15 @@ class HTTP:
                         self.__raise_for_status(response.status, body_text)
 
                 if 300 &gt; response.status &gt;= 200:
+                    self.remaining = response.headers.get(&#34;x-ratelimit-remaining&#34;)
+                    self.reset_after = float(response.headers.get(&#34;x-ratelimit-reset-after&#34;)) if response.headers.get(&#34;x-ratelimit-reset-after&#34;) is not None else 69.0
                     return json_data
                 else:
-                    retry_after = json_data.get(&#34;retry_after&#34;)
-
-                    if retry_after is not None:
-                        return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
-                    else:
-                        self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)
+                    self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)
 
     async def __run_task_when_ratelimit_reset(self, ratelimit: float, method, endpoint, **kwargs):
         await asyncio.sleep(ratelimit + 0.1)
+        self.remaining = 69.0
         return await self.request(method, endpoint, **kwargs)
 
     def __raise_for_status(self, status: int, result: str):
@@ -259,6 +268,10 @@ class HTTP:
         All of the Exceptions from `krema.errors` may raise.
     &#34;&#34;&#34;
 
+    # Check ratelimit
+    if self.remaining is not None and int(self.remaining) &lt; 1:
+        return await self.__run_task_when_ratelimit_reset(self.reset_after, method, endpoint, **kwargs)
+
     extra_header = {}
 
     if &#34;log_reason&#34; in kwargs:
@@ -282,14 +295,11 @@ class HTTP:
                     self.__raise_for_status(response.status, body_text)
 
             if 300 &gt; response.status &gt;= 200:
+                self.remaining = response.headers.get(&#34;x-ratelimit-remaining&#34;)
+                self.reset_after = float(response.headers.get(&#34;x-ratelimit-reset-after&#34;)) if response.headers.get(&#34;x-ratelimit-reset-after&#34;) is not None else 69.0
                 return json_data
             else:
-                retry_after = json_data.get(&#34;retry_after&#34;)
-
-                if retry_after is not None:
-                    return await self.__run_task_when_ratelimit_reset(retry_after, method, endpoint, **kwargs)
-                else:
-                    self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)</code></pre>
+                self.__raise_for_status(response.status, json_data.get(&#34;message&#34;) or json_data)</code></pre>
 </details>
 </dd>
 </dl>
