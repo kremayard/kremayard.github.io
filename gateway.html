@@ -154,7 +154,7 @@ class Gateway:
             self._seq = seq
 
         # print(self._seq, self._session_id, asyncio.all_tasks(self._event_loop))
-        print(message, end=&#34;\n\n&#34;)
+        # print(message, end=&#34;\n\n&#34;)
 
         if opcode == self.HELLO:
             interval = data[&#34;heartbeat_interval&#34;]
@@ -396,7 +396,7 @@ class Gateway:
             self._seq = seq
 
         # print(self._seq, self._session_id, asyncio.all_tasks(self._event_loop))
-        print(message, end=&#34;\n\n&#34;)
+        # print(message, end=&#34;\n\n&#34;)
 
         if opcode == self.HELLO:
             interval = data[&#34;heartbeat_interval&#34;]

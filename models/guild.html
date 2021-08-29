@@ -78,8 +78,8 @@ class Guild:
         self.default_message_notifications: int = data.get(
             &#34;default_message_notifications&#34;)
         self.explicit_content_filter: int = data.get(&#34;explicit_content_filter&#34;)
-        self.roles: list = data.get(&#34;roles&#34;)
-        self.emojis: list = data.get(&#34;emojis&#34;)
+        self.roles: list = [Role(i) for i in data.get(&#34;roles&#34;)]
+        self.emojis: list = [Emoji(self.client, i) for i in data.get(&#34;emojis&#34;)]
         self.features: list = data.get(&#34;features&#34;)
         self.mfa_level: int = data.get(&#34;mfa_level&#34;)
         self.application_id: Union[int, None] = int(
@@ -669,18 +669,18 @@ class Role:
     &#34;&#34;&#34;Role class.
 
     Args:
-        data (dict): Sent packet from websocket.
+        data (dict): Sent packet.
 
     Attributes:
-        id (int): Role ID.
+        id (int): Role id.
         name (str): Role name.
         color (int): Role color.
         hoist (bool): If this role is pinned in the user listing.
         position (int): Role position.
-        permissions (str): Permission bit set.
+        permissions (str): Role permissions bitvise value.
         managed (bool): Whether this role is managed by an integration.
         mentionable (bool): Whether this role is mentionable.
-        tags (dict, None): Role tags object.
+        tags (dict, None): The tags this role has.
     &#34;&#34;&#34;
 
     def __init__(self, data: dict) -&gt; None:
@@ -692,7 +692,7 @@ class Role:
         self.permissions: str = data.get(&#34;permissions&#34;)
         self.managed: bool = data.get(&#34;managed&#34;)
         self.mentionable: bool = data.get(&#34;mentionable&#34;)
-        self.tags: dict = data.get(&#34;tags&#34;)
+        self.tags: Union[dict, None] = data.get(&#34;tags&#34;)
 
 
 @dataclass
@@ -952,8 +952,8 @@ class Guild:
         self.default_message_notifications: int = data.get(
             &#34;default_message_notifications&#34;)
         self.explicit_content_filter: int = data.get(&#34;explicit_content_filter&#34;)
-        self.roles: list = data.get(&#34;roles&#34;)
-        self.emojis: list = data.get(&#34;emojis&#34;)
+        self.roles: list = [Role(i) for i in data.get(&#34;roles&#34;)]
+        self.emojis: list = [Emoji(self.client, i) for i in data.get(&#34;emojis&#34;)]
         self.features: list = data.get(&#34;features&#34;)
         self.mfa_level: int = data.get(&#34;mfa_level&#34;)
         self.application_id: Union[int, None] = int(
@@ -2801,12 +2801,12 @@ class IntegrationApplication:
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Sent packet from websocket.</dd>
+<dd>Sent packet.</dd>
 </dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
 <dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
-<dd>Role ID.</dd>
+<dd>Role id.</dd>
 <dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
 <dd>Role name.</dd>
 <dt><strong><code>color</code></strong> :&ensp;<code>int</code></dt>
@@ -2816,13 +2816,13 @@ class IntegrationApplication:
 <dt><strong><code>position</code></strong> :&ensp;<code>int</code></dt>
 <dd>Role position.</dd>
 <dt><strong><code>permissions</code></strong> :&ensp;<code>str</code></dt>
-<dd>Permission bit set.</dd>
+<dd>Role permissions bitvise value.</dd>
 <dt><strong><code>managed</code></strong> :&ensp;<code>bool</code></dt>
 <dd>Whether this role is managed by an integration.</dd>
 <dt><strong><code>mentionable</code></strong> :&ensp;<code>bool</code></dt>
 <dd>Whether this role is mentionable.</dd>
 <dt><strong><code>tags</code></strong> :&ensp;<code>dict, None</code></dt>
-<dd>Role tags object.</dd>
+<dd>The tags this role has.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -2833,18 +2833,18 @@ class Role:
     &#34;&#34;&#34;Role class.
 
     Args:
-        data (dict): Sent packet from websocket.
+        data (dict): Sent packet.
 
     Attributes:
-        id (int): Role ID.
+        id (int): Role id.
         name (str): Role name.
         color (int): Role color.
         hoist (bool): If this role is pinned in the user listing.
         position (int): Role position.
-        permissions (str): Permission bit set.
+        permissions (str): Role permissions bitvise value.
         managed (bool): Whether this role is managed by an integration.
         mentionable (bool): Whether this role is mentionable.
-        tags (dict, None): Role tags object.
+        tags (dict, None): The tags this role has.
     &#34;&#34;&#34;
 
     def __init__(self, data: dict) -&gt; None:
@@ -2856,7 +2856,7 @@ class Role:
         self.permissions: str = data.get(&#34;permissions&#34;)
         self.managed: bool = data.get(&#34;managed&#34;)
         self.mentionable: bool = data.get(&#34;mentionable&#34;)
-        self.tags: dict = data.get(&#34;tags&#34;)</code></pre>
+        self.tags: Union[dict, None] = data.get(&#34;tags&#34;)</code></pre>
 </details>
 </dd>
 </dl>

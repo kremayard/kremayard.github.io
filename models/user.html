@@ -58,7 +58,8 @@ class User:
         email (str, None): User email.
         flags (int, None): the flags on the user account.
         premium_type (int, None): &#34;the type of Nitro subscription on a user&#39;s account&#34;.
-        flags (int, None): the public flags on the user account.
+        flags (int, None): The public flags on the user account.
+        flags_dict (dict): Flags dictionary for calculating.
     &#34;&#34;&#34;
 
     def __init__(self, client, data: dict) -&gt; None:
@@ -80,6 +81,53 @@ class User:
         self.flags: Union[int, None] = data.get(&#34;flags&#34;)
         self.premium_type: Union[int, None] = data.get(&#34;premium_type&#34;)
         self.public_flags: Union[int, None] = data.get(&#34;public_flags&#34;)
+
+        self.flags_dict: dict = {
+            &#34;DISCORD_EMPLOYEE&#34;: 1 &lt;&lt; 0,
+            &#34;PARTNERED_SERVER_OWNER&#34;: 1 &lt;&lt; 1,
+            &#34;HYPESQUAD_EVENTS&#34;: 1 &lt;&lt; 2,
+            &#34;BUG_HUNTER_LEVEL_1&#34;: 1 &lt;&lt; 3,
+            &#34;HOUSE_BRAVERY&#34;: 1 &lt;&lt; 6,
+            &#34;HOUSE_BRILLIANCE&#34;: 1 &lt;&lt; 7,
+            &#34;HOUSE_BALANCE&#34;: 1 &lt;&lt; 8,
+            &#34;EARLY_SUPPORTER&#34;: 1 &lt;&lt; 9,
+            &#34;TEAM_USER&#34;: 1 &lt;&lt; 10,
+            &#34;BUG_HUNTER_LEVEL_2&#34;: 1 &lt;&lt; 14,
+            &#34;VERIFIED_BOT&#34;: 1 &lt;&lt; 16,
+            &#34;EARLY_VERIFIED_BOT_DEVELOPER&#34;: 1 &lt;&lt; 17,
+            &#34;DISCORD_CERTIFIED_MODERATOR&#34;: 1 &lt;&lt; 18
+        }
+
+    def has_public_flag(self, flag_name: str) -&gt; bool:
+        &#34;&#34;&#34;Check if user has a public flag named x.
+
+        Args:
+            flag_name: The flag name will be checked.
+
+        Returns:
+            bool: Result
+        &#34;&#34;&#34;
+
+        if self.public_flags is None:
+            return False
+
+        for k, v in self.flags_dict.items():
+            if k.upper() == flag_name:
+                return self.public_flags &amp; v != 0
+
+        return False
+
+    def list_public_flags(self) -&gt; list:
+        &#34;&#34;&#34;List flags for the user.
+
+        Returns:
+            list: Found public flags.
+        &#34;&#34;&#34;
+
+        if self.public_flags is None:
+            return []
+
+        return [k for k, v in self.flags_dict.items() if self.public_flags &amp; v != 0]
 
 
 @dataclass
@@ -329,7 +377,9 @@ class ThreadMember:
 <dt><strong><code>premium_type</code></strong> :&ensp;<code>int, None</code></dt>
 <dd>"the type of Nitro subscription on a user's account".</dd>
 <dt><strong><code>flags</code></strong> :&ensp;<code>int, None</code></dt>
-<dd>the public flags on the user account.</dd>
+<dd>The public flags on the user account.</dd>
+<dt><strong><code>flags_dict</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Flags dictionary for calculating.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -357,7 +407,8 @@ class User:
         email (str, None): User email.
         flags (int, None): the flags on the user account.
         premium_type (int, None): &#34;the type of Nitro subscription on a user&#39;s account&#34;.
-        flags (int, None): the public flags on the user account.
+        flags (int, None): The public flags on the user account.
+        flags_dict (dict): Flags dictionary for calculating.
     &#34;&#34;&#34;
 
     def __init__(self, client, data: dict) -&gt; None:
@@ -378,8 +429,124 @@ class User:
         self.email: Union[str, None] = data.get(&#34;email&#34;)
         self.flags: Union[int, None] = data.get(&#34;flags&#34;)
         self.premium_type: Union[int, None] = data.get(&#34;premium_type&#34;)
-        self.public_flags: Union[int, None] = data.get(&#34;public_flags&#34;)</code></pre>
+        self.public_flags: Union[int, None] = data.get(&#34;public_flags&#34;)
+
+        self.flags_dict: dict = {
+            &#34;DISCORD_EMPLOYEE&#34;: 1 &lt;&lt; 0,
+            &#34;PARTNERED_SERVER_OWNER&#34;: 1 &lt;&lt; 1,
+            &#34;HYPESQUAD_EVENTS&#34;: 1 &lt;&lt; 2,
+            &#34;BUG_HUNTER_LEVEL_1&#34;: 1 &lt;&lt; 3,
+            &#34;HOUSE_BRAVERY&#34;: 1 &lt;&lt; 6,
+            &#34;HOUSE_BRILLIANCE&#34;: 1 &lt;&lt; 7,
+            &#34;HOUSE_BALANCE&#34;: 1 &lt;&lt; 8,
+            &#34;EARLY_SUPPORTER&#34;: 1 &lt;&lt; 9,
+            &#34;TEAM_USER&#34;: 1 &lt;&lt; 10,
+            &#34;BUG_HUNTER_LEVEL_2&#34;: 1 &lt;&lt; 14,
+            &#34;VERIFIED_BOT&#34;: 1 &lt;&lt; 16,
+            &#34;EARLY_VERIFIED_BOT_DEVELOPER&#34;: 1 &lt;&lt; 17,
+            &#34;DISCORD_CERTIFIED_MODERATOR&#34;: 1 &lt;&lt; 18
+        }
+
+    def has_public_flag(self, flag_name: str) -&gt; bool:
+        &#34;&#34;&#34;Check if user has a public flag named x.
+
+        Args:
+            flag_name: The flag name will be checked.
+
+        Returns:
+            bool: Result
+        &#34;&#34;&#34;
+
+        if self.public_flags is None:
+            return False
+
+        for k, v in self.flags_dict.items():
+            if k.upper() == flag_name:
+                return self.public_flags &amp; v != 0
+
+        return False
+
+    def list_public_flags(self) -&gt; list:
+        &#34;&#34;&#34;List flags for the user.
+
+        Returns:
+            list: Found public flags.
+        &#34;&#34;&#34;
+
+        if self.public_flags is None:
+            return []
+
+        return [k for k, v in self.flags_dict.items() if self.public_flags &amp; v != 0]</code></pre>
 </details>
+<h3>Methods</h3>
+<dl>
+<dt id="krema.models.user.User.has_public_flag"><code class="name flex">
+<span>def <span class="ident">has_public_flag</span></span>(<span>self, flag_name: str) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if user has a public flag named x.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>flag_name</code></strong></dt>
+<dd>The flag name will be checked.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>Result</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_public_flag(self, flag_name: str) -&gt; bool:
+    &#34;&#34;&#34;Check if user has a public flag named x.
+
+    Args:
+        flag_name: The flag name will be checked.
+
+    Returns:
+        bool: Result
+    &#34;&#34;&#34;
+
+    if self.public_flags is None:
+        return False
+
+    for k, v in self.flags_dict.items():
+        if k.upper() == flag_name:
+            return self.public_flags &amp; v != 0
+
+    return False</code></pre>
+</details>
+</dd>
+<dt id="krema.models.user.User.list_public_flags"><code class="name flex">
+<span>def <span class="ident">list_public_flags</span></span>(<span>self) ‑> list</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List flags for the user.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>Found public flags.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def list_public_flags(self) -&gt; list:
+    &#34;&#34;&#34;List flags for the user.
+
+    Returns:
+        list: Found public flags.
+    &#34;&#34;&#34;
+
+    if self.public_flags is None:
+        return []
+
+    return [k for k, v in self.flags_dict.items() if self.public_flags &amp; v != 0]</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -405,6 +572,10 @@ class User:
 </li>
 <li>
 <h4><code><a title="krema.models.user.User" href="#krema.models.user.User">User</a></code></h4>
+<ul class="">
+<li><code><a title="krema.models.user.User.has_public_flag" href="#krema.models.user.User.has_public_flag">has_public_flag</a></code></li>
+<li><code><a title="krema.models.user.User.list_public_flags" href="#krema.models.user.User.list_public_flags">list_public_flags</a></code></li>
+</ul>
 </li>
 </ul>
 </li>
