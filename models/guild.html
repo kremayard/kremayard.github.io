@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>krema.models.guild API documentation</title>
 <meta name="description" content="Models for guild and other related stuff." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -608,6 +608,45 @@ class Guild:
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/vanity-url&#34;)
         return Invite(self.client, result)
 
+    async def fetch_prune_count(self, **kwargs) -&gt; int:
+        &#34;&#34;&#34;Fetch guild prune count.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#get-guild-prune-count-query-string-params.
+
+        Returns:
+            int: Total kickable user count.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/prune{dict_to_query(kwargs)}&#34;)
+        return result.get(&#34;pruned&#34;)
+
+    async def prune(self, **kwargs) -&gt; int:
+        &#34;&#34;&#34;Begin guild prune.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#begin-guild-prune-json-params.
+
+        Returns:
+            int: Total kicked user count.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/prune&#34;, json=kwargs)
+        return result.get(&#34;pruned&#34;)
+
+    async def fetch_audit_logs(self, **kwargs):
+        &#34;&#34;&#34;Fetch audit logs.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log-query-string-params.
+
+        Returns:
+            AuditLog: Results.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/audit-logs{dict_to_query(kwargs)}&#34;)
+        return AuditLog(self.client, result)
+
 
 @dataclass
 class Emoji:
@@ -774,7 +813,67 @@ class IntegrationApplication:
         self.description: str = data.get(&#34;description&#34;)
         self.summary: str = data.get(&#34;summary&#34;)
         self.bot: Union[User, None] = User(client, data.get(
-            &#34;bot&#34;)) if data.get(&#34;bot&#34;) is not None else None</code></pre>
+            &#34;bot&#34;)) if data.get(&#34;bot&#34;) is not None else None
+
+
+@dataclass
+class AuditLog:
+    &#34;&#34;&#34;Audit log class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet.
+
+    Attributes:
+        webhooks (list): List of webhooks found in the audit log.
+        users (list): List of users found in the audit log.
+        integrations (list): List of integrations found in the audit log.
+        threads (list): List of threads (channels) found in the audit log.
+        entries (list): List of audit log entries.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .webhook import Webhook
+        from .user import User
+        from .channel import Channel
+
+        self.webhooks: list = [Webhook(client, i)
+                               for i in data.get(&#34;webhooks&#34;)]
+        self.users: list = [User(client, i) for i in data.get(&#34;users&#34;)]
+        self.integrations: list = [Integration(
+            client, i) for i in data.get(&#34;integrations&#34;)]
+        self.threads: list = [Channel(client, i) for i in data.get(&#34;threads&#34;)]
+        self.entries: list = [AuditLogEntry(i)
+                              for i in data.get(&#34;audit_log_entries&#34;)]
+
+
+@dataclass
+class AuditLogEntry:
+    &#34;&#34;&#34;Audit log entry class.
+
+    Args:
+        data (dict): Sent packet.
+
+    Attributes:
+        target_id (int, None): Id of the affected entity.
+        changes (list, None): Changes made to the target_id.
+        user_id (int, None): The user who made the changes.
+        id (int): Id of the entry.
+        action_type     (int): Type of action that occurred.
+        options (dict, None) Additional info for certain action types.
+        reason (str): The reason for the change.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: dict) -&gt; None:
+        self.target_id: Union[int, None] = int(
+            data.get(&#34;target_id&#34;)) if data.get(&#34;target_id&#34;) else None
+        self.changes: Union[list, None] = data.get(&#34;changes&#34;)
+        self.user_id: Union[int, None] = int(
+            data.get(&#34;user_id&#34;)) if data.get(&#34;user_id&#34;) else None
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.action_type: int = data.get(&#34;action_type&#34;)
+        self.options: Union[dict, None] = data.get(&#34;options&#34;)
+        self.reason: Union[str, None] = data.get(&#34;reason&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -786,6 +885,127 @@ class IntegrationApplication:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="krema.models.guild.AuditLog"><code class="flex name class">
+<span>class <span class="ident">AuditLog</span></span>
+<span>(</span><span>client, data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Audit log class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>client</code></strong> :&ensp;<code>Client</code></dt>
+<dd>Krema client.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>webhooks</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of webhooks found in the audit log.</dd>
+<dt><strong><code>users</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of users found in the audit log.</dd>
+<dt><strong><code>integrations</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of integrations found in the audit log.</dd>
+<dt><strong><code>threads</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of threads (channels) found in the audit log.</dd>
+<dt><strong><code>entries</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of audit log entries.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class AuditLog:
+    &#34;&#34;&#34;Audit log class.
+
+    Args:
+        client (Client): Krema client.
+        data (dict): Sent packet.
+
+    Attributes:
+        webhooks (list): List of webhooks found in the audit log.
+        users (list): List of users found in the audit log.
+        integrations (list): List of integrations found in the audit log.
+        threads (list): List of threads (channels) found in the audit log.
+        entries (list): List of audit log entries.
+    &#34;&#34;&#34;
+
+    def __init__(self, client, data: dict) -&gt; None:
+        from .webhook import Webhook
+        from .user import User
+        from .channel import Channel
+
+        self.webhooks: list = [Webhook(client, i)
+                               for i in data.get(&#34;webhooks&#34;)]
+        self.users: list = [User(client, i) for i in data.get(&#34;users&#34;)]
+        self.integrations: list = [Integration(
+            client, i) for i in data.get(&#34;integrations&#34;)]
+        self.threads: list = [Channel(client, i) for i in data.get(&#34;threads&#34;)]
+        self.entries: list = [AuditLogEntry(i)
+                              for i in data.get(&#34;audit_log_entries&#34;)]</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.AuditLogEntry"><code class="flex name class">
+<span>class <span class="ident">AuditLogEntry</span></span>
+<span>(</span><span>data: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Audit log entry class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Sent packet.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>target_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>Id of the affected entity.</dd>
+<dt><strong><code>changes</code></strong> :&ensp;<code>list, None</code></dt>
+<dd>Changes made to the target_id.</dd>
+<dt><strong><code>user_id</code></strong> :&ensp;<code>int, None</code></dt>
+<dd>The user who made the changes.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>Id of the entry.</dd>
+<dt>action_type
+(int): Type of action that occurred.</dt>
+<dt>options (dict, None) Additional info for certain action types.</dt>
+<dt><strong><code>reason</code></strong> :&ensp;<code>str</code></dt>
+<dd>The reason for the change.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class AuditLogEntry:
+    &#34;&#34;&#34;Audit log entry class.
+
+    Args:
+        data (dict): Sent packet.
+
+    Attributes:
+        target_id (int, None): Id of the affected entity.
+        changes (list, None): Changes made to the target_id.
+        user_id (int, None): The user who made the changes.
+        id (int): Id of the entry.
+        action_type     (int): Type of action that occurred.
+        options (dict, None) Additional info for certain action types.
+        reason (str): The reason for the change.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: dict) -&gt; None:
+        self.target_id: Union[int, None] = int(
+            data.get(&#34;target_id&#34;)) if data.get(&#34;target_id&#34;) else None
+        self.changes: Union[list, None] = data.get(&#34;changes&#34;)
+        self.user_id: Union[int, None] = int(
+            data.get(&#34;user_id&#34;)) if data.get(&#34;user_id&#34;) else None
+        self.id: int = int(data.get(&#34;id&#34;))
+        self.action_type: int = data.get(&#34;action_type&#34;)
+        self.options: Union[dict, None] = data.get(&#34;options&#34;)
+        self.reason: Union[str, None] = data.get(&#34;reason&#34;)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Ban"><code class="flex name class">
 <span>class <span class="ident">Ban</span></span>
 <span>(</span><span>client, data: dict)</span>
@@ -1480,7 +1700,46 @@ class Guild:
         from .invite import Invite
 
         result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/vanity-url&#34;)
-        return Invite(self.client, result)</code></pre>
+        return Invite(self.client, result)
+
+    async def fetch_prune_count(self, **kwargs) -&gt; int:
+        &#34;&#34;&#34;Fetch guild prune count.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#get-guild-prune-count-query-string-params.
+
+        Returns:
+            int: Total kickable user count.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/prune{dict_to_query(kwargs)}&#34;)
+        return result.get(&#34;pruned&#34;)
+
+    async def prune(self, **kwargs) -&gt; int:
+        &#34;&#34;&#34;Begin guild prune.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/guild#begin-guild-prune-json-params.
+
+        Returns:
+            int: Total kicked user count.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/prune&#34;, json=kwargs)
+        return result.get(&#34;pruned&#34;)
+
+    async def fetch_audit_logs(self, **kwargs):
+        &#34;&#34;&#34;Fetch audit logs.
+
+        Args:
+            **kwargs: https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log-query-string-params.
+
+        Returns:
+            AuditLog: Results.
+        &#34;&#34;&#34;
+
+        result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/audit-logs{dict_to_query(kwargs)}&#34;)
+        return AuditLog(self.client, result)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1993,6 +2252,39 @@ class Guild:
     return ApplicationCommand(self.client, result)</code></pre>
 </details>
 </dd>
+<dt id="krema.models.guild.Guild.fetch_audit_logs"><code class="name flex">
+<span>async def <span class="ident">fetch_audit_logs</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch audit logs.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log-query-string-params.">https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log-query-string-params.</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="krema.models.guild.AuditLog" href="#krema.models.guild.AuditLog">AuditLog</a></code></dt>
+<dd>Results.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_audit_logs(self, **kwargs):
+    &#34;&#34;&#34;Fetch audit logs.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log-query-string-params.
+
+    Returns:
+        AuditLog: Results.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/audit-logs{dict_to_query(kwargs)}&#34;)
+    return AuditLog(self.client, result)</code></pre>
+</details>
+</dd>
 <dt id="krema.models.guild.Guild.fetch_ban"><code class="name flex">
 <span>async def <span class="ident">fetch_ban</span></span>(<span>self, member_id: int)</span>
 </code></dt>
@@ -2229,6 +2521,39 @@ class Guild:
 
     result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/members{dict_to_query(kwargs)}&#34;)
     return [Member(self.client, i) for i in result]</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.fetch_prune_count"><code class="name flex">
+<span>async def <span class="ident">fetch_prune_count</span></span>(<span>self, **kwargs) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch guild prune count.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#get-guild-prune-count-query-string-params.">https://discord.com/developers/docs/resources/guild#get-guild-prune-count-query-string-params.</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Total kickable user count.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def fetch_prune_count(self, **kwargs) -&gt; int:
+    &#34;&#34;&#34;Fetch guild prune count.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/guild#get-guild-prune-count-query-string-params.
+
+    Returns:
+        int: Total kickable user count.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;GET&#34;, f&#34;/guilds/{self.id}/prune{dict_to_query(kwargs)}&#34;)
+    return result.get(&#34;pruned&#34;)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.fetch_roles"><code class="name flex">
@@ -2469,6 +2794,39 @@ class Guild:
 
     result = await self.client.http.request(&#34;PATCH&#34;, f&#34;/guilds/{self.id}/roles&#34;, json=parameters)
     return [Role(i) for i in result]</code></pre>
+</details>
+</dd>
+<dt id="krema.models.guild.Guild.prune"><code class="name flex">
+<span>async def <span class="ident">prune</span></span>(<span>self, **kwargs) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Begin guild prune.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd><a href="https://discord.com/developers/docs/resources/guild#begin-guild-prune-json-params.">https://discord.com/developers/docs/resources/guild#begin-guild-prune-json-params.</a></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Total kicked user count.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def prune(self, **kwargs) -&gt; int:
+    &#34;&#34;&#34;Begin guild prune.
+
+    Args:
+        **kwargs: https://discord.com/developers/docs/resources/guild#begin-guild-prune-json-params.
+
+    Returns:
+        int: Total kicked user count.
+    &#34;&#34;&#34;
+
+    result = await self.client.http.request(&#34;POST&#34;, f&#34;/guilds/{self.id}/prune&#34;, json=kwargs)
+    return result.get(&#34;pruned&#34;)</code></pre>
 </details>
 </dd>
 <dt id="krema.models.guild.Guild.remove_member_role"><code class="name flex">
@@ -2876,6 +3234,12 @@ class Role:
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="krema.models.guild.AuditLog" href="#krema.models.guild.AuditLog">AuditLog</a></code></h4>
+</li>
+<li>
+<h4><code><a title="krema.models.guild.AuditLogEntry" href="#krema.models.guild.AuditLogEntry">AuditLogEntry</a></code></h4>
+</li>
+<li>
 <h4><code><a title="krema.models.guild.Ban" href="#krema.models.guild.Ban">Ban</a></code></h4>
 </li>
 <li>
@@ -2898,6 +3262,7 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.edit_member" href="#krema.models.guild.Guild.edit_member">edit_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.edit_role" href="#krema.models.guild.Guild.edit_role">edit_role</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_application_command" href="#krema.models.guild.Guild.fetch_application_command">fetch_application_command</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_audit_logs" href="#krema.models.guild.Guild.fetch_audit_logs">fetch_audit_logs</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_ban" href="#krema.models.guild.Guild.fetch_ban">fetch_ban</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_bans" href="#krema.models.guild.Guild.fetch_bans">fetch_bans</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_channels" href="#krema.models.guild.Guild.fetch_channels">fetch_channels</a></code></li>
@@ -2906,6 +3271,7 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.fetch_integrations" href="#krema.models.guild.Guild.fetch_integrations">fetch_integrations</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member" href="#krema.models.guild.Guild.fetch_member">fetch_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_member_list" href="#krema.models.guild.Guild.fetch_member_list">fetch_member_list</a></code></li>
+<li><code><a title="krema.models.guild.Guild.fetch_prune_count" href="#krema.models.guild.Guild.fetch_prune_count">fetch_prune_count</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_roles" href="#krema.models.guild.Guild.fetch_roles">fetch_roles</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_sticker" href="#krema.models.guild.Guild.fetch_sticker">fetch_sticker</a></code></li>
 <li><code><a title="krema.models.guild.Guild.fetch_vanity_url" href="#krema.models.guild.Guild.fetch_vanity_url">fetch_vanity_url</a></code></li>
@@ -2914,6 +3280,7 @@ class Role:
 <li><code><a title="krema.models.guild.Guild.list_stickers" href="#krema.models.guild.Guild.list_stickers">list_stickers</a></code></li>
 <li><code><a title="krema.models.guild.Guild.modify_channel_positions" href="#krema.models.guild.Guild.modify_channel_positions">modify_channel_positions</a></code></li>
 <li><code><a title="krema.models.guild.Guild.modify_role_positions" href="#krema.models.guild.Guild.modify_role_positions">modify_role_positions</a></code></li>
+<li><code><a title="krema.models.guild.Guild.prune" href="#krema.models.guild.Guild.prune">prune</a></code></li>
 <li><code><a title="krema.models.guild.Guild.remove_member_role" href="#krema.models.guild.Guild.remove_member_role">remove_member_role</a></code></li>
 <li><code><a title="krema.models.guild.Guild.search_member" href="#krema.models.guild.Guild.search_member">search_member</a></code></li>
 <li><code><a title="krema.models.guild.Guild.unban_member" href="#krema.models.guild.Guild.unban_member">unban_member</a></code></li>
@@ -2935,7 +3302,7 @@ class Role:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>

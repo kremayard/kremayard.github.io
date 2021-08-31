@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>krema.gateway API documentation</title>
 <meta name="description" content="Gateway part of the krema." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -40,8 +40,7 @@ import sys
 
 import aiohttp
 
-from .models import Message, Channel, Guild
-from .models import Interaction, ApplicationCommand, User
+from .models import Interaction, ApplicationCommand, User, Message, Channel, Guild, Role, Emoji, Sticker, Member, Integration
 
 
 class Gateway:
@@ -201,9 +200,52 @@ class Gateway:
             filtered = self.__filter_events(
                 event_type, (ApplicationCommand(self.client, event_data),))
         elif event_type in (&#34;guild_ban_add&#34;, &#34;guild_ban_remove&#34;):
-            event_data[&#34;user&#34;] = User(self.client, event_data.get(
-                &#34;user&#34;)) if event_data.get(&#34;user&#34;) else None
-            filtered = self.__filter_events(event_type, (event_data,))
+            guild_id = int(event_data.get(&#34;guild_id&#34;)) if event_data.get(&#34;guild_id&#34;) else None
+            usr_obj = User(self.client, event_data.get(&#34;user&#34;)) if event_data.get(&#34;user&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, usr_obj, ))
+        elif event_type in (&#34;guild_emojis_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            emojis_obj = [Emoji(self.client, i) for i in event_data[&#34;emojis&#34;]] if event_data.get(&#34;emojis&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, emojis_obj, ))
+        elif event_type in (&#34;guild_stickers_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            stickers_obj = [Sticker(self.client, i) for i in event_data[&#34;stickers&#34;]] if event_data.get(&#34;stickers&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, stickers_obj, ))
+        elif event_type in (&#34;guild_integration_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, ))
+        elif event_type in (&#34;guild_member_add&#34;, &#34;guild_member_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+
+            del event_data[&#34;guild_id&#34;]
+            member_obj = Member(self.client, event_data)
+
+            filtered = self.__filter_events(event_type, (guild_id, member_obj, ))
+        elif event_type in (&#34;guild_member_remove&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            usr_obj = User(self.client, event_data[&#34;user&#34;]) if event_data.get(&#34;user&#34;) else None
+
+            filtered = self.__filter_events(event_type, (guild_id, usr_obj, ))
+        elif event_type in (&#34;guild_role_create&#34;, &#34;guild_role_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            role_obj = Role(event_data[&#34;role&#34;]) if event_data.get(&#34;role&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, role_obj, ))
+        elif event_type in (&#34;guild_role_delete&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            role_id = int(event_data[&#34;role_id&#34;]) if event_data.get(&#34;role_id&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, role_id, ))
+        elif event_type in (&#34;integration_create&#34;, &#34;integration_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+
+            del event_data[&#34;guild_id&#34;]
+            integration_obj = Integration(self.client, event_data)
+            filtered = self.__filter_events(event_type, (guild_id, integration_obj, ))
+        elif event_type in (&#34;integration_delete&#34;, ):
+            integration_id = int(event_data[&#34;id&#34;]) if event_data.get(&#34;id&#34;) else None
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            application_id = int(event_data[&#34;application_id&#34;]) if event_data.get(&#34;application_id&#34;) else None
+
+            filtered = self.__filter_events(event_type, (integration_id, guild_id, application_id, ))
         else:
             filtered = self.__filter_events(event_type, (event_data,))
 
@@ -443,9 +485,52 @@ class Gateway:
             filtered = self.__filter_events(
                 event_type, (ApplicationCommand(self.client, event_data),))
         elif event_type in (&#34;guild_ban_add&#34;, &#34;guild_ban_remove&#34;):
-            event_data[&#34;user&#34;] = User(self.client, event_data.get(
-                &#34;user&#34;)) if event_data.get(&#34;user&#34;) else None
-            filtered = self.__filter_events(event_type, (event_data,))
+            guild_id = int(event_data.get(&#34;guild_id&#34;)) if event_data.get(&#34;guild_id&#34;) else None
+            usr_obj = User(self.client, event_data.get(&#34;user&#34;)) if event_data.get(&#34;user&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, usr_obj, ))
+        elif event_type in (&#34;guild_emojis_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            emojis_obj = [Emoji(self.client, i) for i in event_data[&#34;emojis&#34;]] if event_data.get(&#34;emojis&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, emojis_obj, ))
+        elif event_type in (&#34;guild_stickers_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            stickers_obj = [Sticker(self.client, i) for i in event_data[&#34;stickers&#34;]] if event_data.get(&#34;stickers&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, stickers_obj, ))
+        elif event_type in (&#34;guild_integration_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, ))
+        elif event_type in (&#34;guild_member_add&#34;, &#34;guild_member_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+
+            del event_data[&#34;guild_id&#34;]
+            member_obj = Member(self.client, event_data)
+
+            filtered = self.__filter_events(event_type, (guild_id, member_obj, ))
+        elif event_type in (&#34;guild_member_remove&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            usr_obj = User(self.client, event_data[&#34;user&#34;]) if event_data.get(&#34;user&#34;) else None
+
+            filtered = self.__filter_events(event_type, (guild_id, usr_obj, ))
+        elif event_type in (&#34;guild_role_create&#34;, &#34;guild_role_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            role_obj = Role(event_data[&#34;role&#34;]) if event_data.get(&#34;role&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, role_obj, ))
+        elif event_type in (&#34;guild_role_delete&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            role_id = int(event_data[&#34;role_id&#34;]) if event_data.get(&#34;role_id&#34;) else None
+            filtered = self.__filter_events(event_type, (guild_id, role_id, ))
+        elif event_type in (&#34;integration_create&#34;, &#34;integration_update&#34;, ):
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+
+            del event_data[&#34;guild_id&#34;]
+            integration_obj = Integration(self.client, event_data)
+            filtered = self.__filter_events(event_type, (guild_id, integration_obj, ))
+        elif event_type in (&#34;integration_delete&#34;, ):
+            integration_id = int(event_data[&#34;id&#34;]) if event_data.get(&#34;id&#34;) else None
+            guild_id = int(event_data[&#34;guild_id&#34;]) if event_data.get(&#34;guild_id&#34;) else None
+            application_id = int(event_data[&#34;application_id&#34;]) if event_data.get(&#34;application_id&#34;) else None
+
+            filtered = self.__filter_events(event_type, (integration_id, guild_id, application_id, ))
         else:
             filtered = self.__filter_events(event_type, (event_data,))
 
@@ -623,7 +708,7 @@ class Gateway:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
